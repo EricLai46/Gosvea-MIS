@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.gosvea.mapper.InstructorMapper">
+    <!--分类查询-->
+    <select id="getInstructor" resultType="org.gosvea.pojo.Instructor">
+        select * from instructors
+        <where >
+            <if test="state!=null">
+                state=#{state}
+            </if>
+            <if test="city!=null">
+                and city=#{city}
+
+            </if>
+
+            <if test="instructorId!=null">
+                and id=#{instructorId}
+
+            </if>
+
+            <if test="phoneNumber!=null">
+                and phone_number=#{phoneNumber}
+            </if>
+
+            <if test="email!=null">
+                and email=#{email}
+            </if>
+            <if test="wageHour!=null">
+                and wage_hour=#{wageHour}
+            </if>
+        </where>
+    </select>
+
+    <update id="updateInstructor" >
+        update instructors
+        <set>
+            <if test="firstname!=null">
+                firstname=#{firstname},
+            </if>
+            <if test="lastname!=null">
+                lastname=#{lastname},
+            </if>
+            <if test="state!=null">
+                state=#{state},
+            </if>
+            <if test="city!=null">
+                city=#{city},
+            </if>
+            <if test="email!=null">
+                email=#{email},
+            </if>
+            <if test="phoneNumber!=null">
+                phone_number=#{phoneNumber},
+            </if>
+            <if test="wageHour!=null">
+                wage_hour=#{wageHour},
+            </if>
+            <if test="totalClassTimes!=null">
+                total_class_times=#{totalClassTimes},
+            </if>
+            <if test="deposit!=null">
+                deposit=#{deposit},
+            </if>
+            <if test="rentManikinNumbers!=null">
+                rent_manikin_numbers=#{rentManikinNumbers},
+            </if>
+            <if test="finance!=null">
+                finance=#{finance},
+            </if>
+            <if test="rentStatus!=null">
+                rent_status=#{rentStatus},
+            </if>
+            <if test="fobKey!=null">
+                fob_key=#{fobKey},
+            </if>
+
+        </set>
+                where id=#{id}
+
+    </update>
+
+
+
+</mapper>

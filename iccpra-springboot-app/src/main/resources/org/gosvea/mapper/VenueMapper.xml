@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.gosvea.mapper.VenueMapper">
+     <!--分类查询-->
+     <select id="list" resultType="org.gosvea.pojo.Venue">
+       select * from venue
+         <where >
+             <if test="state!=null">
+                 state=#{state}
+             </if>
+             <if test="city!=null">
+                 and city=#{city}
+
+             </if>
+
+             <if test="timeZone!=null">
+                 and time_zone=#{timeZone}
+
+             </if>
+
+             <if test="paymentMethod!=null">
+                 and payment_method=#{paymentMethod}
+             </if>
+
+             <if test="instructorId!=null">
+                 and instructor_id=#{instructorID}
+             </if>
+         </where>
+     </select>
+    <!--更新数据库-->
+    <update id="updateVenue">
+        update venue
+        <set>
+            <if test="timeZone != null">
+                time_zone = #{timeZone},
+            </if>
+            <if test="state != null">
+                state = #{state},
+            </if>
+            <if test="city != null">
+                city = #{city},
+            </if>
+            <if test="address != null">
+                address = #{address},
+            </if>
+            <if test="cancellationPolicy != null">
+                cancellation_policy = #{cancellationPolicy},
+            </if>
+            <if test="paymentMode != null">
+                payment_mode = #{paymentMode},
+            </if>
+            <if test="nonrefundableFee != null">
+                nonrefundable_fee = #{nonrefundableFee},
+            </if>
+            <if test="fobKey != null">
+                fob_key = #{fobKey},
+            </if>
+            <if test="deposit != null">
+                deposit = #{deposit},
+            </if>
+            <if test="membershipFee != null">
+                membership_fee = #{membershipFee},
+            </if>
+            <if test="usageFee != null">
+                usage_fee = #{usageFee},
+            </if>
+            <if test="refundableStatus != null">
+                refundable_status = #{refundableStatus},
+            </if>
+            <if test="bookMethod != null">
+                book_method = #{bookMethod},
+            </if>
+            <if test="registrationLink != null">
+                registration_link = #{registrationLink},
+            </if>
+            <if test="instructor!=null">
+                instructor=#{instructor}
+            </if>
+        </set>
+        where id=#{id}
+    </update>
+
+
+</mapper>
