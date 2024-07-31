@@ -22,6 +22,7 @@ const VenueTable = ({ currentItems, handleClickOpen }) => (
           <TableCell>RefundableStatus</TableCell>
           <TableCell>BookMethod</TableCell>
           <TableCell>RegistrationLink</TableCell>
+          <TableCell>Actions</TableCell>
         </TableRow>
       </TableHead>
       <TableBody>

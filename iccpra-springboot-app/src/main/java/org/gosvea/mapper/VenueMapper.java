@@ -17,7 +17,7 @@ public interface VenueMapper {
             "values(#{state}, #{city}, #{instructor}, #{address}, #{timeZone}, #{cancellationPolicy}, #{paymentMode}, #{nonrefundableFee}, #{fobKey}, #{deposit}, #{membershipFee}, #{usageFee}, #{refundableStatus}, #{bookMethod}, #{registrationLink})")
     void add(Venue venue);
 
-    List<Venue> list(String state, String city, Integer instructorId, String paymentMethod, String timeZone);
+    List<Venue> list(String state, String city, Integer instructor, String paymentMethod, String timeZone);
     //@Update("update venue set state=#{state},city=#{city},instructor=#{instructor},address=#{address},time_zone=#{timeZone},cancellation_policy=#{cancellationPolicy},payment_mode=#{paymentMode},nonrefundable_fee=#{nonrefundableFee},fob_key=#{fobKey},deposit=#{deposit},membership_fee=#{membershipFee},usage_fee=#{usageFee},refundable_status=#{refundableStatus},book_method=#{bookMethod},registration_link=#{registrationLink} where id=#{id}")
     void updateVenue(Venue venue);
     @Delete("delete from venue where id=#{venueId}")

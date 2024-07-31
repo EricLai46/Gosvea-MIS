@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import axiosInstance from "../AxiosInstance";
 import SidebarLayout from "../SidebarLayout";
 import InstructorSearchForm from "./InstructorSearchForm";
@@ -14,7 +14,7 @@ const InstructorMain = () => {
   const [instructors, setInstructors] = useState([]);
   const [venues, setVenues] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const [itemsPerPage] = useState(1);
   const [currentVenue, setCurrentVenue] = useState({});
   const [currentInstructor, setCurrentInstructor] = useState({});
   const [open, setOpen] = useState(false);
@@ -25,6 +25,38 @@ const InstructorMain = () => {
   const [lastname, setLastname] = useState('');
   const [email, setEmail] = useState('');
   const [phonenumber, setPhonenumber] = useState('');
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalInstructors,setTotalInstructors]=useState(0);
+  useEffect(() => {
+    fetchInstructors();
+    handleSearch();
+  }, [currentPage]);
+  
+  
+  const fetchInstructors = async () => {
+    try {
+   
+      const response = await axiosInstance.get('/instructor', {
+        params: {
+          pageNum: currentPage,
+          pageSize: itemsPerPage,
+          state,
+          phoneNumber: '',
+          lastname,
+          firstname,
+          timeZone: timeZone,
+        },
+      });
+      if (response.data.message === 'success') {
+        setInstructors(response.data.data.items);
+       
+      } else {
+        showNotification('获取Instructor信息失败！', 'error');
+      }
+    } catch (error) {
+      console.error('获取Instructor信息时出错:', error);
+    }
+  };
 
   const handleSearch = () => {
     if (isLoading) return; // 避免重复请求
@@ -52,6 +84,8 @@ const InstructorMain = () => {
         console.log('Response received:', response); // 添加日志
         if (response.data.message === "success") {
           setInstructors(response.data.data.items);
+          setTotalInstructors(response.data.totalElements);
+          setTotalPages(Math.ceil(response.data.data.totalElement / itemsPerPage));
         } else {
           console.error('Error in response data:', response.data.message); // 添加日志
           showNotification('Instructor search failed!', 'error');
@@ -71,19 +105,18 @@ const InstructorMain = () => {
       id: null,
       state: '',
       city: '',
-      address: '',
+      venueId: '',
       timeZone: '',
-      cancellationPolicy: '',
-      paymentMode: '',
-      nonrefundableFee: 0,
-      fobKey: '',
-      deposit: '',
-      membershipFee: 0,
-      usageFee: 0,
-      refundableStatus: '',
-      bookMethod: '',
-      registrationLink: '',
-      instructorId: null
+      firstname: '',
+      phoneNumber: '',
+      email: '',
+      wagePerHour: 0,
+      totalClassTimes: 0,
+      deposit: 0,
+      rentManikinNumbers: 0,
+      finance: 0,
+      rentStatus: '',
+      fobKey: ''
     };
 
     setCurrentInstructor(newInstructor);
@@ -170,10 +203,7 @@ const InstructorMain = () => {
     handleSearch();
   };
 
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = instructors.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(instructors.length / itemsPerPage);
+
 
   return (
     <SidebarLayout>
@@ -194,7 +224,7 @@ const InstructorMain = () => {
           handleSearch={handleSearch}
           handleReset={handleReset}
         />
-        <InstructorTable currentItems={currentItems} handleClickOpen={handleClickOpen} />
+        <InstructorTable currentItems={instructors} handleClickOpen={handleClickOpen} />
         <InstructorPagination totalPages={totalPages} currentPage={currentPage} handlePageChange={handlePageChange} />
         <Button variant="contained" color="primary" onClick={handleAdd} sx={{ mt: 2 }}>
           Add Instructor

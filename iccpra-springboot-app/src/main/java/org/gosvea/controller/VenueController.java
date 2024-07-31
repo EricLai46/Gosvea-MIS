@@ -80,12 +80,12 @@ public class VenueController {
             Integer pageSize,
             @RequestParam(required = false) String state,
             @RequestParam(required = false) String city,
-            @RequestParam(required = false) Integer instructorId,
+            @RequestParam(required = false) Integer instructor,
             @RequestParam(required = false) String paymentMethod,
             @RequestParam(required = false) String timeZone){
 
         try {
-            PageResponse<Venue> ps=venueService.list(pageNum,pageSize,state,city,instructorId,paymentMethod,timeZone);
+            PageResponse<Venue> ps=venueService.list(pageNum,pageSize,state,city,instructor,paymentMethod,timeZone);
             return Result.success(ps);
         } catch (Exception e) {
             e.printStackTrace();

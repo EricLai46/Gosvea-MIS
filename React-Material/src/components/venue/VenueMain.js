@@ -13,54 +13,44 @@ const VenueMain = () => {
   const [state, setState] = useState('');
   const [instructor, setInstructor] = useState('');
   const [venues, setVenues] = useState([]);
-  const [schedules, setSchedules] = useState([]);
+  const [totalVenues,setTotalVenues]=useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const [itemsPerPage] = useState(2); // 每页显示1个item
   const [currentVenue, setCurrentVenue] = useState({});
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const timeZones = ['PST', 'EST', 'CST', 'MST', 'GMT', 'UTC', 'BST', 'CEST'];
   const { showNotification } = useNotification();
-
+  const [totalPages, setTotalPages] = useState(1); // 添加 totalPages 状态
   useEffect(() => {
-    // Fetch venues and schedules data when the component mounts
     fetchVenues();
-    //fetchSchedules();
-  }, []);
-
-  useEffect(() => {
-    // Automatically check venues and instructors after fetching data
-    if (venues.length > 0 && schedules.length > 0) {
-      checkVenuesAndInstructors();
-    }
-  }, [venues, schedules]);
+    handleSearch();
+  }, [currentPage]);
 
   const fetchVenues = async () => {
     try {
-      const response = await axiosInstance.get('/venue');
-      if (response.data.message === "success") {
+   
+      const response = await axiosInstance.get('/venue', {
+        params: {
+          pageNum: currentPage,
+          pageSize: itemsPerPage,
+          state,
+          city: '',
+          instructor: instructor,
+          paymentMode: '',
+          timeZone: timeZone,
+        },
+      });
+      if (response.data.message === 'success') {
         setVenues(response.data.data.items);
       } else {
-        showNotification('Failed to fetch venues!', 'error');
+        showNotification('获取场地信息失败！', 'error');
       }
     } catch (error) {
-      console.error('Error fetching venues:', error);
+      console.error('获取场地信息时出错:', error);
     }
   };
-
-  // const fetchSchedules = async () => {
-  //   try {
-  //     const response = await axiosInstance.get('/schedule');
-  //     if (response.data.message === "success") {
-  //       setSchedules(response.data.data.items);
-  //     } else {
-  //       showNotification('Failed to fetch schedules!', 'error');
-  //     }
-  //   } catch (error) {
-  //     console.error('Error fetching schedules:', error);
-  //   }
-  // };
 
   const handleSearch = () => {
     if (isLoading) return;
@@ -76,27 +66,30 @@ const VenueMain = () => {
       timeZone: timeZone,
     };
 
-    Object.keys(params).forEach(key => {
+    Object.keys(params).forEach((key) => {
       if (params[key] === '' || params[key] === null || params[key] === undefined) {
         delete params[key];
       }
     });
 
-    axiosInstance.get('/venue', { params })
-      .then(response => {
-        if (response.data.message === "success") {
+    axiosInstance
+      .get('/venue', { params })
+      .then((response) => {
+        if (response.data.message === 'success') {
           setVenues(response.data.data.items);
-          console.log(response.data.data);
-          showNotification('Venue found successfully!', 'success');
+          showNotification('场地查找成功！', 'success');
+          setTotalVenues(response.data.totalElements);
+          setTotalPages(Math.ceil(response.data.data.totalElement / itemsPerPage));
         } else {
-          showNotification('Venue search failed!', 'error');
+          showNotification('场地查找失败！', 'error');
         }
       })
-      .catch(error => {
-        console.error('Error in request:', error);
+      .catch((error) => {
+        console.error('请求出错:', error);
       })
       .finally(() => {
         setIsLoading(false);
+        console.log(`totalpages,${totalPages}`);
       });
   };
 
@@ -117,7 +110,7 @@ const VenueMain = () => {
       refundableStatus: '',
       bookMethod: '',
       registrationLink: '',
-      instructor: null
+      instructor: null,
     };
 
     setCurrentVenue(newVenue);
@@ -137,52 +130,52 @@ const VenueMain = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setCurrentVenue(prev => ({ ...prev, [name]: value }));
+    setCurrentVenue((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSave = () => {
-    axiosInstance.put('/venue', currentVenue, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-      .then(response => {
-        setVenues(prev => prev.map(v => v.id === currentVenue.id ? currentVenue : v));
-        setOpen(false);
-        showNotification('Venue updated successfully!', 'success');
-        checkVenuesAndInstructors(); // Check after save
+    axiosInstance
+      .put('/venue', currentVenue, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
       })
-      .catch(error => {
-        console.error('Error in request:', error);
-        showNotification('Venue update failed!', 'error');
+      .then((response) => {
+        setVenues((prev) => prev.map((v) => (v.id === currentVenue.id ? currentVenue : v)));
+        setOpen(false);
+        showNotification('场地信息更新成功！', 'success');
+      })
+      .catch((error) => {
+        console.error('请求出错:', error);
+        showNotification('场地信息更新失败！', 'error');
       });
   };
 
   const handleInsert = () => {
-    axiosInstance.post('/venue', currentVenue, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-      .then(response => {
-        setOpen(false);
-        showNotification('Venue added successfully!', 'success');
-        checkVenuesAndInstructors(); // Check after insert
+    axiosInstance
+      .post('/venue', currentVenue, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
       })
-      .catch(error => {
-        console.error('Error in request:', error);
+      .then((response) => {
+        setOpen(false);
+        showNotification('场地添加成功！', 'success');
+      })
+      .catch((error) => {
+        console.error('请求出错:', error);
       });
   };
 
   const handleDelete = () => {
-    axiosInstance.delete('/venue', { params: { venueId: currentVenue.id } })
-      .then(response => {
+    axiosInstance
+      .delete('/venue', { params: { venueId: currentVenue.id } })
+      .then((response) => {
         setOpen(false);
-        showNotification('Venue deleted!', 'success');
-        checkVenuesAndInstructors(); // Check after delete
+        showNotification('场地删除成功！', 'success');
       })
-      .catch(error => {
-        console.error('Error in request', error);
+      .catch((error) => {
+        console.error('请求出错', error);
       });
   };
 
@@ -192,81 +185,17 @@ const VenueMain = () => {
     setInstructor('');
     setVenues([]);
     setCurrentPage(1);
-    showNotification('Reset successfully!', 'success');
+    showNotification('重置成功！', 'success');
   };
 
   const handlePageChange = (event, value) => {
+
     setCurrentPage(value);
-    handleSearch();
+    console.log(`Page change triggered: ${value}`);
   };
 
-  const checkVenuesAndInstructors = async () => {
-    let updatedCourseSchedules = [];
-    for (const venue of venues) {
-      if (!venue.instructor) {
-        showNotification(`Venue ${venue.id} has no instructor assigned!`, 'warning');
-      } else {
-        const venueSchedule = schedules.filter(schedule => schedule.venue_id === venue.id);
-        const instructorSchedule = schedules.filter(schedule => schedule.instructor_id === venue.instructor);
+  //const totalPages = Math.ceil(totalVenues/ itemsPerPage);
   
-        const matchingSchedules = venueSchedule.filter(vs =>
-          instructorSchedule.some(is =>
-            vs.date === is.date &&
-            (
-              (is.start_time >= vs.start_time && is.start_time < vs.end_time) ||
-              (is.end_time > vs.start_time && is.end_time <= vs.end_time) ||
-              (is.start_time <= vs.start_time && is.end_time >= vs.end_time)
-            )
-          )
-        );
-  
-        if (matchingSchedules.length > 0) {
-          // Add matching schedules to the course schedule update list
-          matchingSchedules.forEach(vs => {
-            instructorSchedule.forEach(is => {
-              if (
-                vs.date === is.date &&
-                (
-                  (is.start_time >= vs.start_time && is.start_time < vs.end_time) ||
-                  (is.end_time > vs.start_time && is.end_time <= vs.end_time) ||
-                  (is.start_time <= vs.start_time && is.end_time >= vs.end_time)
-                )
-              ) {
-                const start_time = is.start_time > vs.start_time ? is.start_time : vs.start_time;
-                const end_time = is.end_time < vs.end_time ? is.end_time : vs.end_time;
-  
-                updatedCourseSchedules.push({
-                  instructor_id: venue.instructor,
-                  venue_id: venue.id,
-                  date: vs.date,
-                  start_time: start_time,
-                  end_time: end_time,
-                  is_active: 1 // Assuming we want to set the new course schedule as active
-                });
-              }
-            });
-          });
-        } else {
-          showNotification(`Instructor ${venue.instructor} has no matching schedule with Venue ${venue.city}!`, 'warning');
-        }
-      }
-    }
-  
-    if (updatedCourseSchedules.length > 0) {
-      try {
-        await axiosInstance.post('/course', { schedules: updatedCourseSchedules });
-        showNotification('Course schedules updated successfully!', 'success');
-      } catch (error) {
-        console.error('Error updating course schedules:', error);
-        showNotification('Failed to update course schedules!', 'error');
-      }
-    }
-  };
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = venues.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(venues.length / itemsPerPage);
 
   return (
     <SidebarLayout>
@@ -281,10 +210,10 @@ const VenueMain = () => {
           handleSearch={handleSearch}
           handleReset={handleReset}
         />
-        <VenueTable currentItems={currentItems} handleClickOpen={handleClickOpen} />
+        <VenueTable currentItems={venues} handleClickOpen={handleClickOpen} />
         <VenuePagination totalPages={totalPages} currentPage={currentPage} handlePageChange={handlePageChange} />
         <Button variant="contained" color="primary" onClick={handleAdd} sx={{ mt: 2 }}>
-          Add Venue
+          添加场地
         </Button>
       </Container>
       <VenueDialog

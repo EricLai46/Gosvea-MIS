@@ -30,11 +30,14 @@ public class VenueServiceImpl implements VenueService {
     }
 
     @Override
-    public PageResponse<Venue> list(Integer pageNum, Integer pageSize,String state, String city, Integer instructorId, String paymentMethod, String timeZone) {
+    public PageResponse<Venue> list(Integer pageNum, Integer pageSize,String state, String city, Integer instructor, String paymentMethod, String timeZone) {
         PageResponse<Venue> ps=new PageResponse<>();
+        // 打印分页参数
+        System.out.println("Page number: " + pageNum);
+        System.out.println("Page size: " + pageSize);
 
         PageHelper.startPage(pageNum,pageSize);
-        List<Venue> lv =venueMapper.list(state,city,instructorId,paymentMethod,timeZone);
+        List<Venue> lv =venueMapper.list(state,city,instructor,paymentMethod,timeZone);
         Page<Venue> pv=(Page<Venue>) lv;
 
         ps.setTotalElement(pv.getTotal());

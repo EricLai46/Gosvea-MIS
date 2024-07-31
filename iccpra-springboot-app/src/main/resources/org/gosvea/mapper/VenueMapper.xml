@@ -24,8 +24,8 @@
                  and payment_method=#{paymentMethod}
              </if>
 
-             <if test="instructorId!=null">
-                 and instructor_id=#{instructorID}
+             <if test="instructor!=null">
+                 and instructor=#{instructor}
              </if>
          </where>
      </select>

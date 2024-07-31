@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Pagination } from '@mui/material';
+import { Box, Pagination, PaginationItem } from '@mui/material';
 
 const InstructorPagination = ({ totalPages, currentPage, handlePageChange }) => {
   return (
@@ -7,7 +7,19 @@ const InstructorPagination = ({ totalPages, currentPage, handlePageChange }) => 
       <Pagination
         count={totalPages}
         page={currentPage}
-        onChange={handlePageChange}
+        onChange={(event, value) => {
+          handlePageChange(event, value);
+        }}
+        variant="outlined"
+        renderItem={(item) => (
+          <PaginationItem
+            {...item}
+            disabled={
+              (item.type === 'next' && currentPage >= totalPages) ||
+              (item.type === 'previous' && currentPage <= 1)
+            }
+          />
+        )}
       />
     </Box>
   );

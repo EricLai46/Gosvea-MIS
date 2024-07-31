@@ -12,7 +12,7 @@ import java.util.List;
 public interface VenueService {
     void add(Venue venue);
 
-    PageResponse<Venue> list(Integer pageNum, Integer pageSize, String state, String city, Integer instructorId, String paymentMethod, String timeZone);
+    PageResponse<Venue> list(Integer pageNum, Integer pageSize, String state, String city, Integer instructor, String paymentMethod, String timeZone);
 
     void updateVenue(Venue venue);
 
