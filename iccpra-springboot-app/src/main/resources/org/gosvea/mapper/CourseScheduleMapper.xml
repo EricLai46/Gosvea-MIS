@@ -5,26 +5,25 @@
 <mapper namespace="org.gosvea.mapper.CourseScheduleMapper">
     <!--分类查询-->
     <select id="getCourseSchedule" resultType="org.gosvea.pojo.CourseSchedule">
-        select * from coursesschedule
+        SELECT * FROM coursesschedule
         <where>
-        <if test="instructorId!=null">
-            instructor_id=#{instructorId}
-        </if>
-
-        <if test="venueId!=null">
-            venue_id=#{venueId}
-        </if>
-            <if test="date!=null">
-                date=#{date}
+            <if test="instructorId != null">
+                instructor_id = #{instructorId}
             </if>
-            <if test="startTime!=null">
-                start_time=#{startTime}
+            <if test="venueId != null">
+                AND venue_id = #{venueId}
             </if>
-            <if test="endTime!=null">
-                end_time=#{endTime}
+            <if test="date != null">
+                AND date = #{date}
             </if>
-            <if test="isActive!=null">
-                is_active=#{isActive}
+            <if test="startTime != null">
+                AND start_time = #{startTime}
+            </if>
+            <if test="endTime != null">
+                AND end_time = #{endTime}
+            </if>
+            <if test="isActive != null">
+                AND is_active = #{isActive}
             </if>
         </where>
     </select>

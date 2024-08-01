@@ -29,4 +29,6 @@ public interface InstructorMapper {
     void deleteInstructorSchedule(Integer id);
     @Insert("insert into instructorschedule (date,instructor_id,start_time,end_time) values(#{date},#{instructorId},#{startTime},#{endTime})")
     void addInstructorSchedule(InstructorSchedule instructorSchedule);
+    @Select("select * from instructors where id=#{instructor}")
+    Instructor getInstructorById(Integer instructor);
 }

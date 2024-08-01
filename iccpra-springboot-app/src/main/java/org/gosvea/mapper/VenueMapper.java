@@ -41,4 +41,6 @@ public interface VenueMapper {
     void addVenueSchedule(VenueSchedule venueSchedule);
     @Delete("delete from venueschedule where id=#{id}")
     void deleteVenueScheduleSingle(Integer id);
+    @Select("select * from venue")
+    List<Venue> getAllVenues();
 }

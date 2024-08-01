@@ -16,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/course")
+@CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
 public class CourseController {
 
     @Autowired
@@ -30,10 +31,11 @@ public class CourseController {
             @RequestParam(required = false)LocalDate date,
             @RequestParam(required = false)LocalTime startTime,
             @RequestParam(required = false)LocalTime endTime,
-            @RequestParam(required = false)boolean isActive
+            @RequestParam(required = false)Boolean isActive
             )
     {
         try {
+            boolean activeStatus = (isActive != null) ? isActive : false;
             return  Result.success(courseService.getCourseSchedule(pageNum,pageSize,instructorId,venueId,date,startTime,endTime,isActive));
         } catch (Exception e) {
             e.printStackTrace();

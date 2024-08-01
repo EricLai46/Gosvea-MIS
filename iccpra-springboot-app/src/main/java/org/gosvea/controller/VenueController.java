@@ -5,10 +5,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotEmpty;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.gosvea.pojo.PageResponse;
-import org.gosvea.pojo.Result;
-import org.gosvea.pojo.Venue;
-import org.gosvea.pojo.VenueSchedule;
+import org.gosvea.pojo.*;
+import org.gosvea.service.CourseService;
+import org.gosvea.service.InstructorService;
 import org.gosvea.service.VenueService;
 import org.gosvea.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +43,15 @@ public class VenueController {
 
     @Autowired
     private VenueService venueService;
-//    @GetMapping("/list")
+
+    @Autowired
+    private CourseService courseService;
+
+
+    @Autowired
+    private InstructorService instructorService;
+
+    //    @GetMapping("/list")
 //    public Result<String> lists(@RequestHeader(name="Authorization") String token, HttpServletResponse response){
 //        try {
 //            Map<String,Object> claims=JwtUtil.parseToken(token);
@@ -57,8 +64,7 @@ public class VenueController {
 //    }
     //添加新场地
     @PostMapping
-    public  Result add(@RequestBody Venue venue)
-    {
+    public Result add(@RequestBody Venue venue) {
         try {
             //生成新场地
             venueService.add(venue);
@@ -82,10 +88,10 @@ public class VenueController {
             @RequestParam(required = false) String city,
             @RequestParam(required = false) Integer instructor,
             @RequestParam(required = false) String paymentMethod,
-            @RequestParam(required = false) String timeZone){
+            @RequestParam(required = false) String timeZone) {
 
         try {
-            PageResponse<Venue> ps=venueService.list(pageNum,pageSize,state,city,instructor,paymentMethod,timeZone);
+            PageResponse<Venue> ps = venueService.list(pageNum, pageSize, state, city, instructor, paymentMethod, timeZone);
             return Result.success(ps);
         } catch (Exception e) {
             e.printStackTrace();
@@ -94,90 +100,91 @@ public class VenueController {
         }
 
     }
+
     private String getStackTrace(Exception e) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);
         return sw.toString();
     }
+
     //更新场地
     @PutMapping
-    public Result updateVenue(@RequestBody Venue venue)
-    {
+    public Result updateVenue(@RequestBody Venue venue) {
 
         try {
             venueService.updateVenue(venue);
-            return  Result.success();
+            checkVenueInstructorInformation();
+            return Result.success();
         } catch (Exception e) {
             e.printStackTrace();
 
             return Result.error(e.getMessage() + "\n" + getStackTrace(e));
         }
     }
+
     //删除场地
     @DeleteMapping
-    public Result deleteVenue(Integer venueId){
+    public Result deleteVenue(Integer venueId) {
         try {
             //删除场地
             venueService.deleteVenue(venueId);
             //删除场地schedule
             venueService.deleteVenueSchedule(venueId);
             return Result.success("Delete venue successfully");
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-            return Result.error(e.getMessage() + "\n" );
+            return Result.error(e.getMessage() + "\n");
         }
     }
+
     //更新场地schedule
     @PutMapping("/schedule")
-    public Result updateVenueSchedule(@RequestBody VenueSchedule venueSchedule)
-    {
-        LocalDate date=venueSchedule.getDate();
-        LocalTime startTime=venueSchedule.getStartTime();
-        LocalTime endTime=venueSchedule.getEndTime();
+    public Result updateVenueSchedule(@RequestBody VenueSchedule venueSchedule) {
+        LocalDate date = venueSchedule.getDate();
+        LocalTime startTime = venueSchedule.getStartTime();
+        LocalTime endTime = venueSchedule.getEndTime();
 
         try {
-            venueService.updateVenueSchedule(date,startTime,endTime,venueSchedule.getVenueId());
+
+            venueService.updateVenueSchedule(date, startTime, endTime, venueSchedule.getVenueId());
 
             return Result.success("update schedule succcessfully");
         } catch (Exception e) {
             e.printStackTrace();
-            return Result.error(e.getMessage()+"\n");
+            return Result.error(e.getMessage() + "\n");
         }
     }
+
     //获取场地schedule
     @GetMapping("/schedule")
-    public Result<List<VenueSchedule>> getVenueSchedule(Integer venueId)
-    {
+    public Result<List<VenueSchedule>> getVenueSchedule(Integer venueId) {
 
         try {
             return Result.success(venueService.getVenueSchedule(venueId));
         } catch (Exception e) {
             e.printStackTrace();
-            return Result.error(e.getMessage()+"\n");
+            return Result.error(e.getMessage() + "\n");
         }
     }
+
     //添加新场地schedule
     @PostMapping("/schedule")
-    public Result<VenueSchedule> addVenueSchedule(@RequestBody VenueSchedule venueSchedule)
-    {
+    public Result<VenueSchedule> addVenueSchedule(@RequestBody VenueSchedule venueSchedule) {
         venueService.addVenueSchedule(venueSchedule);
         return Result.success();
     }
 
     //删除场地schedule
     @DeleteMapping("/schedule")
-    public Result<VenueSchedule> deleteVenueScheduleSingle(Integer id)
-    {
+    public Result<VenueSchedule> deleteVenueScheduleSingle(Integer id) {
         venueService.deleteVenueScheduleSingle(id);
         return Result.success();
     }
 
     //文件上传
     @PostMapping("/import")
-    public ResponseEntity<?> importVenueData(@RequestParam("file")MultipartFile file)
-    {
+    public ResponseEntity<?> importVenueData(@RequestParam("file") MultipartFile file) {
         try (InputStream inputStream = file.getInputStream();
              Workbook workbook = new XSSFWorkbook(inputStream)) {
             Sheet sheet = workbook.getSheetAt(0);
@@ -218,6 +225,7 @@ public class VenueController {
         String fullHash = formatter.toString();
         return fullHash.substring(0, 8); // 返回前八位作为唯一ID
     }
+
     //文件导出
     @GetMapping("/export")
     public ResponseEntity<InputStreamResource> exportVenueData() {
@@ -256,5 +264,59 @@ public class VenueController {
             return ResponseEntity.badRequest().body(null);
         }
     }
-}
 
+    //检查venue和instructor是否有匹配的时间
+    public Result checkVenueInstructorInformation() {
+        List<Venue> venues = venueService.getAllVenues();
+        List<CourseSchedule> commonSchedules=new ArrayList<>();
+        for (Venue venue : venues) {
+            Instructor instructor = instructorService.getInstructorById(venue.getInstructor());
+
+
+            if (instructor == null) {
+                return Result.error("Venue ID " + venue.getId() + " does not have an assigned instructor.");
+            }
+            instructor.setScheduleList(instructorService.getInstructorSchedule(venue.getInstructor()));
+            // 打印调试信息
+            System.out.println("Venue: " + venue);
+            System.out.println("Instructor: " + instructor);
+            System.out.println("Venue Schedules: " + venue.getScheduleList());
+            System.out.println("Instructor Schedules: " + instructor.getScheduleList());
+
+            commonSchedules=getCommonSchedules(instructor.getId(),venue.getId(),venue.getScheduleList(),instructor.getScheduleList());
+            commonSchedules.forEach(courseSchedule -> System.out.println(courseSchedule.toString()));
+            courseService.insertCourseSchedule(commonSchedules);
+        }
+        return  Result.success();
+    }
+   //获取公共的schedule
+    public List<CourseSchedule> getCommonSchedules(Integer instructorId, Integer venueId,List<VenueSchedule> venueSchedules, List<InstructorSchedule> instructorSchedules) {
+        List<CourseSchedule> commonSchedules = new ArrayList<>();
+
+        for (VenueSchedule venueSchedule : venueSchedules) {
+            LocalDate venueDate = venueSchedule.getDate();
+            LocalTime venueStartTime = venueSchedule.getStartTime();
+            LocalTime venueEndTime = venueSchedule.getEndTime();
+
+            for (InstructorSchedule instructorSchedule : instructorSchedules) {
+                LocalDate instructorDate = instructorSchedule.getDate();
+                if (!venueDate.equals(instructorDate)) {
+                    continue;
+                }
+
+                LocalTime instructorStartTime = instructorSchedule.getStartTime();
+                LocalTime instructorEndTime = instructorSchedule.getEndTime();
+
+                LocalTime commonStartTime = venueStartTime.isAfter(instructorStartTime) ? venueStartTime : instructorStartTime;
+                LocalTime commonEndTime = venueEndTime.isBefore(instructorEndTime) ? venueEndTime : instructorEndTime;
+
+                if (!commonStartTime.isAfter(commonEndTime)) {
+                    commonSchedules.add(new CourseSchedule(instructorId,venueId,instructorDate,commonStartTime,commonEndTime));
+                }
+            }
+        }
+        return commonSchedules;
+    }
+
+
+}

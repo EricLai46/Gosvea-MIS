@@ -16,19 +16,18 @@ const CourseTable = ({ currentItems, handleClickOpen }) => (
         </TableRow>
       </TableHead>
       <TableBody>
-        {/* {currentItems.map((course) => (
+        {currentItems.map((course) => (
           <TableRow key={course.courseid}>
             <TableCell>{course.courseid}</TableCell>
-            <TableCell>{course['course address']}</TableCell>
-            <TableCell>{course['course instructor']}</TableCell>
-            <TableCell>{course['course date']}</TableCell>
-            <TableCell>{course['course start time']}</TableCell>
-            <TableCell>{course['course end time']}</TableCell>
+            <TableCell>{course.date}</TableCell>
+            <TableCell>{course.startTime}</TableCell>
+            <TableCell>{course.endTime}</TableCell>
+
             <TableCell>
               <Button variant="outlined" onClick={() => handleClickOpen(course)}>Edit</Button>
             </TableCell>
           </TableRow>
-        ))} */}
+        ))} 
       </TableBody>
     </Table>
   </TableContainer>

@@ -35,9 +35,11 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public PageResponse<CourseSchedule> getCourseSchedule(Integer pageNum, Integer pageSize, Integer instructorId, Integer venueId, LocalDate date, LocalTime startTime, LocalTime endTime, boolean isActive) {
+    public PageResponse<CourseSchedule> getCourseSchedule(Integer pageNum, Integer pageSize, Integer instructorId, Integer venueId, LocalDate date, LocalTime startTime, LocalTime endTime, Boolean isActive) {
         PageResponse<CourseSchedule> prc=new PageResponse<>();
         PageHelper.startPage(pageNum,pageSize);
+
+        Boolean activeStatus = (isActive != null) ? isActive : false;
 
         List<CourseSchedule> lic=courseScheduleMapper.getCourseSchedule(instructorId,venueId,date,startTime,endTime,isActive);
         Page<CourseSchedule> pgc=(Page<CourseSchedule>) lic;

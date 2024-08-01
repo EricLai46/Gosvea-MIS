@@ -79,4 +79,10 @@ public class InstructorServiceImpl implements InstructorService {
     public void addInstructorSchedule(InstructorSchedule instructorSchedule) {
         instructorMapper.addInstructorSchedule(instructorSchedule);
     }
+
+    @Override
+    public Instructor getInstructorById(Integer instructor) {
+
+        return instructorMapper.getInstructorById(instructor);
+    }
 }

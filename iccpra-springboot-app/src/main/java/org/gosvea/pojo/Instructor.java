@@ -3,6 +3,9 @@ package org.gosvea.pojo;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 public class Instructor {
     private Integer id;
@@ -35,6 +38,6 @@ public class Instructor {
     private String rentStatus;
 
     private String fobKey;
-
+    private List<InstructorSchedule> scheduleList;
 
 }

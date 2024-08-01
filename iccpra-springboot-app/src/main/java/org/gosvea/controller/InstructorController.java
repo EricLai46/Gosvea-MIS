@@ -72,6 +72,15 @@ public class InstructorController {
        return instructorService.getInstructorNameList();
    }
 
+
+   //通过instructorid来获取 instructor信息
+   @GetMapping("/instructorid")
+   public Instructor getInstructorById(Integer instructor)
+   {
+       return instructorService.getInstructorById(instructor);
+   }
+
+
    //更新Instructor信息
    @PutMapping
     public Result updateInstructor(@RequestBody Instructor instructor)

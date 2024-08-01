@@ -44,7 +44,7 @@ const InstructorMain = () => {
           phoneNumber: '',
           lastname,
           firstname,
-          timeZone: timeZone,
+          
         },
       });
       if (response.data.message === 'success') {
@@ -70,7 +70,6 @@ const InstructorMain = () => {
       firstname: firstname,
       lastname: lastname,
       email: email,
-      timeZone: timeZone,
     };
 
     Object.keys(params).forEach(key => {
@@ -106,7 +105,6 @@ const InstructorMain = () => {
       state: '',
       city: '',
       venueId: '',
-      timeZone: '',
       firstname: '',
       phoneNumber: '',
       email: '',
@@ -188,7 +186,7 @@ const InstructorMain = () => {
   };
 
   const handleReset = () => {
-    setTimeZone('');
+    
     setState('');
     setFirstname('');
     setLastname('');
@@ -209,8 +207,7 @@ const InstructorMain = () => {
     <SidebarLayout>
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         <InstructorSearchForm
-          timeZone={timeZone}
-          setTimeZone={setTimeZone}
+
           state={state}
           setState={setState}
           email={email}

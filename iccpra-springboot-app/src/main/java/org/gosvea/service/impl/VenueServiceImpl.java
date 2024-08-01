@@ -84,4 +84,14 @@ public class VenueServiceImpl implements VenueService {
     public void deleteVenueScheduleSingle(Integer id) {
         venueMapper.deleteVenueScheduleSingle(id);
     }
+
+    @Override
+    public List<Venue> getAllVenues() {
+        List<Venue> venues=venueMapper.getAllVenues();
+        for (Venue venue : venues) {
+            List<VenueSchedule> scheduleList = getVenueSchedule(venue.getId());
+            venue.setScheduleList(scheduleList);
+        }
+        return venues;
+    }
 }

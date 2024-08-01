@@ -1,24 +1,12 @@
 import React from 'react';
 import { Box, FormControl, InputLabel, Select, MenuItem, TextField, Button } from '@mui/material';
 
-const InstructorSearchForm = ({ timeZone, setTimeZone, state, setState, email, setEmail, firstname, setFirstname, lastname, setLastname, phonenumber, setPhonenumber, handleSearch, handleReset }) => {
+const InstructorSearchForm = ({  state, setState, email, setEmail, firstname, setFirstname, lastname, setLastname, phonenumber, setPhonenumber, handleSearch, handleReset }) => {
   const timeZones = ['PST', 'EST', 'CST', 'MST', 'GMT', 'UTC', 'BST', 'CEST'];
 
   return (
     <Box display="flex" alignItems="center" mb={3}>
-      <FormControl variant="outlined" sx={{ minWidth: 100, mr: 2 }}>
-        <InputLabel>Time Zone</InputLabel>
-        <Select
-          value={timeZone}
-          onChange={(e) => setTimeZone(e.target.value)}
-          label="Time Zone"
-        >
-          <MenuItem value=""><em>Please Select</em></MenuItem>
-          {timeZones.map(tz => (
-            <MenuItem key={tz} value={tz}>{tz}</MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+
       <FormControl variant="outlined" sx={{ minWidth: 100, mr: 2 }}>
         <InputLabel>State</InputLabel>
         <Select

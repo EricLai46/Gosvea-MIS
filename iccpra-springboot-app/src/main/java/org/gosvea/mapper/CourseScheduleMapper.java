@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Mapper
 public interface CourseScheduleMapper {
 
-    List<CourseSchedule> getCourseSchedule(Integer instructorId, Integer venueId, LocalDate date, LocalTime startTime, LocalTime endTime, boolean isActive);
+    List<CourseSchedule> getCourseSchedule(Integer instructorId, Integer venueId, LocalDate date, LocalTime startTime, LocalTime endTime, Boolean isActive);
 
     @Update("update coursesschedule set is_active=False where id=#{courseId}")
     void deActivateCourseSchedule(Integer courseId);

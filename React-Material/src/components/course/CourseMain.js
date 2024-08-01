@@ -21,6 +21,7 @@ const CourseMain = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const timeZones = ['PST', 'EST', 'CST', 'MST', 'GMT', 'UTC', 'BST', 'CEST'];
   const { showNotification } = useNotification();
+  
 
   useEffect(() => {
     // Fetch venues and schedules data when the component mounts
@@ -68,10 +69,8 @@ const CourseMain = () => {
     let params = {
       pageNum: currentPage,
       pageSize: itemsPerPage,
-      state,
-      city: '',
-      instructor: instructor,
-      timeZone: timeZone,
+      instructor: '',
+      date: '',
     };
 
     Object.keys(params).forEach(key => {
@@ -222,9 +221,7 @@ const CourseMain = () => {
         />
         <CourseTable currentItems={currentItems} handleClickOpen={handleClickOpen} />
         <CoursePagination totalPages={totalPages} currentPage={currentPage} handlePageChange={handlePageChange} />
-        <Button variant="contained" color="primary" onClick={handleAdd} sx={{ mt: 2 }}>
-          Add Course
-        </Button>
+
       </Container>
     </SidebarLayout>
   );

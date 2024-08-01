@@ -37,7 +37,7 @@ public class Venue {
     private String refundableStatus;
     private String bookMethod;
     private String registrationLink;
-    private List<VenueSchedule> scheduleList=new ArrayList<>();
+    private List<VenueSchedule> scheduleList;
 
     private static final Map<String,String> TIME_ZONE_MAP=new HashMap<>();
 

@@ -27,4 +27,6 @@ public interface VenueService {
     List<VenueSchedule> getVenueSchedule(Integer venueId);
 
     void deleteVenueScheduleSingle(Integer id);
+
+     List<Venue> getAllVenues();
 }

@@ -25,4 +25,6 @@ public interface InstructorService {
     void deleteInstructorSchedule(Integer id);
 
     void addInstructorSchedule(InstructorSchedule instructorSchedule);
+
+    Instructor getInstructorById(Integer instructor);
 }
