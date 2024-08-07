@@ -10,7 +10,7 @@ const VenueScheduleCalendar = ({ venueId }) => {
     const [events, setEvents] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
     const [newEvent, setNewEvent] = useState({
-        title: '',
+        courseTitle: '',
         start: '',
         end: '',
         isWeekly: false,
@@ -25,14 +25,17 @@ const VenueScheduleCalendar = ({ venueId }) => {
         try {
             const response = await axiosInstance.get(`/venue/schedule?venueId=${venueId}`);
             const availableTimes = response.data.data;
-
+            //console.log(response.data.data);
             // Convert the data to FullCalendar event format
             const eventsData = availableTimes.map(time => ({
-                title: 'Available',
+                title: time.courseTitle,
                 start: `${time.date}T${time.startTime}`,
                 end: time.endTime ? `${time.date}T${time.endTime}` : undefined,
                 backgroundColor: 'lightgreen',
-                id: time.id
+                id: time.id,
+                extendedProps: {
+                    endTime: time.endTime, // 确保结束时间传递到extendedProps
+                }
             }));
 
             setEvents(eventsData);
@@ -50,7 +53,7 @@ const VenueScheduleCalendar = ({ venueId }) => {
         if (window.confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
             clickInfo.event.remove();
             try {
-                await axiosInstance.delete(`/schedule`, { params: { id: clickInfo.event.id } }); // MODIFIED
+                await axiosInstance.delete(`/venue/schedule`, { params: { id: clickInfo.event.id } }); // MODIFIED
             } catch (error) {
                 console.error('Error deleting event:', error);
             }
@@ -63,7 +66,7 @@ const VenueScheduleCalendar = ({ venueId }) => {
 
         for (let i = 0; i < (newEvent.isWeekly ? 5 : 1); i++) {
             eventsToSave.push({
-                title: newEvent.title,
+                courseTitle: newEvent.courseTitle,
                 date: currentDate.toISOString().split('T')[0],
                 venueId: venueId,
                 startTime: newEvent.start,
@@ -76,8 +79,15 @@ const VenueScheduleCalendar = ({ venueId }) => {
             const responses = await Promise.all(eventsToSave.map(event => 
                 axiosInstance.post(`/venue/schedule`, event)
             ));
-            setEvents([...events, ...responses.map(response => response.data)]);
+            setEvents([...events, ...responses.map(response => ({
+                title: newEvent.courseTitle,
+                start: `${response.data.date}T${response.data.startTime}`,
+                end: response.data.endTime ? `${response.data.date}T${response.data.endTime}` : undefined,
+                backgroundColor: 'lightgreen',
+                id: response.data.id
+            }))]);
             setOpenDialog(false);
+            fetchEvents();
         } catch (error) {
             console.error('Error saving event:', error);
         }
@@ -87,7 +97,13 @@ const VenueScheduleCalendar = ({ venueId }) => {
         const { name, value, checked, type } = e.target;
         setNewEvent(prevState => ({ ...prevState, [name]: type === 'checkbox' ? checked : value }));
     };
-
+    const renderEventContent = (eventInfo) => (
+        <div>
+            <b>{eventInfo.timeText}</b>
+            <i>{eventInfo.event.title}</i>
+            <div>{eventInfo.event.extendedProps.endTime ? `End: ${eventInfo.event.extendedProps.endTime}` : ''}</div>
+        </div>
+    );
     return (
         <div>
             <FullCalendar
@@ -96,6 +112,7 @@ const VenueScheduleCalendar = ({ venueId }) => {
                 events={events}
                 dateClick={handleDateClick}
                 eventClick={handleEventClick}
+                eventContent={renderEventContent}
             />
             <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
                 <DialogTitle>Add New Event</DialogTitle>
@@ -103,11 +120,11 @@ const VenueScheduleCalendar = ({ venueId }) => {
                     <TextField
                         autoFocus
                         margin="dense"
-                        name="title"
-                        label="Event Title"
+                        name="courseTitle"
+                        label="Course Title"
                         type="text"
                         fullWidth
-                        value={newEvent.title}
+                        value={newEvent.courseTitle}
                         onChange={handleInputChange}
                     />
                     <TextField

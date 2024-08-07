@@ -11,6 +11,7 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
+
 mybatis:
   configuration:
     map-underscore-to-camel-case: true

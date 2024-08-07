@@ -23,7 +23,7 @@ const VenueDialog = ({ open, handleClose, isEditMode, currentVenue, handleChange
 
 
   return(
-  <Dialog open={open} onClose={handleClose}>
+  <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
     <DialogTitle>{isEditMode ? "Edit Venue" : "Add a Venue"}</DialogTitle>
     <DialogContent>
       <DialogContentText>

@@ -26,32 +26,38 @@ const VenueTable = ({ currentItems, handleClickOpen }) => (
         </TableRow>
       </TableHead>
       <TableBody>
-        {currentItems.map((venue) => (
-          <TableRow key={venue.id}>
-            <TableCell>{venue.id}</TableCell>
-            <TableCell>{venue.address}</TableCell>
-            <TableCell>{venue.timeZone}</TableCell>
-            <TableCell>{venue.state}</TableCell>
-            <TableCell>{venue.instructor}</TableCell>
-            <TableCell>{venue.city}</TableCell>
-            <TableCell>{venue.cancellationPolicy}</TableCell>
-            <TableCell>{venue.paymentMode}</TableCell>
-            <TableCell>{venue.nonrefundableFee}</TableCell>
-            <TableCell>{venue.fobKey}</TableCell>
-            <TableCell>{venue.deposit}</TableCell>
-            <TableCell>{venue.membershipFee}</TableCell>
-            <TableCell>{venue.usageFee}</TableCell>
-            <TableCell>{venue.refundableStatus}</TableCell>
-            <TableCell>{venue.bookMethod}</TableCell>
-            <TableCell>{venue.registrationLink}</TableCell>
-            <TableCell>
-              <Button variant="outlined" onClick={() => handleClickOpen(venue)}>Edit</Button>
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  </TableContainer>
-);
+      {Array.isArray(currentItems) && currentItems.length > 0 ? (
+            currentItems.map((venue) => (
+              <TableRow key={venue.id}>
+                <TableCell>{venue.id}</TableCell>
+                <TableCell>{venue.address}</TableCell>
+                <TableCell>{venue.timeZone}</TableCell>
+                <TableCell>{venue.state}</TableCell>
+                <TableCell>{venue.instructor}</TableCell>
+                <TableCell>{venue.city}</TableCell>
+                <TableCell>{venue.cancellationPolicy}</TableCell>
+                <TableCell>{venue.paymentMode}</TableCell>
+                <TableCell>{venue.nonrefundableFee}</TableCell>
+                <TableCell>{venue.fobKey}</TableCell>
+                <TableCell>{venue.deposit}</TableCell>
+                <TableCell>{venue.membershipFee}</TableCell>
+                <TableCell>{venue.usageFee}</TableCell>
+                <TableCell>{venue.refundableStatus}</TableCell>
+                <TableCell>{venue.bookMethod}</TableCell>
+                <TableCell>{venue.registrationLink}</TableCell>
+                <TableCell>
+                  <Button variant="outlined" onClick={() => handleClickOpen(venue)}>Edit</Button>
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={17} align="center">No data available</TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
 
 export default VenueTable;

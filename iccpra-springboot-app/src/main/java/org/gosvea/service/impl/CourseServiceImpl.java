@@ -47,4 +47,9 @@ public class CourseServiceImpl implements CourseService {
         prc.setTotalElement(pgc.getTotal());
         return prc;
     }
+
+    @Override
+    public void deleteAllSchedule() {
+        courseScheduleMapper.deleteAllSchedule();
+    }
 }

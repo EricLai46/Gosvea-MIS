@@ -11,16 +11,19 @@ public class CourseSchedule extends Schedule{
     private Integer instructorId;
     private Integer venueId;
     private boolean isActive;
-
+    private String address;
+    private String courseTitle;
 
     public CourseSchedule(){
 
     }
 
-    public CourseSchedule(Integer instructorId, Integer venueId, LocalDate date, LocalTime startTime, LocalTime endTime){
+    public CourseSchedule(Integer instructorId, Integer venueId, LocalDate date, LocalTime startTime, LocalTime endTime,String address,String courseTitle){
         super(date,startTime,endTime);
         this.instructorId=instructorId;
         this.venueId=venueId;
         this.isActive=true;
+        this.address=address;
+        this.courseTitle=courseTitle;
     }
 }

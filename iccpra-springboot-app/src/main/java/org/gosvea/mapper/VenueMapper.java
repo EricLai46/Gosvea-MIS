@@ -37,10 +37,11 @@ public interface VenueMapper {
     })
     List<VenueSchedule> getVenueSchedule(Integer venueId);
 
-    @Insert("insert into venueschedule(date,start_time,end_time,venue_id) values(#{date},#{startTime},#{endTime},#{venueId}) ")
+    @Insert("insert into venueschedule(date,start_time,end_time,venue_id,course_title) values(#{date},#{startTime},#{endTime},#{venueId},#{courseTitle}) ")
     void addVenueSchedule(VenueSchedule venueSchedule);
     @Delete("delete from venueschedule where id=#{id}")
     void deleteVenueScheduleSingle(Integer id);
     @Select("select * from venue")
     List<Venue> getAllVenues();
+
 }

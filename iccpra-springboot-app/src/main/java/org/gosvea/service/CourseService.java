@@ -17,4 +17,6 @@ public interface CourseService {
     void deleteCourse(Integer instructorId, Integer venueId);
 
     PageResponse<CourseSchedule> getCourseSchedule(Integer pageNum, Integer pageSize, Integer instructorId, Integer venueId, LocalDate date, LocalTime startTime,LocalTime endTime,Boolean isActive);
+
+    void deleteAllSchedule();
 }

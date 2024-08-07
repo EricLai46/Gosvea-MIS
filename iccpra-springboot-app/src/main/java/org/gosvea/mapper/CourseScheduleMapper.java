@@ -18,9 +18,9 @@ public interface CourseScheduleMapper {
 
     @Insert({
             "<script>",
-            "INSERT INTO coursesschedule (date, instructor_id, venue_id, start_time, end_time, is_active) VALUES ",
+            "INSERT INTO coursesschedule (date, instructor_id, venue_id, start_time, end_time, is_active,address,course_title) VALUES ",
             "<foreach collection='courseSchedules' item='courseSchedule' separator=','>",
-            "(#{courseSchedule.date}, #{courseSchedule.instructorId}, #{courseSchedule.venueId}, #{courseSchedule.startTime}, #{courseSchedule.endTime}, #{courseSchedule.isActive})",
+            "(#{courseSchedule.date}, #{courseSchedule.instructorId}, #{courseSchedule.venueId}, #{courseSchedule.startTime}, #{courseSchedule.endTime}, #{courseSchedule.isActive},#{courseSchedule.address},#{courseSchedule.courseTitle})",
             "</foreach>",
             "</script>"
     })
@@ -31,4 +31,6 @@ public interface CourseScheduleMapper {
 
      @Update("update coursesschedule set instructor_id=#{instructorId},venue_id=#{venueId},start_time=#{startTime},end_time=#{endTime},date=#{date},is_active=#{isActive} where id=#{id}")
     void updateCourseInformation(CourseSchedule courseSchedule);
+    @Delete("delete from coursesschedule")
+    void deleteAllSchedule();
 }

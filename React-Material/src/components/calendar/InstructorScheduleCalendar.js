@@ -50,7 +50,7 @@ const InstructorScheduleCalendar = ({ instructorId }) => {
         if (window.confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
             clickInfo.event.remove();
             try {
-                await axiosInstance.delete(`/schedule`, { params: { id: clickInfo.event.id } });
+                await axiosInstance.delete(`/instructor/schedule`, { params: { id: clickInfo.event.id } });
             } catch (error) {
                 console.error('Error deleting event:', error);
             }
@@ -78,6 +78,7 @@ const InstructorScheduleCalendar = ({ instructorId }) => {
             ));
             setEvents([...events, ...responses.map(response => response.data)]);
             setOpenDialog(false);
+            fetchEvents();
         } catch (error) {
             console.error('Error saving event:', error);
         }

@@ -114,7 +114,6 @@ public class VenueController {
 
         try {
             venueService.updateVenue(venue);
-            checkVenueInstructorInformation();
             return Result.success();
         } catch (Exception e) {
             e.printStackTrace();
@@ -148,7 +147,7 @@ public class VenueController {
         try {
 
             venueService.updateVenueSchedule(date, startTime, endTime, venueSchedule.getVenueId());
-
+            checkVenueInstructorInformation();
             return Result.success("update schedule succcessfully");
         } catch (Exception e) {
             e.printStackTrace();
@@ -172,6 +171,7 @@ public class VenueController {
     @PostMapping("/schedule")
     public Result<VenueSchedule> addVenueSchedule(@RequestBody VenueSchedule venueSchedule) {
         venueService.addVenueSchedule(venueSchedule);
+        checkVenueInstructorInformation();
         return Result.success();
     }
 
@@ -179,6 +179,7 @@ public class VenueController {
     @DeleteMapping("/schedule")
     public Result<VenueSchedule> deleteVenueScheduleSingle(Integer id) {
         venueService.deleteVenueScheduleSingle(id);
+        checkVenueInstructorInformation();
         return Result.success();
     }
 
@@ -269,28 +270,48 @@ public class VenueController {
     public Result checkVenueInstructorInformation() {
         List<Venue> venues = venueService.getAllVenues();
         List<CourseSchedule> commonSchedules=new ArrayList<>();
+        //警告列表
+        List<String> warnings = new ArrayList<>();
+        //添加数据前先清除原有的数据
+        courseService.deleteAllSchedule();
         for (Venue venue : venues) {
             Instructor instructor = instructorService.getInstructorById(venue.getInstructor());
 
 
             if (instructor == null) {
-                return Result.error("Venue ID " + venue.getId() + " does not have an assigned instructor.");
+                warnings.add("Venue ID " + venue.getId() + " does not have an assigned instructor.");
+                continue;
             }
             instructor.setScheduleList(instructorService.getInstructorSchedule(venue.getInstructor()));
+
+
             // 打印调试信息
             System.out.println("Venue: " + venue);
             System.out.println("Instructor: " + instructor);
             System.out.println("Venue Schedules: " + venue.getScheduleList());
             System.out.println("Instructor Schedules: " + instructor.getScheduleList());
+            System.out.println("Venue Address: " + venue.getAddress());
 
-            commonSchedules=getCommonSchedules(instructor.getId(),venue.getId(),venue.getScheduleList(),instructor.getScheduleList());
-            commonSchedules.forEach(courseSchedule -> System.out.println(courseSchedule.toString()));
-            courseService.insertCourseSchedule(commonSchedules);
+
+            commonSchedules=getCommonSchedules(instructor.getId(),venue.getId(),venue.getAddress(),venue.getScheduleList(),instructor.getScheduleList());
+            if (commonSchedules.isEmpty()) {
+                warnings.add("Venue ID " + venue.getId() + " does not have matching schedules with its instructor.");
+            } else {
+                commonSchedules.forEach(courseSchedule -> System.out.println(courseSchedule.toString()));
+                courseService.insertCourseSchedule(commonSchedules);
+            }
         }
-        return  Result.success();
+
+        if (!warnings.isEmpty()) {
+            // 返回警告信息到前端
+            return Result.error("Course search failed!", warnings);
+
+        }
+
+        return Result.success();
     }
    //获取公共的schedule
-    public List<CourseSchedule> getCommonSchedules(Integer instructorId, Integer venueId,List<VenueSchedule> venueSchedules, List<InstructorSchedule> instructorSchedules) {
+    public List<CourseSchedule> getCommonSchedules(Integer instructorId, Integer venueId,String address,List<VenueSchedule> venueSchedules, List<InstructorSchedule> instructorSchedules) {
         List<CourseSchedule> commonSchedules = new ArrayList<>();
 
         for (VenueSchedule venueSchedule : venueSchedules) {
@@ -311,12 +332,13 @@ public class VenueController {
                 LocalTime commonEndTime = venueEndTime.isBefore(instructorEndTime) ? venueEndTime : instructorEndTime;
 
                 if (!commonStartTime.isAfter(commonEndTime)) {
-                    commonSchedules.add(new CourseSchedule(instructorId,venueId,instructorDate,commonStartTime,commonEndTime));
+                    commonSchedules.add(new CourseSchedule(instructorId,venueId,instructorDate,commonStartTime,commonEndTime,address,venueSchedule.getCourseTitle()));
                 }
             }
         }
         return commonSchedules;
     }
+
 
 
 }

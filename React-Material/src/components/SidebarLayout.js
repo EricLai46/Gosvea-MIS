@@ -87,7 +87,7 @@ const SidebarLayout = ({ children }) => {
               Venues
             </Typography>
             <IconButton color="inherit">
-              <Badge badgeContent={notifications} color="secondary">
+              <Badge badgeContent={3} color="secondary">
                 <NotificationsIcon />
               </Badge>
             </IconButton>

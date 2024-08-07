@@ -49,18 +49,18 @@ public class Venue {
         TIME_ZONE_MAP.put("MNT","America/Boise");
     }
 
-    public void generateSchedule(Integer venueid){
-        ZoneId zoneId=ZoneId.of(TIME_ZONE_MAP.get(timeZone));
-        ZonedDateTime startDateTime=ZonedDateTime.now(zoneId);
-        ZonedDateTime endDateTime=startDateTime.plus(1, ChronoUnit.MONTHS);
-
-        scheduleList.clear();
-
-        for(ZonedDateTime dateTime=startDateTime;dateTime.isAfter(endDateTime); dateTime=dateTime.plusDays(1)){
-            scheduleList.add(new VenueSchedule(dateTime.toLocalDate(),venueid, LocalTime.of(15,0),LocalTime.of(17,0)));
-
-        }
-    }
+//    public void generateSchedule(Integer venueid){
+//        ZoneId zoneId=ZoneId.of(TIME_ZONE_MAP.get(timeZone));
+//        ZonedDateTime startDateTime=ZonedDateTime.now(zoneId);
+//        ZonedDateTime endDateTime=startDateTime.plus(1, ChronoUnit.MONTHS);
+//
+//        scheduleList.clear();
+//
+//        for(ZonedDateTime dateTime=startDateTime;dateTime.isAfter(endDateTime); dateTime=dateTime.plusDays(1)){
+//            scheduleList.add(new VenueSchedule(dateTime.toLocalDate(),venueid, LocalTime.of(15,0),LocalTime.of(17,0)));
+//
+//        }
+//    }
 
 
     public boolean needUpdateReminder(){

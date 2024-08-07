@@ -7,7 +7,7 @@ const InstructorDialog = ({ open, handleClose, isEditMode, currentInstructor, ha
   const timeZones = ['PST', 'EST', 'CST', 'MST', 'GMT', 'UTC', 'BST', 'CEST'];
 
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
       <DialogTitle>{isEditMode ? "Edit Instructor" : "Add an Instructor"}</DialogTitle>
       <DialogContent>
         <DialogContentText>
