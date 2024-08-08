@@ -14,7 +14,7 @@ const InstructorMain = () => {
   const [instructors, setInstructors] = useState([]);
   const [venues, setVenues] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(1);
+  const [itemsPerPage] = useState(10);
   const [currentVenue, setCurrentVenue] = useState({});
   const [currentInstructor, setCurrentInstructor] = useState({});
   const [open, setOpen] = useState(false);

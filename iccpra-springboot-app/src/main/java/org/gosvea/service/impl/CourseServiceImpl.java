@@ -5,6 +5,7 @@ import com.github.pagehelper.PageHelper;
 import org.gosvea.mapper.CourseScheduleMapper;
 import org.gosvea.pojo.CourseSchedule;
 import org.gosvea.pojo.PageResponse;
+import org.gosvea.pojo.Result;
 import org.gosvea.service.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,4 +53,5 @@ public class CourseServiceImpl implements CourseService {
     public void deleteAllSchedule() {
         courseScheduleMapper.deleteAllSchedule();
     }
+
 }

@@ -3,6 +3,7 @@ package org.gosvea.service;
 
 import org.gosvea.pojo.CourseSchedule;
 import org.gosvea.pojo.PageResponse;
+import org.gosvea.pojo.Result;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -19,4 +20,6 @@ public interface CourseService {
     PageResponse<CourseSchedule> getCourseSchedule(Integer pageNum, Integer pageSize, Integer instructorId, Integer venueId, LocalDate date, LocalTime startTime,LocalTime endTime,Boolean isActive);
 
     void deleteAllSchedule();
+
+
 }

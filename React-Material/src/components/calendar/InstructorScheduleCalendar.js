@@ -32,7 +32,10 @@ const InstructorScheduleCalendar = ({ instructorId }) => {
                 start: `${time.date}T${time.startTime}`, // Use `startTime` based on the response structure
                 end: time.endTime ? `${time.date}T${time.endTime}` : undefined, // Use `endTime` based on the response structure
                 backgroundColor: 'lightgreen',
-                id: time.id
+                id: time.id,
+                extendedProps: {
+                    endTime: time.endTime, // 确保结束时间传递到extendedProps
+                }
             }));
 
             setEvents(eventsData);
@@ -89,6 +92,14 @@ const InstructorScheduleCalendar = ({ instructorId }) => {
         setNewEvent(prevState => ({ ...prevState, [name]: type === 'checkbox' ? checked : value }));
     };
 
+    const renderEventContent = (eventInfo) => (
+        <div>
+            <b>{eventInfo.timeText}</b>
+            <i>{eventInfo.event.title}</i>
+            <div>{eventInfo.event.extendedProps.endTime ? `End: ${eventInfo.event.extendedProps.endTime}` : ''}</div>
+        </div>
+    );
+
     return (
         <div>
             <FullCalendar
@@ -97,6 +108,7 @@ const InstructorScheduleCalendar = ({ instructorId }) => {
                 events={events}
                 dateClick={handleDateClick}
                 eventClick={handleEventClick}
+                eventContent={renderEventContent}
             />
             <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
                 <DialogTitle>Add New Event</DialogTitle>

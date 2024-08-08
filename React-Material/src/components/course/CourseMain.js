@@ -80,38 +80,38 @@ const CourseMain = () => {
     });
 
     axiosInstance.get('/course', { params })
-      .then(response => {
-        console.log("Full response:", response.data); 
-        if (response.data.message === "success") {
-          // 成功时处理数据和警告
-          console.log(response);
-          setCourses(response.data.data ? response.data.data.items : []);
-          console.log("Warnings (success):", response.data.warnings); // 打印 warnings
-    
-          if (response.data.warnings && response.data.warnings.length > 0) {
-            response.data.warnings.forEach(warning => {
-              showNotification(warning, 'warning');
-            });
-          }
-          showNotification('Course found successfully!', 'success');
-        } else {
-          // 失败时处理警告
-          showNotification('Course search failed!', 'error');
-    
-          if (response.data.warnings && response.data.warnings.length > 0) {
-            console.log("Warnings (error):", response.data.warnings); // 打印 warnings
-            response.data.warnings.forEach(warning => {
-              showNotification(warning, 'warning');
-            });
-          }
+    .then(response => {
+      console.log("Full response:", response.data); 
+      if (response.data.message === "success") {
+        // 成功时处理数据和警告
+        console.log(response);
+        setCourses(response.data.data ? response.data.data.items : []);
+        console.log("Warnings (success):", response.data.warnings); // 打印 warnings
+  
+        if (response.data.warnings && Object.keys(response.data.warnings).length > 0) {
+          Object.entries(response.data.warnings).forEach(([key, value]) => {
+            showNotification(value, 'warning');
+          });
         }
-      })
-      .catch(error => {
-        console.error('Error in request:', error);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+        //showNotification('Course found successfully!', 'success');
+      } else {
+        // 失败时处理警告
+        showNotification('Course search failed!', 'error');
+  
+        if (response.data.warnings && Object.keys(response.data.warnings).length > 0) {
+          console.log("Warnings (error):", response.data.warnings); // 打印 warnings
+          Object.entries(response.data.warnings).forEach(([key, value]) => {
+            showNotification(value, 'warning');
+          });
+        }
+      }
+    })
+    .catch(error => {
+      console.error('Error in request:', error);
+    })
+    .finally(() => {
+      setIsLoading(false);
+    });
   };
 
   const handleAdd = () => {

@@ -12,9 +12,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/course")
@@ -43,9 +41,9 @@ public class CourseController {
             )
     {
         try {
-            checkVenueInstructorInformation();
+            Map<Integer,String> warnings=checkVenueInstructorInformation();
             boolean activeStatus = (isActive != null) ? isActive : false;
-            return  Result.success(courseService.getCourseSchedule(pageNum,pageSize,instructorId,venueId,date,startTime,endTime,isActive));
+            return  Result.success(courseService.getCourseSchedule(pageNum,pageSize,instructorId,venueId,date,startTime,endTime,isActive),warnings);
         } catch (Exception e) {
             e.printStackTrace();
             return Result.error(e.getMessage()+"\n"+getStackTrace(e));
@@ -92,11 +90,12 @@ public class CourseController {
 
 
     //检查venue和instructor是否有匹配的时间
-    public Result checkVenueInstructorInformation() {
+    public Map<Integer,String> checkVenueInstructorInformation() {
         List<Venue> venues = venueService.getAllVenues();
         List<CourseSchedule> commonSchedules=new ArrayList<>();
         //警告列表
-        Collection<String> warnings = new ArrayList<>();
+        Map<Integer,String> warnings=new HashMap<Integer,String>();
+
 
         //添加数据前先清除原有的数据
         courseService.deleteAllSchedule();
@@ -105,7 +104,7 @@ public class CourseController {
 
 
             if (instructor == null) {
-                warnings.add("Venue ID " + venue.getId() + " does not have an assigned instructor.");
+                warnings.put(venue.getId(),"Venue ID " + venue.getId() + " does not have an assigned instructor.");
                 continue;
             }
             instructor.setScheduleList(instructorService.getInstructorSchedule(venue.getInstructor()));
@@ -121,7 +120,7 @@ public class CourseController {
 
             commonSchedules=getCommonSchedules(instructor.getId(),venue.getId(),venue.getAddress(),venue.getScheduleList(),instructor.getScheduleList());
             if (commonSchedules.isEmpty()) {
-                warnings.add("Venue ID " + venue.getId() + " does not have matching schedules with its instructor.");
+                warnings.put(venue.getId(),"Venue ID " + venue.getId() + " does not have matching schedules with its instructor.");
             } else {
                 commonSchedules.forEach(courseSchedule -> System.out.println(courseSchedule.toString()));
                 courseService.insertCourseSchedule(commonSchedules);
@@ -130,17 +129,17 @@ public class CourseController {
 
         Result result;
         if (!warnings.isEmpty()) {
-            result = Result.success(commonSchedules, warnings);
+            return  warnings;
         } else {
-            result = Result.success(commonSchedules);
+            return null;
         }
         //System.out.println(result); // 打印调试信息
         // Debug output
-        System.out.println("Result Code: " + result.getCode());
-        System.out.println("Result Message: " + result.getMessage());
-        System.out.println("Result Data: " + result.getData());
-        System.out.println("Result Warnings: " + result.getWarnings());
-        return result;
+       // System.out.println("Result Code: " + result.getCode());
+       // System.out.println("Result Message: " + result.getMessage());
+      //  System.out.println("Result Data: " + result.getData());
+       // System.out.println("Result Warnings: " + result.getWarnings());
+
     }
     //获取公共的schedule
     public List<CourseSchedule> getCommonSchedules(Integer instructorId, Integer venueId,String address,List<VenueSchedule> venueSchedules, List<InstructorSchedule> instructorSchedules) {
@@ -177,5 +176,7 @@ public class CourseController {
         }
         return commonSchedules;
     }
+
+
 
 }

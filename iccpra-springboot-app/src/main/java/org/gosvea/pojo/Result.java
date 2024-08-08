@@ -2,28 +2,37 @@ package org.gosvea.pojo;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
 import java.util.Collection;
+import java.util.Map;
+@NoArgsConstructor
 
 public class Result<T> {
     private Integer code;
     private String message;
     private T data;
 
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    private Collection<String> warnings;
 
-    public Result(Integer code, String message, T data, Collection<String> warnings) {
+    private Map<Integer,String> warnings;
+
+
+
+
+    public Result(Integer code, String message, T data, Map<Integer,String> warnings) {
         this.code = code;
         this.message = message;
         this.data = data;
         this.warnings = warnings;
+
     }
 
     public static Result error(String errormessage) {
         return new Result<>(1, errormessage, null, null);
     }
 
-    public static <E> Result<E> error(String errormessage, Collection<String> warnings) {
+    public static <E> Result<E> error(String errormessage, Map<Integer,String> warnings, String warning) {
         return new Result<>(1, errormessage, null, warnings);
     }
 
@@ -35,7 +44,7 @@ public class Result<T> {
         return new Result<>(0, "success", null, null);
     }
 
-    public static <E> Result<E> success(E data, Collection<String> warnings) {
+    public static <E> Result<E> success(E data, Map<Integer,String> warnings) {
         return new Result<>(0, "success", data, warnings);
     }
 
@@ -64,11 +73,13 @@ public class Result<T> {
         this.data = data;
     }
 
-    public Collection<String> getWarnings() {
+    public Map<Integer,String> getWarnings() {
         return warnings;
     }
 
-    public void setWarnings(Collection<String> warnings) {
+    public void setWarnings(Map<Integer,String> warnings) {
         this.warnings = warnings;
     }
+
+
 }
