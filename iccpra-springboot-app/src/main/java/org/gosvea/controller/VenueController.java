@@ -38,6 +38,7 @@ import java.io.ByteArrayOutputStream;
 
 @RestController
 @RequestMapping("/venue")
+//@CrossOrigin(origins = "http://54.175.129.180:80", allowedHeaders = "*")
 @CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
 public class VenueController {
 
@@ -165,6 +166,25 @@ public class VenueController {
             e.printStackTrace();
             return Result.error(e.getMessage() + "\n");
         }
+    }
+  //获取所有场地信息from map
+    @GetMapping("/venuemap")
+     public Result<List<Venue>> getAllVenueFromMap()
+    {
+        List<Venue> venues=venueService.getAllVenues();
+
+        //System.out.println(venues);
+        for(Venue venue : venues)
+        {
+            double[] latlon=venueService.getLatLon(venue.getAddress());
+            if(latlon!=null){
+                venue.setLatitude(latlon[0]);
+                venue.setLongitude(latlon[1]);
+                venueService.saveLatLon(latlon,venue.getId());
+            }
+
+        }
+        return Result.success(venues);
     }
 
     //添加新场地schedule

@@ -23,12 +23,12 @@ export const mainListItems = (
       </ListItemIcon>
       <ListItemText primary="Dashboard" />
     </ListItemButton>
-    <ListItemButton>
+    {/* <ListItemButton>
       <ListItemIcon>
         <AdminPanelSettingsIcon/>
       </ListItemIcon>
       <ListItemText primary="ICPIEs"/>
-    </ListItemButton>
+    </ListItemButton> */}
     <ListItemButton component={Link} to="/venuemain">
       <ListItemIcon>
         <AddLocationIcon />
@@ -47,43 +47,38 @@ export const mainListItems = (
       </ListItemIcon> 
       <ListItemText primary="Courses" />
     </ListItemButton >
-    <ListItemButton>
+    {/* <ListItemButton>
       <ListItemIcon>
         <AnalyticsIcon />
       </ListItemIcon>
-      <ListItemText primary="Reports" />
-    </ListItemButton>
-    <ListItemButton>
-      <ListItemIcon>
-        <AccountBoxIcon />
-      </ListItemIcon>
+
       <ListItemText primary="Profile" />
-    </ListItemButton>
+    </ListItemButton> */}
   </React.Fragment>
 );
 
-export const secondaryListItems = (
-  <React.Fragment>
-    <ListSubheader component="div" inset>
-      Saved reports
-    </ListSubheader>
-    <ListItemButton>
-      <ListItemIcon>
-        <TodayIcon />
-      </ListItemIcon>
-      <ListItemText primary="Current month" />
-    </ListItemButton>
-    <ListItemButton>
-      <ListItemIcon>
-        <EventIcon />
-      </ListItemIcon>
-      <ListItemText primary="Last month" />
-    </ListItemButton>
-    <ListItemButton>
-      <ListItemIcon>
-        <DateRangeIcon />
-      </ListItemIcon>
-      <ListItemText primary="Next month" />
-    </ListItemButton>
-  </React.Fragment>
-);
+// export const secondaryListItems = (
+//   <React.Fragment>
+//     <ListSubheader component="div" inset>
+//       Saved reports
+//     </ListSubheader>
+//     <ListItemButton>
+//       <ListItemIcon>
+//         <TodayIcon />
+//       </ListItemIcon>
+//       <ListItemText primary="Current month" />
+//     </ListItemButton>
+//     <ListItemButton>
+//       <ListItemIcon>
+//         <EventIcon />
+//       </ListItemIcon>
+//       <ListItemText primary="Last month" />
+//     </ListItemButton>
+//     <ListItemButton>
+//       <ListItemIcon>
+//         <DateRangeIcon />
+//       </ListItemIcon>
+//       <ListItemText primary="Next month" />
+//     </ListItemButton>
+//   </React.Fragment>
+// );

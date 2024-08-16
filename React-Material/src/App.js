@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import VenueMain from './components/venue/VenueMain.js';
 import InstructorMain from './components/instructor/InstructorMain.js';
 import CourseMain from './components/course/CourseMain.js'
+
 function App() {
   return (
     <Router>

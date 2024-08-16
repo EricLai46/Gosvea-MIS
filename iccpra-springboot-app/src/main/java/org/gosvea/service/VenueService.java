@@ -30,5 +30,11 @@ public interface VenueService {
 
      List<Venue> getAllVenues();
 
+     double[] getLatLon(String address);
 
+    void saveLatLon(double[] latlon, Integer id);
+
+    String cleanAddress(String address);
+
+    void updateVenueStatus(Integer id, Venue.VenueStatus venueStatus);
 }

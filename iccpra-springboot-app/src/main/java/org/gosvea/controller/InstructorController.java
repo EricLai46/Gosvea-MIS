@@ -18,6 +18,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/instructor")
+//@CrossOrigin(origins = "http://54.175.129.180:80", allowedHeaders = "*")
 @CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
 public class InstructorController {
 

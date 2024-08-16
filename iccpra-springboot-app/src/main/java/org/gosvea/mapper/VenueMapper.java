@@ -43,5 +43,12 @@ public interface VenueMapper {
     void deleteVenueScheduleSingle(Integer id);
     @Select("select * from venue")
     List<Venue> getAllVenues();
-
+    @Select("select * from venue")
+    List<Venue> getAllVenueFromMap();
+    @Update("update venue set latitude=#{lat},longitude=#{lon} where id=#{id}")
+    void saveLatLon(double lat, double lon, Integer id);
+    @Select("select latitude,longitude where id=#{id}")
+    double[] getLatLon(Integer id);
+    @Update("update venue set venue_status=#{venueStatus} where id=#{id}")
+    void updateVenueStatus(Integer id, Venue.VenueStatus venueStatus);
 }

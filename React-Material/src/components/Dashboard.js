@@ -10,12 +10,12 @@ import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import Badge from '@mui/material/Badge';
-
+import VenueMap from './map/VenueMap.js';
 import Link from '@mui/material/Link';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import { mainListItems, secondaryListItems } from './listItems';
+import { mainListItems } from './listItems';
 
 
 function Copyright(props) {
@@ -141,7 +141,7 @@ export default function Dashboard() {
           <List component="nav">
             {mainListItems}
             <Divider sx={{ my: 1 }} />
-            {secondaryListItems}
+            {/* {secondaryListItems} */}
           </List>
         </Drawer>
         <Box
@@ -157,7 +157,7 @@ export default function Dashboard() {
           }}
         >
           <Toolbar />
-        
+          <VenueMap></VenueMap>
           <Copyright sx={{ pt: 4 }} />
           
         </Box>

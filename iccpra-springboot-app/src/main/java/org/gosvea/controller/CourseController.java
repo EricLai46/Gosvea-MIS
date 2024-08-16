@@ -16,6 +16,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/course")
+//@CrossOrigin(origins = "http://54.175.129.180:80", allowedHeaders = "*")
 @CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
 public class CourseController {
 
@@ -105,6 +106,10 @@ public class CourseController {
 
             if (instructor == null) {
                 warnings.put(venue.getId(),"Venue ID " + venue.getId() + " does not have an assigned instructor.");
+                //更新场地状态为INSTRUCTORISSUE
+                venueService.updateVenueStatus(venue.getId(),Venue.VenueStatus.INSTRUCTORISSUE);
+
+                //venue.setVenueStatus(Venue.VenueStatus.INSTRUCTORISSUE);
                 continue;
             }
             instructor.setScheduleList(instructorService.getInstructorSchedule(venue.getInstructor()));
@@ -121,7 +126,12 @@ public class CourseController {
             commonSchedules=getCommonSchedules(instructor.getId(),venue.getId(),venue.getAddress(),venue.getScheduleList(),instructor.getScheduleList());
             if (commonSchedules.isEmpty()) {
                 warnings.put(venue.getId(),"Venue ID " + venue.getId() + " does not have matching schedules with its instructor.");
+                //更新场地状态为VENUEISSUE
+                venueService.updateVenueStatus(venue.getId(), Venue.VenueStatus.VENUEISSUE);
             } else {
+                //更新场地状态为NORMAL
+                venueService.updateVenueStatus(venue.getId(),Venue.VenueStatus.NORMAL);
+
                 commonSchedules.forEach(courseSchedule -> System.out.println(courseSchedule.toString()));
                 courseService.insertCourseSchedule(commonSchedules);
             }

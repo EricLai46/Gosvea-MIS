@@ -27,6 +27,8 @@
              <if test="instructor!=null">
                  and instructor=#{instructor}
              </if>
+
+
          </where>
      </select>
     <!--更新数据库-->
@@ -76,7 +78,11 @@
                 registration_link = #{registrationLink},
             </if>
             <if test="instructor!=null">
-                instructor=#{instructor}
+                instructor=#{instructor},
+            </if>
+
+            <if test="venueStatus!=null">
+                venue_status=#{venueStatus}
             </if>
         </set>
         where id=#{id}

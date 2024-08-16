@@ -15,13 +15,14 @@ const VenueMain = () => {
   const [venues, setVenues] = useState([]);
   const [totalVenues,setTotalVenues]=useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(2); // 每页显示1个item
+  const [itemsPerPage] = useState(10); // 每页显示1个item
   const [currentVenue, setCurrentVenue] = useState({});
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const timeZones = ['PST', 'EST', 'CST', 'MST', 'GMT', 'UTC', 'BST', 'CEST'];
   const { showNotification } = useNotification();
+  const [venueStatus]=useState('');
   const [totalPages, setTotalPages] = useState(1); // 添加 totalPages 状态
   useEffect(() => {
     fetchVenues();
@@ -40,15 +41,16 @@ const VenueMain = () => {
           instructor: instructor,
           paymentMode: '',
           timeZone: timeZone,
+          venueStatus: venueStatus,
         },
       });
       if (response.data.message === 'success') {
         setVenues(response.data.data.items);
       } else {
-        showNotification('获取场地信息失败！', 'error');
+        showNotification('Get Venue information failed!', 'error');
       }
     } catch (error) {
-      console.error('获取场地信息时出错:', error);
+      console.error('Get Venue information failed:', error);
     }
   };
 
@@ -77,15 +79,15 @@ const VenueMain = () => {
       .then((response) => {
         if (response.data.message === 'success') {
           setVenues(response.data.data.items);
-          showNotification('场地查找成功！', 'success');
+          showNotification('Venues information searched successfully!', 'success');
           setTotalVenues(response.data.totalElements);
           setTotalPages(Math.ceil(response.data.data.totalElement / itemsPerPage));
         } else {
-          showNotification('场地查找失败！', 'error');
+          showNotification('Venues information searched failed!', 'error');
         }
       })
       .catch((error) => {
-        console.error('请求出错:', error);
+        console.error('Error:', error);
       })
       .finally(() => {
         setIsLoading(false);
@@ -111,6 +113,7 @@ const VenueMain = () => {
       bookMethod: '',
       registrationLink: '',
       instructor: null,
+      venueStatus: null,
     };
 
     setCurrentVenue(newVenue);
@@ -143,11 +146,11 @@ const VenueMain = () => {
       .then((response) => {
         setVenues((prev) => prev.map((v) => (v.id === currentVenue.id ? currentVenue : v)));
         setOpen(false);
-        showNotification('场地信息更新成功！', 'success');
+        showNotification('Venues information updated successfully!', 'success');
       })
       .catch((error) => {
-        console.error('请求出错:', error);
-        showNotification('场地信息更新失败！', 'error');
+        console.error('Bad request:', error);
+        showNotification('Venues information update failed!', 'error');
       });
   };
 
@@ -160,10 +163,10 @@ const VenueMain = () => {
       })
       .then((response) => {
         setOpen(false);
-        showNotification('场地添加成功！', 'success');
+        showNotification('Add a new venue successfully', 'success');
       })
       .catch((error) => {
-        console.error('请求出错:', error);
+        console.error('Bad Request:', error);
       });
   };
 
@@ -172,10 +175,10 @@ const VenueMain = () => {
       .delete('/venue', { params: { venueId: currentVenue.id } })
       .then((response) => {
         setOpen(false);
-        showNotification('场地删除成功！', 'success');
+        showNotification('Venue deleted successfully!', 'success');
       })
       .catch((error) => {
-        console.error('请求出错', error);
+        console.error('bad request', error);
       });
   };
 
@@ -185,7 +188,7 @@ const VenueMain = () => {
     setInstructor('');
     setVenues([]);
     setCurrentPage(1);
-    showNotification('重置成功！', 'success');
+    showNotification('Reset successfully!', 'success');
   };
 
   const handlePageChange = (event, value) => {
@@ -213,7 +216,7 @@ const VenueMain = () => {
         <VenueTable currentItems={venues} handleClickOpen={handleClickOpen} />
         <VenuePagination totalPages={totalPages} currentPage={currentPage} handlePageChange={handlePageChange} />
         <Button variant="contained" color="primary" onClick={handleAdd} sx={{ mt: 2 }}>
-          添加场地
+          Add a new venue
         </Button>
       </Container>
       <VenueDialog
