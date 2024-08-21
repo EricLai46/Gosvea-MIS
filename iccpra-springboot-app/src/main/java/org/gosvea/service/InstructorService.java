@@ -3,6 +3,7 @@ package org.gosvea.service;
 import org.gosvea.pojo.Instructor;
 import org.gosvea.pojo.InstructorSchedule;
 import org.gosvea.pojo.PageResponse;
+import org.gosvea.pojo.Venue;
 
 import java.util.List;
 import java.util.Map;
@@ -27,4 +28,8 @@ public interface InstructorService {
     void addInstructorSchedule(InstructorSchedule instructorSchedule);
 
     Instructor getInstructorById(Integer instructor);
+
+    List<Instructor> getAllInstructors();
+
+
 }

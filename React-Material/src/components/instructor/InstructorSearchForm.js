@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, FormControl, InputLabel, Select, MenuItem, TextField, Button } from '@mui/material';
 
-const InstructorSearchForm = ({  state, setState, email, setEmail, firstname, setFirstname, lastname, setLastname, phonenumber, setPhonenumber, handleSearch, handleReset }) => {
+const InstructorSearchForm = ({  state, setState, email, setEmail, firstname, setFirstname, lastname, setLastname, phonenumber, setPhonenumber, handleSearch, handleReset,handleExport }) => {
   const timeZones = ['PST', 'EST', 'CST', 'MST', 'GMT', 'UTC', 'BST', 'CEST'];
 
   return (
@@ -51,8 +51,16 @@ const InstructorSearchForm = ({  state, setState, email, setEmail, firstname, se
       <Button variant="contained" color="primary" onClick={handleSearch} sx={{ mr: 2 }}>
         Search
       </Button>
-      <Button variant="outlined" onClick={handleReset}>
+      <Button variant="outlined" onClick={handleReset} sx={{mr:15}}>
         Reset
+      </Button>
+
+      <Button variant='outlined' sx={{mr:2}}>
+        import
+      </Button>
+
+      <Button variant='outlined'onClick={handleExport}>
+        Export
       </Button>
       <Box sx={{ flexGrow: 1 }} />
     </Box>

@@ -16,8 +16,8 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/course")
-//@CrossOrigin(origins = "http://54.175.129.180:80", allowedHeaders = "*")
-@CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
+@CrossOrigin(origins =  {"http://54.175.129.180:80", "http://allcprmanage.com","http://localhost:3000"}, allowedHeaders = "*")
+//@CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
 public class CourseController {
 
     @Autowired

@@ -4,6 +4,7 @@ package org.gosvea.mapper;
 import org.apache.ibatis.annotations.*;
 import org.gosvea.pojo.Instructor;
 import org.gosvea.pojo.InstructorSchedule;
+import org.gosvea.pojo.Venue;
 
 import java.util.List;
 import java.util.Map;
@@ -31,4 +32,7 @@ public interface InstructorMapper {
     void addInstructorSchedule(InstructorSchedule instructorSchedule);
     @Select("select * from instructors where id=#{instructor}")
     Instructor getInstructorById(Integer instructor);
+    @Select("select * from instructors")
+    List<Instructor> getAllInstructors();
+
 }

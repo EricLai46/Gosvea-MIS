@@ -37,4 +37,6 @@ public interface VenueService {
     String cleanAddress(String address);
 
     void updateVenueStatus(Integer id, Venue.VenueStatus venueStatus);
+
+    Venue getVenueById(Integer venueId);
 }

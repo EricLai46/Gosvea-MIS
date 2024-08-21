@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, FormControl, InputLabel, Select, MenuItem, Button } from '@mui/material';
 
-const VenueSearchForm = ({ timeZone, state, instructor, setTimeZone, setState, setInstructor, handleSearch, handleReset }) => (
+const VenueSearchForm = ({ timeZone, state, instructor, setTimeZone, setState, setInstructor, handleSearch, handleReset, handleExport }) => (
   <Box display="flex" alignItems="center" mb={3}>
     <FormControl variant="outlined" sx={{ minWidth: 200, mr: 2 }}>
       <InputLabel>Time Zone</InputLabel>
@@ -44,8 +44,14 @@ const VenueSearchForm = ({ timeZone, state, instructor, setTimeZone, setState, s
     <Button variant="contained" color="primary" onClick={handleSearch} sx={{ mr: 2 }}>
       Search
     </Button>
-    <Button variant="outlined" onClick={handleReset}>
+    <Button variant="outlined" onClick={handleReset} sx={{ mr: 15 }}>
       Reset
+    </Button>
+    <Button variant="outlined" sx={{mr:2}}>
+      Import
+    </Button>
+    <Button variant="outlined" onClick={handleExport}>
+      Export
     </Button>
   </Box>
 );

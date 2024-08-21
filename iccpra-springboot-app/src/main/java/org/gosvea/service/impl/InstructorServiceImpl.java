@@ -6,6 +6,7 @@ import org.gosvea.mapper.InstructorMapper;
 import org.gosvea.pojo.Instructor;
 import org.gosvea.pojo.InstructorSchedule;
 import org.gosvea.pojo.PageResponse;
+import org.gosvea.pojo.Venue;
 import org.gosvea.service.InstructorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -85,4 +86,11 @@ public class InstructorServiceImpl implements InstructorService {
 
         return instructorMapper.getInstructorById(instructor);
     }
+
+    @Override
+    public List<Instructor> getAllInstructors() {
+        return instructorMapper.getAllInstructors();
+    }
+
+
 }

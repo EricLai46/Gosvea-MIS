@@ -51,4 +51,6 @@ public interface VenueMapper {
     double[] getLatLon(Integer id);
     @Update("update venue set venue_status=#{venueStatus} where id=#{id}")
     void updateVenueStatus(Integer id, Venue.VenueStatus venueStatus);
+    @Select("select * from venue where id=#{venueId}")
+    Venue getVenueById(Integer venueId);
 }

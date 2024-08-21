@@ -38,8 +38,8 @@ import java.io.ByteArrayOutputStream;
 
 @RestController
 @RequestMapping("/venue")
-//@CrossOrigin(origins = "http://54.175.129.180:80", allowedHeaders = "*")
-@CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
+@CrossOrigin(origins =  {"http://54.175.129.180:80", "http://allcprmanage.com","http://localhost:3000"}, allowedHeaders = "*")
+//@CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
 public class VenueController {
 
     @Autowired
@@ -48,7 +48,9 @@ public class VenueController {
     @Autowired
     private CourseService courseService;
 
-
+    private String[] headers={"ID","State","City","Address","Instructor","Time Zone","Time Zone","Cancellation Policy","Payment Mode",
+                              "Nonrefundable Fee","Fob Key","Deposit","Membership Fee","Usage Fee","Refundable Status","Book Method",
+                               "Registration Link","Venue Status"};
     @Autowired
     private InstructorService instructorService;
 
@@ -256,32 +258,55 @@ public class VenueController {
             Sheet sheet = workbook.createSheet("Venues");
             // 创建表头
             Row header = sheet.createRow(0);
-            header.createCell(0).setCellValue("Id");
-            header.createCell(1).setCellValue("State");
-            header.createCell(2).setCellValue("City");
-            header.createCell(3).setCellValue("Address");
-            // 其他表头...
+
+            for(int i=0;i<headers.length;i++) {
+
+                header.createCell(i).setCellValue(headers[i]);
+            }
+
 
             // 从数据库获取数据
-            List<Venue> venues = new ArrayList<Venue>();
+            List<Venue> venues = venueService.getAllVenues();
             int rowIdx = 1;
             for (Venue venue : venues) {
                 Row row = sheet.createRow(rowIdx++);
-                row.createCell(0).setCellValue(venue.getId());
-                row.createCell(1).setCellValue(venue.getState());
-                row.createCell(2).setCellValue(venue.getCity());
-                row.createCell(3).setCellValue(venue.getAddress());
-                // 其他列...
+                System.out.println(venue);
+                row.createCell(0).setCellValue(venue.getId() != null ? String.valueOf(venue.getId()) : "1");
+                row.createCell(1).setCellValue(venue.getState() != null ? venue.getState() : "");
+                row.createCell(2).setCellValue(venue.getCity() != null ? venue.getCity() : "");
+                row.createCell(3).setCellValue(venue.getAddress() != null ? venue.getAddress() : "");
+                String instructorName = "";
+                if (venue.getInstructor() != null) {
+                    Instructor instructor = instructorService.getInstructorById(venue.getInstructor());
+                    if (instructor != null) {
+                        instructorName = instructor.getFirstname() + " " + instructor.getLastname();
+                    }
+                }
+                row.createCell(4).setCellValue(instructorName);
+                row.createCell(5).setCellValue(venue.getTimeZone() != null ? venue.getTimeZone() : "");
+                row.createCell(6).setCellValue(venue.getCancellationPolicy() != null ? venue.getCancellationPolicy() : "");
+                row.createCell(7).setCellValue(venue.getPaymentMode() != null ? venue.getPaymentMode() : "");
+                row.createCell(8).setCellValue(String.valueOf(venue.getNonrefundableFee() != null ? venue.getNonrefundableFee() : ""));
+                row.createCell(9).setCellValue(venue.getFobKey() != null ? venue.getFobKey()  : "");
+                row.createCell(10).setCellValue(String.valueOf(venue.getDeposit()!= null ? venue.getDeposit(): ""));
+                row.createCell(11).setCellValue(String.valueOf(venue.getMembershipFee() != null ? venue.getMembershipFee(): ""));
+                row.createCell(12).setCellValue(String.valueOf(venue.getUsageFee()!= null ? venue.getUsageFee() : ""));
+                row.createCell(13).setCellValue(venue.getRefundableStatus() != null ? venue.getRefundableStatus() : "");
+                row.createCell(14).setCellValue(venue.getBookMethod()!= null ? venue.getBookMethod() : "");
+                row.createCell(15).setCellValue(venue.getRegistrationLink() != null ? venue.getRegistrationLink() : "");
+                row.createCell(16).setCellValue(String.valueOf(venue.getVenueStatus()!= null ? venue.getVenueStatus() : ""));
+
             }
 
             workbook.write(out);
             InputStreamResource file = new InputStreamResource(new ByteArrayInputStream(out.toByteArray()));
 
             return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=data.xlsx")
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=venues.xlsx")
                     .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                     .body(file);
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.badRequest().body(null);
         }
     }

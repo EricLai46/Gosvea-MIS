@@ -162,5 +162,10 @@ public class VenueServiceImpl implements VenueService {
         venueMapper.updateVenueStatus(id, venueStatus);
     }
 
+    @Override
+    public Venue getVenueById(Integer venueId) {
+        return venueMapper.getVenueById(venueId);
+    }
+
 
 }

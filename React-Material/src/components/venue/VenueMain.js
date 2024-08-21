@@ -7,6 +7,8 @@ import VenuePagination from './VenuePagination';
 import VenueDialog from './VenueDialog';
 import { Container, Button } from '@mui/material';
 import { useNotification } from '../NotificationContext';
+import {saveAs} from 'file-saver';
+
 
 const VenueMain = () => {
   const [timeZone, setTimeZone] = useState('');
@@ -28,7 +30,7 @@ const VenueMain = () => {
     fetchVenues();
     handleSearch();
   }, [currentPage]);
-
+//获取venues信息
   const fetchVenues = async () => {
     try {
    
@@ -53,7 +55,7 @@ const VenueMain = () => {
       console.error('Get Venue information failed:', error);
     }
   };
-
+//搜索venues信息
   const handleSearch = () => {
     if (isLoading) return;
     setIsLoading(true);
@@ -126,16 +128,16 @@ const VenueMain = () => {
     setOpen(true);
     setIsEditMode(true);
   };
-
+//关闭
   const handleClose = () => {
     setOpen(false);
   };
-
+//变化
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCurrentVenue((prev) => ({ ...prev, [name]: value }));
   };
-
+//保存
   const handleSave = () => {
     axiosInstance
       .put('/venue', currentVenue, {
@@ -153,7 +155,7 @@ const VenueMain = () => {
         showNotification('Venues information update failed!', 'error');
       });
   };
-
+//添加新场地
   const handleInsert = () => {
     axiosInstance
       .post('/venue', currentVenue, {
@@ -169,7 +171,7 @@ const VenueMain = () => {
         console.error('Bad Request:', error);
       });
   };
-
+//删除场地
   const handleDelete = () => {
     axiosInstance
       .delete('/venue', { params: { venueId: currentVenue.id } })
@@ -181,7 +183,7 @@ const VenueMain = () => {
         console.error('bad request', error);
       });
   };
-
+//重置搜索条件
   const handleReset = () => {
     setTimeZone('');
     setState('');
@@ -190,12 +192,33 @@ const VenueMain = () => {
     setCurrentPage(1);
     showNotification('Reset successfully!', 'success');
   };
-
+//翻页
   const handlePageChange = (event, value) => {
 
     setCurrentPage(value);
     console.log(`Page change triggered: ${value}`);
   };
+
+  //导出文件
+   const handleExport=async()=>{
+    try{
+      const response=await axiosInstance.get('/venue/export',{
+        responseType:'blob',
+      });
+
+      const contentDisposition=(await response).headers['content-disposition'];
+      const filename=contentDisposition
+                ?contentDisposition.split('filename')[1].split(';')[0].replace(/"/g,''):'venues.xlsx';
+      
+      console.log('Content-Disposition:', contentDisposition);          
+
+    //文件下载
+    saveAs(new Blob([response.data]),filename);
+    } catch(error){
+      console.error('Error exported data',error);
+    }
+   };
+  
 
   //const totalPages = Math.ceil(totalVenues/ itemsPerPage);
   
@@ -212,9 +235,10 @@ const VenueMain = () => {
           setInstructor={setInstructor}
           handleSearch={handleSearch}
           handleReset={handleReset}
+          handleExport={handleExport}
         />
         <VenueTable currentItems={venues} handleClickOpen={handleClickOpen} />
-        <VenuePagination totalPages={totalPages} currentPage={currentPage} handlePageChange={handlePageChange} />
+        <VenuePagination totalPages={totalPages} currentPage={currentPage} handlePageChange={handlePageChange}/>
         <Button variant="contained" color="primary" onClick={handleAdd} sx={{ mt: 2 }}>
           Add a new venue
         </Button>
@@ -229,6 +253,7 @@ const VenueMain = () => {
         handleInsert={handleInsert}
         handleDelete={handleDelete}
         timeZones={timeZones}
+        
       />
     </SidebarLayout>
   );

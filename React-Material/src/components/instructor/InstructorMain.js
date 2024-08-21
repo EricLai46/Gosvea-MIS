@@ -7,7 +7,7 @@ import InstructorPagination from "./InstructorPagination";
 import InstructorDialog from "./InstructorDialog";
 import { useNotification } from '../NotificationContext';
 import { Container, Button } from '@mui/material';
-
+import { saveAs } from 'file-saver';
 const InstructorMain = () => {
   const [timeZone, setTimeZone] = useState('');
   const [state, setState] = useState('');
@@ -201,7 +201,25 @@ const InstructorMain = () => {
     handleSearch();
   };
 
+  //导出文件
+  const handleExport=async()=>{
+    try{
+      const response=await axiosInstance.get('/instructor/export',{
+        responseType:'blob',
+      });
 
+      const contentDisposition=(await response).headers['content-disposition'];
+      const filename=contentDisposition
+                ?contentDisposition.split('filename')[1].split(';')[0].replace(/"/g,''):'instructors.xlsx';
+      
+      console.log('Content-Disposition:', contentDisposition);     
+         //文件下载
+    saveAs(new Blob([response.data]),filename);
+  } catch(error){
+    console.error('Error exported data',error);
+  }
+ };
+   
 
   return (
     <SidebarLayout>
@@ -220,6 +238,7 @@ const InstructorMain = () => {
           setPhonenumber={setPhonenumber}
           handleSearch={handleSearch}
           handleReset={handleReset}
+          handleExport={handleExport}
         />
         <InstructorTable currentItems={instructors} handleClickOpen={handleClickOpen} />
         <InstructorPagination totalPages={totalPages} currentPage={currentPage} handlePageChange={handlePageChange} />
