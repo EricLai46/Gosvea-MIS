@@ -3,6 +3,7 @@ package org.gosvea.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotEmpty;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.gosvea.pojo.*;
@@ -217,21 +218,127 @@ public class VenueController {
                     continue; // 跳过表头
                 }
                 Venue venue = new Venue();
-                String state = row.getCell(1).getStringCellValue();
-                String city = row.getCell(2).getStringCellValue();
-                String address = row.getCell(3).getStringCellValue();
-                String uniqueId = generateUniqueId(state, city, address);
-                //venue.setId(uniqueId);
-                venue.setState(state);
-                venue.setCity(city);
-                venue.setAddress(address);
-                // 设置其他属性...
-                venueService.add(venue);
+// 处理ID
+                if (row.getCell(0) != null) {
+                    if (row.getCell(0).getCellType() == CellType.NUMERIC) {
+                        venue.setId((int) row.getCell(0).getNumericCellValue());
+                    } else if (row.getCell(0).getCellType() == CellType.STRING) {
+                        venue.setId(Integer.parseInt(row.getCell(0).getStringCellValue().trim()));
+                    }
+                }
+
+// 处理State
+                if (row.getCell(1) != null) {
+                    if (row.getCell(1).getCellType() == CellType.STRING) {
+                        venue.setState(row.getCell(1).getStringCellValue().trim());
+                    } else {
+                        // 处理其他可能的情况，比如State是数值类型
+                        venue.setState(String.valueOf(row.getCell(1).getNumericCellValue()));
+                    }
+                }
+
+// 处理City
+                if (row.getCell(2) != null) {
+                    if (row.getCell(2).getCellType() == CellType.STRING) {
+                        venue.setCity(row.getCell(2).getStringCellValue().trim());
+                    } else {
+                        venue.setCity(String.valueOf(row.getCell(2).getNumericCellValue()));
+                    }
+                }
+
+// 处理Address
+                if (row.getCell(3) != null) {
+                    if (row.getCell(3).getCellType() == CellType.STRING) {
+                        venue.setAddress(row.getCell(3).getStringCellValue().trim());
+                    } else {
+                        venue.setAddress(String.valueOf(row.getCell(3).getNumericCellValue()));
+                    }
+                }
+
+                if (row.getCell(4) != null && !row.getCell(4).getStringCellValue().isEmpty()) {
+                    String fullName = row.getCell(4).getStringCellValue().trim();
+                    String[] nameParts = fullName.split(" ");
+                    if (nameParts.length == 2) {
+                        String firstName = nameParts[0];
+                        String lastName = nameParts[1];
+                        Integer instructorId = instructorService.findIdByName(firstName, lastName);
+                        if (instructorId != null) {
+                            venue.setInstructor(instructorId);
+                        }
+                    }
+                }
+
+                venue.setTimeZone(row.getCell(5).getStringCellValue().trim());
+                venue.setCancellationPolicy(row.getCell(6) != null ? row.getCell(6).getStringCellValue().trim() : null);
+                venue.setPaymentMode(row.getCell(7) != null ? row.getCell(7).getStringCellValue().trim() : null);
+
+                // 检查nonrefundableFee单元格类型
+                if (row.getCell(8) != null) {
+                    if (row.getCell(8).getCellType() == CellType.NUMERIC) {
+                        venue.setNonrefundableFee(row.getCell(8).getNumericCellValue());
+                    } else if (row.getCell(8).getCellType() == CellType.STRING) {
+                        venue.setNonrefundableFee(Double.valueOf(row.getCell(8).getStringCellValue().trim()));
+                    }
+                } else {
+                    venue.setNonrefundableFee(0.0);  // 默认值
+                }
+
+                venue.setFobKey(row.getCell(9) != null ? row.getCell(9).getStringCellValue().trim() : null);
+
+                if (row.getCell(10) != null) {
+                    if (row.getCell(10).getCellType() == CellType.NUMERIC) {
+                        venue.setDeposit(row.getCell(10).getNumericCellValue());
+                    } else if (row.getCell(10).getCellType() == CellType.STRING) {
+                        venue.setDeposit(Double.valueOf(row.getCell(10).getStringCellValue().trim()));
+                    }
+                }
+
+                if (row.getCell(11) != null) {
+                    if (row.getCell(11).getCellType() == CellType.NUMERIC) {
+                        venue.setMembershipFee(row.getCell(11).getNumericCellValue());
+                    } else if (row.getCell(11).getCellType() == CellType.STRING) {
+                        venue.setMembershipFee(Double.valueOf(row.getCell(11).getStringCellValue().trim()));
+                    }
+                }
+
+                if (row.getCell(12) != null) {
+                    if (row.getCell(12).getCellType() == CellType.NUMERIC) {
+                        venue.setUsageFee(row.getCell(12).getNumericCellValue());
+                    } else if (row.getCell(12).getCellType() == CellType.STRING) {
+                        venue.setUsageFee(Double.valueOf(row.getCell(12).getStringCellValue().trim()));
+                    }
+                }
+
+                venue.setRefundableStatus(row.getCell(13) != null ? row.getCell(13).getStringCellValue().trim() : null);
+                venue.setBookMethod(row.getCell(14) != null ? row.getCell(14).getStringCellValue().trim() : null);
+                venue.setRegistrationLink(row.getCell(15) != null ? row.getCell(15).getStringCellValue().trim() : null);
+
+                if (row.getCell(16) != null) {
+                    String statusString = row.getCell(16).getStringCellValue().trim().toUpperCase();
+                    try {
+                        Venue.VenueStatus status = Venue.VenueStatus.valueOf(statusString);
+                        venue.setVenueStatus(status);
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Unknown venue status: " + statusString);
+                        venue.setVenueStatus(null);
+                    }
+                } else {
+                    venue.setVenueStatus(null);
+                }
+
+                Venue existingVenue = venueService.getVenueById(venue.getId());
+                if (existingVenue != null) {
+                    venueService.updateVenue(venue);
+
+                } else {
+                    venueService.add(venue);
+
+                }
             }
+
             return ResponseEntity.ok().body("{\"success\": true}");
-        } catch (NoSuchAlgorithmException e) {
-            return ResponseEntity.badRequest().body("{\"success\": false, \"error\": \"" + e.getMessage() + "\"}");
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.badRequest().body("{\"success\": false, \"error\": \"An error occurred while processing the file.\"}");
         }
     }
@@ -286,11 +393,11 @@ public class VenueController {
                 row.createCell(5).setCellValue(venue.getTimeZone() != null ? venue.getTimeZone() : "");
                 row.createCell(6).setCellValue(venue.getCancellationPolicy() != null ? venue.getCancellationPolicy() : "");
                 row.createCell(7).setCellValue(venue.getPaymentMode() != null ? venue.getPaymentMode() : "");
-                row.createCell(8).setCellValue(String.valueOf(venue.getNonrefundableFee() != null ? venue.getNonrefundableFee() : ""));
+                row.createCell(8).setCellValue(venue.getNonrefundableFee() != null ? venue.getNonrefundableFee() : 0.0);
                 row.createCell(9).setCellValue(venue.getFobKey() != null ? venue.getFobKey()  : "");
-                row.createCell(10).setCellValue(String.valueOf(venue.getDeposit()!= null ? venue.getDeposit(): ""));
-                row.createCell(11).setCellValue(String.valueOf(venue.getMembershipFee() != null ? venue.getMembershipFee(): ""));
-                row.createCell(12).setCellValue(String.valueOf(venue.getUsageFee()!= null ? venue.getUsageFee() : ""));
+                row.createCell(10).setCellValue(venue.getDeposit()!= null ? venue.getDeposit(): 0.0);
+                row.createCell(11).setCellValue(venue.getMembershipFee() != null ? venue.getMembershipFee(): 0.0);
+                row.createCell(12).setCellValue(venue.getUsageFee()!= null ? venue.getUsageFee() : 0.0);
                 row.createCell(13).setCellValue(venue.getRefundableStatus() != null ? venue.getRefundableStatus() : "");
                 row.createCell(14).setCellValue(venue.getBookMethod()!= null ? venue.getBookMethod() : "");
                 row.createCell(15).setCellValue(venue.getRegistrationLink() != null ? venue.getRegistrationLink() : "");

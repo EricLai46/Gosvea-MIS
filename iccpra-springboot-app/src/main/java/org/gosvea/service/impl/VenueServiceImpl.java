@@ -39,8 +39,8 @@ public class VenueServiceImpl implements VenueService {
     public PageResponse<Venue> list(Integer pageNum, Integer pageSize,String state, String city, Integer instructor, String paymentMethod, String timeZone) {
         PageResponse<Venue> ps=new PageResponse<>();
         // 打印分页参数
-        System.out.println("Page number: " + pageNum);
-        System.out.println("Page size: " + pageSize);
+        //System.out.println("Page number: " + pageNum);
+        //System.out.println("Page size: " + pageSize);
 
         PageHelper.startPage(pageNum,pageSize);
         List<Venue> lv =venueMapper.list(state,city,instructor,paymentMethod,timeZone);
@@ -166,6 +166,8 @@ public class VenueServiceImpl implements VenueService {
     public Venue getVenueById(Integer venueId) {
         return venueMapper.getVenueById(venueId);
     }
+
+
 
 
 }

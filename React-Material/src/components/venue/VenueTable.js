@@ -33,7 +33,7 @@ const VenueTable = ({ currentItems, handleClickOpen }) => (
                 <TableCell>{venue.address}</TableCell>
                 <TableCell>{venue.timeZone}</TableCell>
                 <TableCell>{venue.state}</TableCell>
-                <TableCell>{venue.instructor}</TableCell>
+                <TableCell>{venue.instructorName}</TableCell>
                 <TableCell>{venue.city}</TableCell>
                 <TableCell>{venue.cancellationPolicy}</TableCell>
                 <TableCell>{venue.paymentMode}</TableCell>

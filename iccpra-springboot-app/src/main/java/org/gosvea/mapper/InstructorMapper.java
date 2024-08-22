@@ -34,5 +34,6 @@ public interface InstructorMapper {
     Instructor getInstructorById(Integer instructor);
     @Select("select * from instructors")
     List<Instructor> getAllInstructors();
-
+    @Select("select id from instructors where firstname=#{firstname} and lastname=#{lastname}")
+    Integer findIdByName(String firstname,String lastname);
 }

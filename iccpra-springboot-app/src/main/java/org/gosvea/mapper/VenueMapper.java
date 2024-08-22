@@ -53,4 +53,5 @@ public interface VenueMapper {
     void updateVenueStatus(Integer id, Venue.VenueStatus venueStatus);
     @Select("select * from venue where id=#{venueId}")
     Venue getVenueById(Integer venueId);
+
 }

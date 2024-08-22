@@ -5,27 +5,29 @@
 <mapper namespace="org.gosvea.mapper.VenueMapper">
      <!--分类查询-->
      <select id="list" resultType="org.gosvea.pojo.Venue">
-       select * from venue
+         SELECT v.*, CONCAT(i.firstname, ' ', i.lastname) AS instructorName
+         FROM venue v
+         LEFT JOIN instructors i ON v.instructor = i.id
          <where >
              <if test="state!=null">
-                 state=#{state}
+                 v.state=#{state}
              </if>
              <if test="city!=null">
-                 and city=#{city}
+                 and v.city=#{city}
 
              </if>
 
              <if test="timeZone!=null">
-                 and time_zone=#{timeZone}
+                 and v.time_zone=#{timeZone}
 
              </if>
 
              <if test="paymentMethod!=null">
-                 and payment_method=#{paymentMethod}
+                 and v.payment_method=#{paymentMethod}
              </if>
 
              <if test="instructor!=null">
-                 and instructor=#{instructor}
+                 and v.instructor=#{instructor}
              </if>
 
 

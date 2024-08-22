@@ -26,6 +26,8 @@ const VenueMain = () => {
   const { showNotification } = useNotification();
   const [venueStatus]=useState('');
   const [totalPages, setTotalPages] = useState(1); // 添加 totalPages 状态
+  const [selectedFile,setSelectedFile]=useState(null);
+
   useEffect(() => {
     fetchVenues();
     handleSearch();
@@ -222,6 +224,33 @@ const VenueMain = () => {
 
   //const totalPages = Math.ceil(totalVenues/ itemsPerPage);
   
+   //上传文件到后端
+   const handleFileChange=(event)=>{
+        setSelectedFile(event.target.files[0]);
+        event.target.value = null;
+   };
+
+   const handleUpload=()=>{
+        if(!selectedFile){
+          showNotification("Please select a file first!","error");
+          return;
+        }
+        const formData=new FormData();
+        formData.append('file',selectedFile);
+
+        axiosInstance.post('/venue/import',formData,{
+          headers:{
+            'Content-Type':'multipart/form-data'
+          }
+        })
+        .then(response=>{
+          console.log(response.data);
+
+        })
+        .catch(error=>{
+          console.log(error);
+        });
+   };
 
   return (
     <SidebarLayout>
@@ -236,6 +265,9 @@ const VenueMain = () => {
           handleSearch={handleSearch}
           handleReset={handleReset}
           handleExport={handleExport}
+          handleFileChange={handleFileChange}
+          handleUpload={handleUpload}
+          selectedFile={selectedFile}
         />
         <VenueTable currentItems={venues} handleClickOpen={handleClickOpen} />
         <VenuePagination totalPages={totalPages} currentPage={currentPage} handlePageChange={handlePageChange}/>

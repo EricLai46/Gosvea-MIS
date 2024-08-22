@@ -43,7 +43,7 @@ public class Venue {
 
     private Double latitude;
     private Double longitude;
-
+    private  String instructorName;
     // VenueStatus 枚举类型的属性
     private VenueStatus venueStatus;
 

@@ -92,5 +92,10 @@ public class InstructorServiceImpl implements InstructorService {
         return instructorMapper.getAllInstructors();
     }
 
+    @Override
+    public Integer findIdByName(String firstName, String lastName) {
+        return  instructorMapper.findIdByName(firstName,lastName);
+    }
+
 
 }

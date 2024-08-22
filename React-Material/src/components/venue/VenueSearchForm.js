@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, FormControl, InputLabel, Select, MenuItem, Button } from '@mui/material';
 
-const VenueSearchForm = ({ timeZone, state, instructor, setTimeZone, setState, setInstructor, handleSearch, handleReset, handleExport }) => (
+const VenueSearchForm = ({ timeZone, state, instructor, setTimeZone, setState, setInstructor, handleSearch, handleReset, handleExport,handleUpload, handleFileChange,selectedFile}) => (
   <Box display="flex" alignItems="center" mb={3}>
     <FormControl variant="outlined" sx={{ minWidth: 200, mr: 2 }}>
       <InputLabel>Time Zone</InputLabel>
@@ -47,9 +47,21 @@ const VenueSearchForm = ({ timeZone, state, instructor, setTimeZone, setState, s
     <Button variant="outlined" onClick={handleReset} sx={{ mr: 15 }}>
       Reset
     </Button>
-    <Button variant="outlined" sx={{mr:2}}>
-      Import
-    </Button>
+    <input
+      accept=".xlsx, .xls"
+      type="file"
+      onChange={(e)=>{handleFileChange(e);
+          handleUpload();
+      }}
+      style={{ display: 'none' }}
+      id="upload-file"
+    />
+    <label htmlFor="upload-file">
+      <Button variant="outlined" component="span" sx={{ mr: 2 }}>
+        Upload
+      </Button>
+    </label>
+
     <Button variant="outlined" onClick={handleExport}>
       Export
     </Button>

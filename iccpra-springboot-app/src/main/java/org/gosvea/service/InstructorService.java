@@ -32,4 +32,5 @@ public interface InstructorService {
     List<Instructor> getAllInstructors();
 
 
+    Integer findIdByName(String firstName, String lastName);
 }

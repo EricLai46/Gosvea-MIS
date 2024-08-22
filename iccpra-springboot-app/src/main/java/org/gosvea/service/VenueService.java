@@ -39,4 +39,6 @@ public interface VenueService {
     void updateVenueStatus(Integer id, Venue.VenueStatus venueStatus);
 
     Venue getVenueById(Integer venueId);
+
+
 }
