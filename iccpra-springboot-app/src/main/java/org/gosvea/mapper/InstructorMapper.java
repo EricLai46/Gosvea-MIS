@@ -36,4 +36,11 @@ public interface InstructorMapper {
     List<Instructor> getAllInstructors();
     @Select("select id from instructors where firstname=#{firstname} and lastname=#{lastname}")
     Integer findIdByName(String firstname,String lastname);
+
+    @Select("select concat(firstname.' ',lastname) as fullName from instructors ")
+    List<String> getAllInstructorNames();
+
+    void insertListInstructors(List<Instructor> instructorList);
+
+    void updateListInstructors(List<Instructor> instructorList);
 }

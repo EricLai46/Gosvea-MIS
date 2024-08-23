@@ -40,5 +40,9 @@ public interface VenueService {
 
     Venue getVenueById(Integer venueId);
 
+    void insertListVenues(List<Venue> venueList);
 
+    void updateListVenues(List<Venue> venueList);
+
+    Integer getVenueIdByAddress(String address);
 }

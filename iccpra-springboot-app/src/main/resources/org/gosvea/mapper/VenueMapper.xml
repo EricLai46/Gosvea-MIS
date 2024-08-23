@@ -36,7 +36,7 @@
     <!--更新数据库-->
     <update id="updateVenue">
         update venue
-        <set>
+        <trim prefix="SET" suffixOverrides=",">
             <if test="timeZone != null">
                 time_zone = #{timeZone},
             </if>
@@ -84,11 +84,85 @@
             </if>
 
             <if test="venueStatus!=null">
-                venue_status=#{venueStatus}
+                venue_status=#{venueStatus},
             </if>
-        </set>
+        </trim>
         where id=#{id}
     </update>
 
+    <!--批量更新Venue到数据库-->
+    <update id="updateListVenues" parameterType="list">
+        <foreach collection="list" item="venue" separator=";">
+            <choose>
+                <when test="venue.state != null or venue.city != null or venue.instructor != null or
+                        venue.address != null or venue.timeZone != null or venue.cancellationPolicy != null or
+                        venue.paymentMode != null or venue.nonrefundableFee != null or venue.fobKey != null or
+                        venue.deposit != null or venue.membershipFee != null or venue.usageFee != null or
+                        venue.refundableStatus != null or venue.bookMethod != null or venue.registrationLink != null or
+                        venue.venueStatus != null">
+                    UPDATE venue
+                    <trim prefix="SET" suffixOverrides=",">
+                        <if test="venue.state != null">
+                            state = #{venue.state},
+                        </if>
+                        <if test="venue.city != null">
+                            city = #{venue.city},
+                        </if>
+                        <if test="venue.instructor != null">
+                            instructor = #{venue.instructor},
+                        </if>
+                        <if test="venue.address != null">
+                            address = #{venue.address},
+                        </if>
+                        <if test="venue.timeZone != null">
+                            time_zone = #{venue.timeZone},
+                        </if>
+                        <if test="venue.cancellationPolicy != null">
+                            cancellation_policy = #{venue.cancellationPolicy},
+                        </if>
+                        <if test="venue.paymentMode != null">
+                            payment_mode = #{venue.paymentMode},
+                        </if>
+                        <if test="venue.nonrefundableFee != null">
+                            nonrefundable_fee = #{venue.nonrefundableFee},
+                        </if>
+                        <if test="venue.fobKey != null">
+                            fob_key = #{venue.fobKey},
+                        </if>
+                        <if test="venue.deposit != null">
+                            deposit = #{venue.deposit},
+                        </if>
+                        <if test="venue.membershipFee != null">
+                            membership_fee = #{venue.membershipFee},
+                        </if>
+                        <if test="venue.usageFee != null">
+                            usage_fee = #{venue.usageFee},
+                        </if>
+                        <if test="venue.refundableStatus != null">
+                            refundable_status = #{venue.refundableStatus},
+                        </if>
+                        <if test="venue.bookMethod != null">
+                            book_method = #{venue.bookMethod},
+                        </if>
+                        <if test="venue.registrationLink != null">
+                            registration_link = #{venue.registrationLink},
+                        </if>
+                        <if test="venue.venueStatus != null">
+                            venue_status = #{venue.venueStatus},
+                        </if>
+                    </trim>
+                    WHERE id = #{venue.id}
+                </when>
+            </choose>
+        </foreach>
+    </update>
+        <!--批量插入Venues到数据库-->
+    <insert id="insertListVenues" parameterType="list">
+        insert into venue (id,state,city,address,instructor,time_zone,cancellation_policy,payment_mode,nonrefundable_fee,fob_key,deposit,membership_fee,usage_fee,refundable_status,book_method,registration_link,venue_status)
+        values
+        <foreach collection="list" item="venue" separator=",">
+            (#{venue.id},#{venue.state},#{venue.city},#{venue.address},#{venue.instructor},#{venue.timeZone},#{venue.cancellationPolicy},#{venue.paymentMode},#{venue.nonrefundableFee},#{venue.fobKey},#{venue.deposit},#{venue.membershipFee},#{venue.usageFee},#{venue.refundableStatus},#{venue.bookMethod},#{venue.registrationLink},#{venue.venueStatus})
+        </foreach>
+    </insert>
 
 </mapper>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker,Tooltip } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker,Tooltip,useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Card, CardContent, Typography } from '@mui/material';
@@ -7,11 +7,10 @@ import axiosInstance from '../AxiosInstance';
 import { useNotification } from '../NotificationContext';
 
 
-
 const VenueMap = () => {
   const [venues, setVenues] = useState([]);
   const { showNotification } = useNotification();
-  const [mapCenter, setMapCenter] = useState([37.0902, -95.7129]);
+  const [mapCenter, setMapCenter] = useState([37.3733939, -121.9182157]);
   useEffect(() => {
     fetchVenues();
   }, []);
@@ -71,7 +70,41 @@ const VenueMap = () => {
         html: `<div style="background-color:${color}; width:20px; height:20px; border-radius:50%;"></div>`,
       });
     };
-
+    
+    const countVenuesByStatus = (status) => {
+      return venues.filter(venue => venue.venueStatus === status).length;
+    };
+  
+    const CustomControl = () => {
+      const map = useMap();
+  
+      useEffect(() => {
+        const customControl = L.control({ position: 'bottomleft' });
+  
+        customControl.onAdd = function () {
+          const div = L.DomUtil.create('div', 'custom-control');
+          div.innerHTML = `
+            <div style="background-color: white; padding: 5px; border-radius: 5px;">
+              <strong>Venue Status Counts:</strong><br />
+              Normal: ${countVenuesByStatus('NORMAL')}<br />
+              Instructor Issue: ${countVenuesByStatus('INSTRUCTORISSUE')}<br />
+              Venue Issue: ${countVenuesByStatus('VENUEISSUE')}<br />
+              Closed: ${countVenuesByStatus('CLOSED')}<br />
+              Investigation: ${countVenuesByStatus('INVESTIGATION')}
+            </div>
+          `;
+          return div;
+        };
+  
+        customControl.addTo(map);
+  
+        return () => {
+          customControl.remove();
+        };
+      }, [map]);
+  
+      return null;
+    };
     return (
       <Card style={{ height: '80vh', width: '100%', margin: '20px' }}>
         <CardContent>
@@ -98,7 +131,10 @@ const VenueMap = () => {
                 </Tooltip>
               </Marker>
             ))}
-          </MapContainer>
+            
+            <CustomControl/>
+            </MapContainer>
+         
         </CardContent>
       </Card>
     );

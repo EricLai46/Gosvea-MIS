@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://gosvea.cf0q6si6co44.us-east-1.rds.amazonaws.com:3306/gosvea
+    url: jdbc:mysql://gosvea.cf0q6si6co44.us-east-1.rds.amazonaws.com:3306/gosvea?useSSL=false&allowMultiQueries=true
     username: admin
     password: Gosvea2024!
   jpa:

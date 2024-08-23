@@ -1,6 +1,7 @@
 package org.gosvea.controller;
 
 
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -15,11 +16,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -224,6 +223,163 @@ public class InstructorController {
             return ResponseEntity.badRequest().body(null);
         }
     }
+
+    //文件上传
+    @PostMapping("/import")
+    public ResponseEntity<?> importInstructorData(@RequestParam("file") MultipartFile file) {
+
+        //需要更新update的Instructor list表
+        List<Instructor> updateVenuesList=new ArrayList<>();
+        //需要添加的Instructor List表
+        List<Instructor> insertVenuesList=new ArrayList<>();
+
+        try (InputStream inputStream = file.getInputStream();
+             Workbook workbook = new XSSFWorkbook(inputStream)) {
+            Sheet sheet = workbook.getSheetAt(0);
+            //venueService.clearAllData(); // 清除所有现有数据
+            for (Row row : sheet) {
+                if (row.getRowNum() == 0) {
+                    continue; // 跳过表头
+                }
+                Instructor instructor = new Instructor();
+                // 处理ID
+                if (row.getCell(0) != null) {
+                    if (row.getCell(0).getCellType() == CellType.NUMERIC) {
+                        instructor.setId((int) row.getCell(0).getNumericCellValue());
+                    } else if (row.getCell(0).getCellType() == CellType.STRING) {
+                        instructor.setId(Integer.parseInt(row.getCell(0).getStringCellValue().trim()));
+                    }
+                }
+
+// 处理venue Id
+                if (row.getCell(1) != null && !row.getCell(1).getStringCellValue().isEmpty()) {
+                    String address = row.getCell(1).getStringCellValue().trim();
+
+
+                        Integer venueId = venueService.getVenueIdByAddress(address);
+                        if (venueId != null)
+                            instructor.setVenueId(venueId);
+
+
+                }
+
+// 处理firstname
+                if (row.getCell(2) != null) {
+                    if (row.getCell(2).getCellType() == CellType.STRING) {
+                        instructor.setFirstname(row.getCell(2).getStringCellValue().trim());
+                    } else {
+                        instructor.setFirstname(String.valueOf(row.getCell(2).getNumericCellValue()));
+                    }
+                }
+
+// 处理lastname
+                if (row.getCell(3) != null) {
+                    if (row.getCell(3).getCellType() == CellType.STRING) {
+                        instructor.setLastname(row.getCell(3).getStringCellValue().trim());
+                    } else {
+                        instructor.setLastname(String.valueOf(row.getCell(3).getNumericCellValue()));
+                    }
+                }
+
+
+                instructor.setState(row.getCell(4) != null ? row.getCell(4).getStringCellValue().trim() : null);
+                instructor.setCity(row.getCell(5) != null ? row.getCell(5).getStringCellValue().trim() : null);
+                if (row.getCell(6) != null) {
+                    if (row.getCell(6).getCellType() == CellType.STRING) {
+                        instructor.setPhoneNumber(row.getCell(6).getStringCellValue().trim());
+                    } else {
+                        instructor.setPhoneNumber(String.valueOf(row.getCell(6).getNumericCellValue()));
+                    }
+                }
+
+
+                instructor.setEmail(row.getCell(7) != null ? row.getCell(7).getStringCellValue().trim() : null);
+                if (row.getCell(8) != null) {
+                    if (row.getCell(8).getCellType() == CellType.STRING) {
+                        instructor.setWageHour(Integer.valueOf(row.getCell(8).getStringCellValue().trim()));
+                    } else {
+                        instructor.setWageHour((int)row.getCell(8).getNumericCellValue());
+                    }
+                }
+                if (row.getCell(9) != null) {
+                    if (row.getCell(9).getCellType() == CellType.STRING) {
+                        instructor.setTotalClassTimes(Integer.valueOf(row.getCell(9).getStringCellValue().trim()));
+                    } else {
+                        instructor.setTotalClassTimes((int)(row.getCell(9).getNumericCellValue()));
+                    }
+                }
+                if (row.getCell(10) != null) {
+                    if (row.getCell(10).getCellType() == CellType.STRING) {
+                        instructor.setDeposit(row.getCell(10).getStringCellValue().trim());
+                    } else {
+                        instructor.setDeposit(String.valueOf(row.getCell(10).getNumericCellValue()));
+                    }
+                }
+                if (row.getCell(11) != null) {
+                    if (row.getCell(11).getCellType() == CellType.STRING) {
+                        instructor.setRentManikinNumbers(row.getCell(11).getStringCellValue().trim());
+                    } else {
+                        instructor.setRentManikinNumbers(String.valueOf(row.getCell(11).getNumericCellValue()));
+                    }
+                }
+                if (row.getCell(12) != null) {
+                    if (row.getCell(12).getCellType() == CellType.STRING) {
+                        instructor.setFinance(row.getCell(12).getStringCellValue().trim());
+                    } else {
+                        instructor.setFinance(String.valueOf(row.getCell(12).getNumericCellValue()));
+                    }
+                }
+                if (row.getCell(13) != null) {
+                    if (row.getCell(13).getCellType() == CellType.STRING) {
+                        instructor.setRentStatus(row.getCell(13).getStringCellValue().trim());
+                    } else {
+                        instructor.setRentStatus(String.valueOf(row.getCell(13).getNumericCellValue()));
+                    }
+                }
+
+                if (row.getCell(14) != null) {
+                    if (row.getCell(14).getCellType() == CellType.STRING) {
+                        instructor.setFobKey(row.getCell(14).getStringCellValue().trim());
+                    } else {
+                        instructor.setFobKey(String.valueOf(row.getCell(14).getNumericCellValue()));
+                    }
+                }
+
+
+
+                Instructor existingInstructor = instructorService.getInstructorById(instructor.getId());
+                if (existingInstructor != null) {
+                    updateVenuesList.add(instructor);
+
+                } else {
+                    insertVenuesList.add(instructor);
+
+                }
+            }
+
+            //循环结束分别添加，更新venuelist
+            if(!insertVenuesList.isEmpty())
+            {
+                System.out.println(insertVenuesList);
+               instructorService.insertListInstructors(insertVenuesList);
+            }
+
+
+            if(!updateVenuesList.isEmpty())
+            {
+                //System.out.println(updateVenuesList);
+
+               instructorService.updateListInstructors(updateVenuesList);
+            }
+
+
+            return ResponseEntity.ok().body("{\"success\": true}");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("{\"success\": false, \"error\": \"An error occurred while processing the file.\"}");
+        }
+    }
+
 //    //检查venue和instructor是否有匹配的时间
 //    public Result checkVenueInstructorInformation() {
 //        List<Venue> venues = venueService.getAllVenues();

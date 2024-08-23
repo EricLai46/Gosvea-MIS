@@ -93,8 +93,23 @@ public class InstructorServiceImpl implements InstructorService {
     }
 
     @Override
+    public List<String> getAllInstructorNames() {
+        return instructorMapper.getAllInstructorNames();
+    }
+
+    @Override
     public Integer findIdByName(String firstName, String lastName) {
         return  instructorMapper.findIdByName(firstName,lastName);
+    }
+
+    @Override
+    public void updateListInstructors(List<Instructor> instructorList) {
+        instructorMapper.updateListInstructors(instructorList);
+    }
+
+    @Override
+    public void insertListInstructors(List<Instructor> instructorList) {
+        instructorMapper.insertListInstructors(instructorList);
     }
 
 

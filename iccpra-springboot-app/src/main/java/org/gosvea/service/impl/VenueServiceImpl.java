@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.github.pagehelper.*;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
@@ -167,7 +168,20 @@ public class VenueServiceImpl implements VenueService {
         return venueMapper.getVenueById(venueId);
     }
 
+    @Override
+    public void insertListVenues(List<Venue> venueList) {
+        venueMapper.insertListVenues(venueList);
+    }
 
+    @Override
+    public void updateListVenues(List<Venue> venueList) {
+        venueMapper.updateListVenues(venueList);
+    }
+
+    @Override
+    public Integer getVenueIdByAddress(String address) {
+        return venueMapper.getVenueIdByAddress(address);
+    }
 
 
 }

@@ -32,7 +32,7 @@
             </if>
         </where>
     </select>
-
+<!--更新单个Instructor-->
     <update id="updateInstructor" >
         update instructors
         <set>
@@ -80,7 +80,74 @@
                 where id=#{id}
 
     </update>
+    <!--批量更新Instructors到数据库-->
+    <update id="updateListInstructors" parameterType="list">
+        <foreach collection="list" item="instructor" separator=";">
+            <choose>
+                <when test="instructor.venueId or instructor.firstname != null or instructor.firstname != null or instructor.lastname != null or
+                        instructor.state != null or instructor.city != null or instructor.phoneNumber != null or
+                        instructor.email != null or instructor.wageHour != null or instructor.totalClassTimes != null or
+                        instructor.deposit != null or instructor.rentManikinNumbers != null or instructor.finance != null or
+                        instructor.rentStatus != null or instructor.fobKey != null">
+                    UPDATE instructors
+                    <trim prefix="SET" suffixOverrides=",">
+                        <if test="instructor.venueId != null">
+                            venue_id = #{instructor.venueId},
+                        </if>
+                        <if test="instructor.firstname != null">
+                            firstname = #{instructor.firstname},
+                        </if>
+                        <if test="instructor.lastname != null">
+                            lastname = #{instructor.lastname},
+                        </if>
+                        <if test="instructor.state != null">
+                            state = #{instructor.state},
+                        </if>
+                        <if test="instructor.city != null">
+                            city = #{instructor.city},
+                        </if>
+                        <if test="instructor.phoneNumber != null">
+                            phone_number = #{instructor.phoneNumber},
+                        </if>
+                        <if test="instructor.email != null">
+                            email = #{instructor.email},
+                        </if>
+                        <if test="instructor.wageHour != null">
+                            wage_hour = #{instructor.wageHour},
+                        </if>
+                        <if test="instructor.totalClassTimes != null">
+                            total_class_times = #{instructor.totalClassTimes},
+                        </if>
+                        <if test="instructor.deposit != null">
+                            deposit = #{instructor.deposit},
+                        </if>
+                        <if test="instructor.rentManikinNumbers != null">
+                            rent_manikin_numbers = #{instructor.rentManikinNumbers},
+                        </if>
+                        <if test="instructor.finance != null">
+                            finance = #{instructor.finance},
+                        </if>
+                        <if test="instructor.rentStatus!= null">
+                            rent_status = #{instructor.rentStatus},
+                        </if>
+                        <if test="instructor.fobKey != null">
+                           fob_key = #{instructor.fobKey},
+                        </if>
 
+                    </trim>
+                    WHERE id = #{instructor.id}
+                </when>
+            </choose>
+        </foreach>
+    </update>
+    <!--批量插入Instructors到数据库-->
+    <insert id="insertListInstructors" parameterType="list">
+        insert into instructors (id,venue_id,firstname,lastname,state,city,phone_number,email,wage_hour,total_class_times,deposit,rent_manikin_numbers,finance,rent_status,fob_key)
+        values
+        <foreach collection="list" item="instructor" separator=",">
+            (#{instructor.id},#{instructor.venueId},#{instructor.firstname},#{instructor.lastname},#{instructor.state},#{instructor.city},#{instructor.phoneNumber},#{instructor.email},#{instructor.wageHour},#{instructor.totalClassTimes},#{instructor.deposit},#{instructor.rentManikinNumbers},#{instructor.finance},#{instructor.rentStatus},#{instructor.fobKey})
+        </foreach>
+    </insert>
 
 
 </mapper>

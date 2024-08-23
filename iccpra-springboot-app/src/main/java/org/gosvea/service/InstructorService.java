@@ -31,6 +31,12 @@ public interface InstructorService {
 
     List<Instructor> getAllInstructors();
 
+    List<String> getAllInstructorNames();
 
     Integer findIdByName(String firstName, String lastName);
+
+
+    void updateListInstructors(List<Instructor> instructorList);
+
+    void insertListInstructors(List<Instructor> instructorList);
 }

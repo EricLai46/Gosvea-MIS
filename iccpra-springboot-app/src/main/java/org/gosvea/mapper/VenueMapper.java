@@ -54,4 +54,10 @@ public interface VenueMapper {
     @Select("select * from venue where id=#{venueId}")
     Venue getVenueById(Integer venueId);
 
+    void updateListVenues(List<Venue> venueList);
+
+    void insertListVenues(List<Venue> venueList);
+
+    @Select("select id from venue where address=#{address}")
+    Integer getVenueIdByAddress(String address);
 }

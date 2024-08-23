@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, FormControl, InputLabel, Select, MenuItem, TextField, Button } from '@mui/material';
 
-const InstructorSearchForm = ({  state, setState, email, setEmail, firstname, setFirstname, lastname, setLastname, phonenumber, setPhonenumber, handleSearch, handleReset,handleExport }) => {
+const InstructorSearchForm = ({  state, setState, email, setEmail, firstname, setFirstname, lastname, setLastname, phonenumber, setPhonenumber, handleSearch, handleReset,handleExport,handleFileChange,handleUpload,selectefile }) => {
   const timeZones = ['PST', 'EST', 'CST', 'MST', 'GMT', 'UTC', 'BST', 'CEST'];
 
   return (
@@ -55,10 +55,20 @@ const InstructorSearchForm = ({  state, setState, email, setEmail, firstname, se
         Reset
       </Button>
 
-      <Button variant='outlined' sx={{mr:2}}>
-        import
+      <input
+      accept=".xlsx, .xls"
+      type="file"
+      onChange={(e)=>{handleFileChange(e);
+          handleUpload();
+      }}
+      style={{ display: 'none' }}
+      id="upload-file"
+    />
+    <label htmlFor="upload-file">
+      <Button variant="outlined" component="span" sx={{ mr: 2 }}>
+        Upload
       </Button>
-
+    </label>
       <Button variant='outlined'onClick={handleExport}>
         Export
       </Button>

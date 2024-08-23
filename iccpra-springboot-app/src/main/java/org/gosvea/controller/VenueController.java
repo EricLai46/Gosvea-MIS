@@ -3,6 +3,7 @@ package org.gosvea.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotEmpty;
+import org.apache.ibatis.session.SqlSession;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -11,6 +12,7 @@ import org.gosvea.service.CourseService;
 import org.gosvea.service.InstructorService;
 import org.gosvea.service.VenueService;
 import org.gosvea.utils.JwtUtil;
+import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -20,7 +22,8 @@ import org.springframework.web.bind.annotation.*;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
-
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSession;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -48,6 +51,9 @@ public class VenueController {
 
     @Autowired
     private CourseService courseService;
+
+    @Autowired
+    private SqlSessionTemplate sqlSessionTemplate;
 
     private String[] headers={"ID","State","City","Address","Instructor","Time Zone","Time Zone","Cancellation Policy","Payment Mode",
                               "Nonrefundable Fee","Fob Key","Deposit","Membership Fee","Usage Fee","Refundable Status","Book Method",
@@ -209,6 +215,12 @@ public class VenueController {
     //文件上传
     @PostMapping("/import")
     public ResponseEntity<?> importVenueData(@RequestParam("file") MultipartFile file) {
+
+        //需要更新update的Venue list表
+        List<Venue> updateVenuesList=new ArrayList<>();
+        //需要添加的Venue List表
+        List<Venue> insertVenuesList=new ArrayList<>();
+
         try (InputStream inputStream = file.getInputStream();
              Workbook workbook = new XSSFWorkbook(inputStream)) {
             Sheet sheet = workbook.getSheetAt(0);
@@ -218,7 +230,7 @@ public class VenueController {
                     continue; // 跳过表头
                 }
                 Venue venue = new Venue();
-// 处理ID
+                   // 处理ID
                 if (row.getCell(0) != null) {
                     if (row.getCell(0).getCellType() == CellType.NUMERIC) {
                         venue.setId((int) row.getCell(0).getNumericCellValue());
@@ -283,7 +295,13 @@ public class VenueController {
                     venue.setNonrefundableFee(0.0);  // 默认值
                 }
 
-                venue.setFobKey(row.getCell(9) != null ? row.getCell(9).getStringCellValue().trim() : null);
+                if (row.getCell(9) != null) {
+                    if (row.getCell(9).getCellType() == CellType.NUMERIC) {
+                        venue.setFobKey(String.valueOf(row.getCell(9).getNumericCellValue()));
+                    } else if (row.getCell(9).getCellType() == CellType.STRING) {
+                        venue.setFobKey(row.getCell(9).getStringCellValue().trim());
+                    }
+                }
 
                 if (row.getCell(10) != null) {
                     if (row.getCell(10).getCellType() == CellType.NUMERIC) {
@@ -328,13 +346,29 @@ public class VenueController {
 
                 Venue existingVenue = venueService.getVenueById(venue.getId());
                 if (existingVenue != null) {
-                    venueService.updateVenue(venue);
+                    updateVenuesList.add(venue);
 
                 } else {
-                    venueService.add(venue);
+                    insertVenuesList.add(venue);
 
                 }
             }
+
+            //循环结束分别添加，更新venuelist
+            if(!insertVenuesList.isEmpty())
+            {
+                System.out.println(insertVenuesList);
+                venueService.insertListVenues(insertVenuesList);
+            }
+
+
+            if(!updateVenuesList.isEmpty())
+            {
+                //System.out.println(updateVenuesList);
+
+                venueService.updateListVenues(updateVenuesList);
+            }
+
 
             return ResponseEntity.ok().body("{\"success\": true}");
         } catch (Exception e) {

@@ -27,12 +27,14 @@ const InstructorMain = () => {
   const [phonenumber, setPhonenumber] = useState('');
   const [totalPages, setTotalPages] = useState(1);
   const [totalInstructors,setTotalInstructors]=useState(0);
+  const [selectedFile,setSelectedFile]=useState(null);
+
   useEffect(() => {
     fetchInstructors();
     handleSearch();
   }, [currentPage]);
   
-  
+  //获取instructor
   const fetchInstructors = async () => {
     try {
    
@@ -57,7 +59,7 @@ const InstructorMain = () => {
       console.error('获取Instructor信息时出错:', error);
     }
   };
-
+ //搜索instructor
   const handleSearch = () => {
     if (isLoading) return; // 避免重复请求
     setIsLoading(true);
@@ -136,7 +138,7 @@ const InstructorMain = () => {
     const { name, value } = e.target;
     setCurrentInstructor(prev => ({ ...prev, [name]: value }));
   };
-
+//保存instructor 信息
   const handleSave = () => {
     axiosInstance.put('/instructor', currentInstructor, {
       headers: {
@@ -154,7 +156,7 @@ const InstructorMain = () => {
         showNotification('Instructor update failed!', 'error');
       });
   };
-
+  //添加新的instructor
   const handleInsert = () => {
     axiosInstance.post('/instructor', currentInstructor, {
       headers: {
@@ -171,7 +173,7 @@ const InstructorMain = () => {
         showNotification('Instructor addition failed!', 'error');
       });
   };
-
+  //删除instructor
   const handleDelete = () => {
     axiosInstance.delete('/instructor', { params: { instructorId: currentInstructor.id } })
       .then(response => {
@@ -184,7 +186,7 @@ const InstructorMain = () => {
         showNotification('Instructor deletion failed!', 'error');
       });
   };
-
+  //重置搜索instructor的条件
   const handleReset = () => {
     
     setState('');
@@ -195,7 +197,7 @@ const InstructorMain = () => {
     setInstructors([]);
     setCurrentPage(1);
   };
-
+ //翻页
   const handlePageChange = (event, value) => {
     setCurrentPage(value);
     handleSearch();
@@ -221,6 +223,35 @@ const InstructorMain = () => {
  };
    
 
+ //上传instructor文件
+  //上传文件到后端
+  const handleFileChange=(event)=>{
+    setSelectedFile(event.target.files[0]);
+    event.target.value = null;
+};
+
+const handleUpload=()=>{
+    if(!selectedFile){
+      showNotification("Please select a file first!","error");
+      return;
+    }
+    const formData=new FormData();
+    formData.append('file',selectedFile);
+
+    axiosInstance.post('/instructor/import',formData,{
+      headers:{
+        'Content-Type':'multipart/form-data'
+      }
+    })
+    .then(response=>{
+      console.log(response.data);
+
+    })
+    .catch(error=>{
+      console.log(error);
+    });
+};
+
   return (
     <SidebarLayout>
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
@@ -239,6 +270,9 @@ const InstructorMain = () => {
           handleSearch={handleSearch}
           handleReset={handleReset}
           handleExport={handleExport}
+          handleFileChange={handleFileChange}
+          handleUpload={handleUpload}
+          selectedFile={selectedFile}
         />
         <InstructorTable currentItems={instructors} handleClickOpen={handleClickOpen} />
         <InstructorPagination totalPages={totalPages} currentPage={currentPage} handlePageChange={handlePageChange} />
