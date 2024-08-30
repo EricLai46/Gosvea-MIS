@@ -7,6 +7,7 @@ const VenueTable = ({ currentItems, handleClickOpen }) => (
       <TableHead>
         <TableRow>
           <TableCell>Id</TableCell>
+          <TableCell>ICPISManager</TableCell>
           <TableCell>Address</TableCell>
           <TableCell>TimeZone</TableCell>
           <TableCell>State</TableCell>
@@ -30,6 +31,7 @@ const VenueTable = ({ currentItems, handleClickOpen }) => (
             currentItems.map((venue) => (
               <TableRow key={venue.id}>
                 <TableCell>{venue.id}</TableCell>
+                <TableCell>{venue.icpisManager}</TableCell>
                 <TableCell>{venue.address}</TableCell>
                 <TableCell>{venue.timeZone}</TableCell>
                 <TableCell>{venue.state}</TableCell>

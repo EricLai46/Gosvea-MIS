@@ -75,6 +75,9 @@
             <if test="fobKey!=null">
                 fob_key=#{fobKey},
             </if>
+            <if test="salaryInfo!+null">
+                salary_info=#{salaryInfo},
+            </if>
 
         </set>
                 where id=#{id}
@@ -88,7 +91,7 @@
                         instructor.state != null or instructor.city != null or instructor.phoneNumber != null or
                         instructor.email != null or instructor.wageHour != null or instructor.totalClassTimes != null or
                         instructor.deposit != null or instructor.rentManikinNumbers != null or instructor.finance != null or
-                        instructor.rentStatus != null or instructor.fobKey != null">
+                        instructor.rentStatus != null or instructor.fobKey != null or instructor.salaryInfo!=null" >
                     UPDATE instructors
                     <trim prefix="SET" suffixOverrides=",">
                         <if test="instructor.venueId != null">
@@ -133,7 +136,9 @@
                         <if test="instructor.fobKey != null">
                            fob_key = #{instructor.fobKey},
                         </if>
-
+                        <if test="instructor.salaryInfo!=null">
+                            salary_info=#{instructor.salaryInfo},
+                        </if>
                     </trim>
                     WHERE id = #{instructor.id}
                 </when>
@@ -142,10 +147,10 @@
     </update>
     <!--批量插入Instructors到数据库-->
     <insert id="insertListInstructors" parameterType="list">
-        insert into instructors (id,venue_id,firstname,lastname,state,city,phone_number,email,wage_hour,total_class_times,deposit,rent_manikin_numbers,finance,rent_status,fob_key)
+        insert into instructors (id,venue_id,firstname,lastname,state,city,phone_number,email,wage_hour,total_class_times,deposit,rent_manikin_numbers,finance,rent_status,fob_key,salary_info)
         values
         <foreach collection="list" item="instructor" separator=",">
-            (#{instructor.id},#{instructor.venueId},#{instructor.firstname},#{instructor.lastname},#{instructor.state},#{instructor.city},#{instructor.phoneNumber},#{instructor.email},#{instructor.wageHour},#{instructor.totalClassTimes},#{instructor.deposit},#{instructor.rentManikinNumbers},#{instructor.finance},#{instructor.rentStatus},#{instructor.fobKey})
+            (#{instructor.id},#{instructor.venueId},#{instructor.firstname},#{instructor.lastname},#{instructor.state},#{instructor.city},#{instructor.phoneNumber},#{instructor.email},#{instructor.wageHour},#{instructor.totalClassTimes},#{instructor.deposit},#{instructor.rentManikinNumbers},#{instructor.finance},#{instructor.rentStatus},#{instructor.fobKey},#{instructor.salaryInfo})
         </foreach>
     </insert>
 

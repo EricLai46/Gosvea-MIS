@@ -27,4 +27,77 @@
             </if>
         </where>
     </select>
+
+    <!--批量插入courseschedules到数据库-->
+    <insert id="insertCourseSchedules" parameterType="list">
+        insert into coursesschedule (instructor_id,venue_id,date,start_time,end_time,is_active,address,course_title)
+        values
+        <foreach collection="list" item="courseschedule" separator=",">
+            (#{courseschedule.instructorId},#{courseschedule.venueId},#{courseschedule.date},#{courseschedule.startTime},#{courseschedule.endTime},#{courseschedule.isActive},#{courseschedule.address},#{courseschedule.courseTitle})
+        </foreach>
+    </insert>
+
+    <!--批量更新courseschedule到数据库-->
+    <update id="updateCourseSchedules" parameterType="list">
+        <foreach collection="list" item="courseschedule" separator=";">
+
+                    UPDATE coursesschedule
+                    <trim prefix="SET" suffixOverrides=",">
+                        <if test="courseschedule.instructorId != null">
+                            instructor_id = #{courseschedule.instructorId},
+                        </if>
+                        <if test="courseschedule.venueId != null">
+                            venue_id = #{courseschedule.venueId},
+                        </if>
+                        <if test="courseschedule.date != null">
+                            date = #{courseschedule.date},
+                        </if>
+                        <if test="courseschedule.startTime != null">
+                            start_time= #{courseschedule.startTime},
+                        </if>
+                        <if test="courseschedule.endTime != null">
+                            end_time= #{courseschedule.endTime},
+                        </if>
+                        <if test="courseschedule.isActive != null">
+                            is_active = #{courseschedule.isActive},
+                        </if>
+                        <if test="courseschedule.address != null">
+                            address = #{courseschedule.address},
+                        </if>
+                        <if test="courseschedule.courseTitle != null">
+                            course_title = #{courseschedule.courseTitle},
+                        </if>
+
+                    </trim>
+                    WHERE id = #{venue.id}
+
+        </foreach>
+    </update>
+
+    <!--批量删除courseschedule-->
+    <delete id="deleteCourseSchedules" parameterType="java.util.List">
+        delete from coursesschedule
+        where id IN
+        <foreach item="courseschedule" collection="list"  open="(" separator="," close=")">
+                #{courseschedule.id}
+        </foreach>
+    </delete>
+
+
+    <!--批量查询courseschedule-->
+    <select id="findCourseSchedulesByVenueAndDateRange" parameterType="map" resultType="org.gosvea.pojo.CourseSchedule">
+        select *
+        from coursesschedule
+        where venue_id=#{venueId}
+        <if test="venueSchedules!=null and venueSchedules.size()>0">
+            And(
+            <foreach item="schedule" collection="venueSchedules" separator="or">
+                (date=#{schedule.date}
+                and start_time &lt;=#{schedule.endTime}
+                and end_time &gt;=#{schedule.startTime})
+            </foreach>
+            )
+        </if>
+
+    </select>
 </mapper>

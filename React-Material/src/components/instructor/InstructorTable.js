@@ -16,6 +16,7 @@ const InstructorTable = ({ currentItems, handleClickOpen }) => {
             <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>PhoneNumber</TableCell>
             <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>Email</TableCell>
             <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>Wage Per Hour</TableCell>
+            <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>Salary Info</TableCell>
             <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>Total Classes Times</TableCell>
             <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>Deposit</TableCell>
             <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>Rent Manikin Numbers</TableCell>
@@ -38,6 +39,7 @@ const InstructorTable = ({ currentItems, handleClickOpen }) => {
                 <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>{instructor.phoneNumber}</TableCell>
                 <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>{instructor.email}</TableCell>
                 <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>{instructor.wageHour}</TableCell>
+                <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>{instructor.salaryInfo}</TableCell>
                 <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>{instructor.totalClassTimes}</TableCell>
                 <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>{instructor.deposit}</TableCell>
                 <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>{instructor.rentManikinNumbers}</TableCell>

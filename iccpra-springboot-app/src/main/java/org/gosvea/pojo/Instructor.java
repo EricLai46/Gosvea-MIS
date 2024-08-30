@@ -10,7 +10,7 @@ import java.util.List;
 public class Instructor {
     private Integer id;
 
-    private Integer venueId;
+    private String venueId;
     @NotEmpty
     private String firstname;
     @NotEmpty
@@ -19,14 +19,12 @@ public class Instructor {
     private String state;
     @NotEmpty
     private String city;
-    @NotEmpty
     private String phoneNumber;
-    @NotEmpty
+
     private String email;
     @NotEmpty
-    private Integer wageHour;
-
-    @NotEmpty
+    private String wageHour;
+    private String salaryInfo;
     private Integer totalClassTimes;
 
     private String deposit;

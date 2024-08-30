@@ -47,6 +47,12 @@ export const mainListItems = (
       </ListItemIcon> 
       <ListItemText primary="Courses" />
     </ListItemButton >
+    {/* <ListItemButton component={Link} to="/advertisementmain">
+      <ListItemIcon>
+        <AddLocationIcon />
+      </ListItemIcon>
+      <ListItemText primary="AD" />
+    </ListItemButton> */}
     {/* <ListItemButton>
       <ListItemIcon>
         <AnalyticsIcon />

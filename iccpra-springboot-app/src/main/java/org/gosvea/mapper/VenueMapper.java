@@ -17,15 +17,15 @@ public interface VenueMapper {
             "values(#{state}, #{city}, #{instructor}, #{address}, #{timeZone}, #{cancellationPolicy}, #{paymentMode}, #{nonrefundableFee}, #{fobKey}, #{deposit}, #{membershipFee}, #{usageFee}, #{refundableStatus}, #{bookMethod}, #{registrationLink})")
     void add(Venue venue);
 
-    List<Venue> list(String state, String city, Integer instructor, String paymentMethod, String timeZone);
+    List<Venue> list(String state, String city, String icpisManager, String paymentMethod, String timeZone);
     //@Update("update venue set state=#{state},city=#{city},instructor=#{instructor},address=#{address},time_zone=#{timeZone},cancellation_policy=#{cancellationPolicy},payment_mode=#{paymentMode},nonrefundable_fee=#{nonrefundableFee},fob_key=#{fobKey},deposit=#{deposit},membership_fee=#{membershipFee},usage_fee=#{usageFee},refundable_status=#{refundableStatus},book_method=#{bookMethod},registration_link=#{registrationLink} where id=#{id}")
     void updateVenue(Venue venue);
     @Delete("delete from venue where id=#{venueId}")
-    void deleteVenue(Integer venueId);
+    void deleteVenue(String venueId);
     @Update("update venueschedule set date=#{date},start_time=#{startTime},end_time=#{endTime} where venue_id=#{venueId}")
-    void updateVenueSchedule(LocalDate date, LocalTime startTime, LocalTime endTime, Integer venueId);
+    void updateVenueSchedule(LocalDate date, LocalTime startTime, LocalTime endTime, String venueId);
     @Delete("delete from venueschedule where venue_id=#{venueId}")
-    void deleteVenueSchedule(Integer venueId);
+    void deleteVenueSchedule(String venueId);
     @Select("select * from venueschedule where venue_id=#{venueId}")
     @Results({
             @Result(property = "id", column = "id"),
@@ -35,29 +35,33 @@ public interface VenueMapper {
             @Result(property = "endTime", column = "end_time", javaType = LocalTime.class, jdbcType = JdbcType.TIME),
             @Result(property = "isBooked", column = "is_booked")
     })
-    List<VenueSchedule> getVenueSchedule(Integer venueId);
+    List<VenueSchedule> getVenueSchedule(String venueId);
 
     @Insert("insert into venueschedule(date,start_time,end_time,venue_id,course_title) values(#{date},#{startTime},#{endTime},#{venueId},#{courseTitle}) ")
     void addVenueSchedule(VenueSchedule venueSchedule);
     @Delete("delete from venueschedule where id=#{id}")
-    void deleteVenueScheduleSingle(Integer id);
+    void deleteVenueScheduleSingle(String id);
     @Select("select * from venue")
     List<Venue> getAllVenues();
     @Select("select * from venue")
     List<Venue> getAllVenueFromMap();
     @Update("update venue set latitude=#{lat},longitude=#{lon} where id=#{id}")
-    void saveLatLon(double lat, double lon, Integer id);
+    void saveLatLon(double lat, double lon, String id);
     @Select("select latitude,longitude where id=#{id}")
     double[] getLatLon(Integer id);
     @Update("update venue set venue_status=#{venueStatus} where id=#{id}")
     void updateVenueStatus(Integer id, Venue.VenueStatus venueStatus);
     @Select("select * from venue where id=#{venueId}")
-    Venue getVenueById(Integer venueId);
+    Venue getVenueById(String venueId);
 
     void updateListVenues(List<Venue> venueList);
 
     void insertListVenues(List<Venue> venueList);
 
     @Select("select id from venue where address=#{address}")
-    Integer getVenueIdByAddress(String address);
+    String getVenueIdByAddress(String address);
+
+    List<Venue> getNormalStatusVenues(String state, String timeZone);
+    @Select("select * from venue where instructor=#{instructorId}")
+    Venue getVenueByInstructorId(Integer instructorId);
 }

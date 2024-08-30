@@ -6,14 +6,14 @@ const CourseTable = ({ currentItems, handleClickOpen }) => (
     <Table sx={{ minWidth: 650 }}>
       <TableHead>
         <TableRow>
-          <TableCell>Course ID</TableCell>
-          <TableCell>Course Address</TableCell>
+          <TableCell>AD ID</TableCell>
+          <TableCell>AD Address</TableCell>
           <TableCell>Course Title</TableCell>
           <TableCell>Course Instructor</TableCell>
           <TableCell>Course Date</TableCell>
           <TableCell>Course Start Time</TableCell>
           <TableCell>Course End Time</TableCell>
-          <TableCell>Course Is Active</TableCell>
+          <TableCell>Course Published</TableCell>
           <TableCell>Actions</TableCell>
         </TableRow>
       </TableHead>
@@ -28,7 +28,8 @@ const CourseTable = ({ currentItems, handleClickOpen }) => (
               <TableCell>{course.date}</TableCell>
               <TableCell>{course.startTime}</TableCell>
               <TableCell>{course.endTime}</TableCell>
-              <TableCell>{course.isActive ? 'true' : 'false'}</TableCell>
+              {console.log("sss",course)}
+              <TableCell>{String(course.active)}</TableCell>
               <TableCell>
                 <Button variant="outlined" onClick={() => handleClickOpen(course)}>Edit</Button>
               </TableCell>

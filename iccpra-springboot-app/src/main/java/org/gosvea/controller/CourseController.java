@@ -28,7 +28,7 @@ public class CourseController {
 
     @Autowired
     private InstructorService instructorService;
-
+//获取课程广告表
     @GetMapping
     public Result<PageResponse<CourseSchedule>> getCourseSchedule(
             Integer pageNum,
@@ -42,15 +42,15 @@ public class CourseController {
             )
     {
         try {
-            Map<Integer,String> warnings=checkVenueInstructorInformation();
+           // Map<Integer,String> warnings=checkVenueInstructorInformation();
             boolean activeStatus = (isActive != null) ? isActive : false;
-            return  Result.success(courseService.getCourseSchedule(pageNum,pageSize,instructorId,venueId,date,startTime,endTime,isActive),warnings);
+            return  Result.success(courseService.getCourseSchedule(pageNum,pageSize,instructorId,venueId,date,startTime,endTime,isActive));
         } catch (Exception e) {
             e.printStackTrace();
             return Result.error(e.getMessage()+"\n"+getStackTrace(e));
         }
     }
-
+//添加一个新课程，广告
     @PostMapping
     public Result addNewCourse(@RequestBody List<CourseSchedule> courseSchedules)
     {
@@ -62,7 +62,7 @@ public class CourseController {
             return Result.error(e.getMessage()+"\n"+getStackTrace(e));
         }
     }
-
+//更新广告，课程的信息
     @PutMapping
     public Result updateCourseInformation(@RequestBody CourseSchedule courseSchedule)
     {
@@ -75,6 +75,7 @@ public class CourseController {
         }
     }
 
+//删除课程，广告的信息
     @DeleteMapping
     public Result deleteCourse(Integer instructorId, Integer venueId)
     {
@@ -90,102 +91,102 @@ public class CourseController {
     }
 
 
-    //检查venue和instructor是否有匹配的时间
-    public Map<Integer,String> checkVenueInstructorInformation() {
-        List<Venue> venues = venueService.getAllVenues();
-        List<CourseSchedule> commonSchedules=new ArrayList<>();
-        //警告列表
-        Map<Integer,String> warnings=new HashMap<Integer,String>();
-
-
-        //添加数据前先清除原有的数据
-        courseService.deleteAllSchedule();
-        for (Venue venue : venues) {
-            Instructor instructor = instructorService.getInstructorById(venue.getInstructor());
-
-
-            if (instructor == null) {
-                warnings.put(venue.getId(),"Venue ID " + venue.getId() + " does not have an assigned instructor.");
-                //更新场地状态为INSTRUCTORISSUE
-                venueService.updateVenueStatus(venue.getId(),Venue.VenueStatus.INSTRUCTORISSUE);
-
-                //venue.setVenueStatus(Venue.VenueStatus.INSTRUCTORISSUE);
-                continue;
-            }
-            instructor.setScheduleList(instructorService.getInstructorSchedule(venue.getInstructor()));
-
-
-            // 打印调试信息
-//            System.out.println("Venue: " + venue);
-//            System.out.println("Instructor: " + instructor);
-//            System.out.println("Venue Schedules: " + venue.getScheduleList());
-//            System.out.println("Instructor Schedules: " + instructor.getScheduleList());
-//            System.out.println("Venue Address: " + venue.getAddress());
-
-
-            commonSchedules=getCommonSchedules(instructor.getId(),venue.getId(),venue.getAddress(),venue.getScheduleList(),instructor.getScheduleList());
-            if (commonSchedules.isEmpty()) {
-                warnings.put(venue.getId(),"Venue ID " + venue.getId() + " does not have matching schedules with its instructor.");
-                //更新场地状态为VENUEISSUE
-                venueService.updateVenueStatus(venue.getId(), Venue.VenueStatus.VENUEISSUE);
-            } else {
-                //更新场地状态为NORMAL
-                venueService.updateVenueStatus(venue.getId(),Venue.VenueStatus.NORMAL);
-
-                commonSchedules.forEach(courseSchedule -> System.out.println(courseSchedule.toString()));
-                courseService.insertCourseSchedule(commonSchedules);
-            }
-        }
-
-        Result result;
-        if (!warnings.isEmpty()) {
-            return  warnings;
-        } else {
-            return null;
-        }
-        //System.out.println(result); // 打印调试信息
-        // Debug output
-       // System.out.println("Result Code: " + result.getCode());
-       // System.out.println("Result Message: " + result.getMessage());
-      //  System.out.println("Result Data: " + result.getData());
-       // System.out.println("Result Warnings: " + result.getWarnings());
-
-    }
-    //获取公共的schedule
-    public List<CourseSchedule> getCommonSchedules(Integer instructorId, Integer venueId,String address,List<VenueSchedule> venueSchedules, List<InstructorSchedule> instructorSchedules) {
-        List<CourseSchedule> commonSchedules = new ArrayList<>();
-
-        for (VenueSchedule venueSchedule : venueSchedules) {
-            LocalDate venueDate = venueSchedule.getDate();
-            LocalTime venueStartTime = venueSchedule.getStartTime();
-            LocalTime venueEndTime = venueSchedule.getEndTime();
-            boolean matchFound = false; // 增加一个标记变量
-
-            for (InstructorSchedule instructorSchedule : instructorSchedules) {
-                LocalDate instructorDate = instructorSchedule.getDate();
-                if (!venueDate.equals(instructorDate)) {
-                    continue;
-                }
-
-                LocalTime instructorStartTime = instructorSchedule.getStartTime();
-                LocalTime instructorEndTime = instructorSchedule.getEndTime();
-
-                LocalTime commonStartTime = venueStartTime.isAfter(instructorStartTime) ? venueStartTime : instructorStartTime;
-                LocalTime commonEndTime = venueEndTime.isBefore(instructorEndTime) ? venueEndTime : instructorEndTime;
-
-                if (!commonStartTime.isAfter(commonEndTime)) {
-                    commonSchedules.add(new CourseSchedule(instructorId, venueId, instructorDate, commonStartTime, commonEndTime, address, venueSchedule.getCourseTitle()));
-                    matchFound = true; // 找到匹配时设置为 true
-                    break; // 跳出内层循环
-                }
-            }
-
-            if (matchFound) {
-                break; // 如果找到匹配的时间段，跳出外层循环
-            }
-        }
-        return commonSchedules;
-    }
+//    //检查venue和instructor是否有匹配的时间
+//    public Map<Integer,String> checkVenueInstructorInformation() {
+//        List<Venue> venues = venueService.getAllVenues();
+//        List<CourseSchedule> commonSchedules=new ArrayList<>();
+//        //警告列表
+//        Map<Integer,String> warnings=new HashMap<Integer,String>();
+//
+//
+//        //添加数据前先清除原有的数据
+//        //courseService.deleteAllSchedule();
+//        for (Venue venue : venues) {
+//            Instructor instructor = instructorService.getInstructorById(venue.getInstructor());
+//
+//
+//            if (instructor == null) {
+//                warnings.put(venue.getId(),"Venue ID " + venue.getId() + " does not have an assigned instructor.");
+//                //更新场地状态为INSTRUCTORISSUE
+//                venueService.updateVenueStatus(venue.getId(),Venue.VenueStatus.INSTRUCTORISSUE);
+//
+//                //venue.setVenueStatus(Venue.VenueStatus.INSTRUCTORISSUE);
+//                continue;
+//            }
+//            instructor.setScheduleList(instructorService.getInstructorSchedule(venue.getInstructor()));
+//
+//
+//            // 打印调试信息
+////            System.out.println("Venue: " + venue);
+////            System.out.println("Instructor: " + instructor);
+////            System.out.println("Venue Schedules: " + venue.getScheduleList());
+////            System.out.println("Instructor Schedules: " + instructor.getScheduleList());
+////            System.out.println("Venue Address: " + venue.getAddress());
+//
+//
+//            commonSchedules=getCommonSchedules(instructor.getId(),venue.getId(),venue.getAddress(),venue.getScheduleList(),instructor.getScheduleList());
+//            if (commonSchedules.isEmpty()) {
+//                warnings.put(venue.getId(),"Venue ID " + venue.getId() + " does not have matching schedules with its instructor.");
+//                //更新场地状态为VENUEISSUE
+//                venueService.updateVenueStatus(venue.getId(), Venue.VenueStatus.VENUEISSUE);
+//            } else {
+//                //更新场地状态为NORMAL
+//                venueService.updateVenueStatus(venue.getId(),Venue.VenueStatus.NORMAL);
+//
+//                commonSchedules.forEach(courseSchedule -> System.out.println(courseSchedule.toString()));
+//                courseService.insertCourseSchedule(commonSchedules);
+//            }
+//        }
+//
+//        Result result;
+//        if (!warnings.isEmpty()) {
+//            return  warnings;
+//        } else {
+//            return null;
+//        }
+//        //System.out.println(result); // 打印调试信息
+//        // Debug output
+//       // System.out.println("Result Code: " + result.getCode());
+//       // System.out.println("Result Message: " + result.getMessage());
+//      //  System.out.println("Result Data: " + result.getData());
+//       // System.out.println("Result Warnings: " + result.getWarnings());
+//
+//    }
+//    //获取公共的schedule
+//    public List<CourseSchedule> getCommonSchedules(Integer instructorId, Integer venueId,String address,List<VenueSchedule> venueSchedules, List<InstructorSchedule> instructorSchedules) {
+//        List<CourseSchedule> commonSchedules = new ArrayList<>();
+//
+//        for (VenueSchedule venueSchedule : venueSchedules) {
+//            LocalDate venueDate = venueSchedule.getDate();
+//            LocalTime venueStartTime = venueSchedule.getStartTime();
+//            LocalTime venueEndTime = venueSchedule.getEndTime();
+//            boolean matchFound = false; // 增加一个标记变量
+//
+//            for (InstructorSchedule instructorSchedule : instructorSchedules) {
+//                LocalDate instructorDate = instructorSchedule.getDate();
+//                if (!venueDate.equals(instructorDate)) {
+//                    continue;
+//                }
+//
+//                LocalTime instructorStartTime = instructorSchedule.getStartTime();
+//                LocalTime instructorEndTime = instructorSchedule.getEndTime();
+//
+//                LocalTime commonStartTime = venueStartTime.isAfter(instructorStartTime) ? venueStartTime : instructorStartTime;
+//                LocalTime commonEndTime = venueEndTime.isBefore(instructorEndTime) ? venueEndTime : instructorEndTime;
+//
+//                if (!commonStartTime.isAfter(commonEndTime)) {
+//                    commonSchedules.add(new CourseSchedule(instructorId, venueId, instructorDate, commonStartTime, commonEndTime, address, venueSchedule.getCourseTitle()));
+//                    matchFound = true; // 找到匹配时设置为 true
+//                    break; // 跳出内层循环
+//                }
+//            }
+//
+//            if (matchFound) {
+//                break; // 如果找到匹配的时间段，跳出外层循环
+//            }
+//        }
+//        return commonSchedules;
+//    }
 
 
 

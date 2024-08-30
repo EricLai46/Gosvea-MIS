@@ -155,6 +155,9 @@ const InstructorMain = () => {
         console.error('Error in request:', error);
         showNotification('Instructor update failed!', 'error');
       });
+
+      //后台更新instructor的信息
+      //axiosInstance.
   };
   //添加新的instructor
   const handleInsert = () => {

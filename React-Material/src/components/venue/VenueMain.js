@@ -14,6 +14,7 @@ const VenueMain = () => {
   const [timeZone, setTimeZone] = useState('');
   const [state, setState] = useState('');
   const [instructor, setInstructor] = useState('');
+  const [icpisManager,setIcpisManager]=useState('');
   const [venues, setVenues] = useState([]);
   const [totalVenues,setTotalVenues]=useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -43,6 +44,7 @@ const VenueMain = () => {
           state,
           city: '',
           instructor: instructor,
+          icpisManager: icpisManager,
           paymentMode: '',
           timeZone: timeZone,
           venueStatus: venueStatus,
@@ -67,7 +69,7 @@ const VenueMain = () => {
       pageSize: itemsPerPage,
       state,
       city: '',
-      instructor: instructor,
+      icpisManager: icpisManager,
       paymentMode: '',
       timeZone: timeZone,
     };
@@ -192,6 +194,7 @@ const VenueMain = () => {
     setInstructor('');
     setVenues([]);
     setCurrentPage(1);
+    setIcpisManager('');
     showNotification('Reset successfully!', 'success');
   };
 //翻页
@@ -259,6 +262,7 @@ const VenueMain = () => {
           timeZone={timeZone}
           state={state}
           instructor={instructor}
+          icpisManager={icpisManager}
           setTimeZone={setTimeZone}
           setState={setState}
           setInstructor={setInstructor}
@@ -268,6 +272,7 @@ const VenueMain = () => {
           handleFileChange={handleFileChange}
           handleUpload={handleUpload}
           selectedFile={selectedFile}
+          setIcpisManager={setIcpisManager}
         />
         <VenueTable currentItems={venues} handleClickOpen={handleClickOpen} />
         <VenuePagination totalPages={totalPages} currentPage={currentPage} handlePageChange={handlePageChange}/>

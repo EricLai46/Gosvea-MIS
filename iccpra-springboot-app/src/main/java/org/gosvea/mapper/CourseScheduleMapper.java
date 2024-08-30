@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.*;
 import org.gosvea.pojo.CourseSchedule;
+import org.gosvea.pojo.VenueSchedule;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @Mapper
@@ -33,4 +34,14 @@ public interface CourseScheduleMapper {
     void updateCourseInformation(CourseSchedule courseSchedule);
     @Delete("delete from coursesschedule")
     void deleteAllSchedule();
+
+    void deleteCourseSchedules(List<CourseSchedule> schedulesToDelete);
+
+    void insertCourseSchedules(List<CourseSchedule> schedulesToInsert);
+
+    void updateCourseSchedules(List<CourseSchedule> schedulesToUpdate);
+
+    List<CourseSchedule> findCourseSchedulesByVenueAndDateRange(String venueId, List<VenueSchedule> venueSchedules);
+
+
 }

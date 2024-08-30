@@ -7,7 +7,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import VenueMain from './components/venue/VenueMain.js';
 import InstructorMain from './components/instructor/InstructorMain.js';
 import CourseMain from './components/course/CourseMain.js'
-
+import AdvertisementMain from './components/Advertisement/AdvertisementMain.js'
 function App() {
   return (
     <Router>
@@ -19,6 +19,7 @@ function App() {
         <Route path="/venuemain" element={<VenueMain />} />
         <Route path="/instructormain" element={<InstructorMain />} />
         <Route path="/coursemain" element={<CourseMain />} />
+        <Route path="/advertisementmain" element={<AdvertisementMain/>}/>
       </Routes>
     </Router>
   );

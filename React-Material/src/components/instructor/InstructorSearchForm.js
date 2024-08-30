@@ -15,9 +15,21 @@ const InstructorSearchForm = ({  state, setState, email, setEmail, firstname, se
           label="State"
         >
           <MenuItem value=""><em>Please Select</em></MenuItem>
-          <MenuItem value="ca">CA</MenuItem>
-          <MenuItem value="wa">WA</MenuItem>
-          <MenuItem value="az">AZ</MenuItem>
+          <MenuItem value="California">CA</MenuItem>
+          <MenuItem value="Washington">WA</MenuItem>
+          <MenuItem value="Arizona">AZ</MenuItem>
+          <MenuItem value="Florida">FL</MenuItem>
+          <MenuItem value="Georgia">GA</MenuItem>
+          <MenuItem value="Indiana">IN</MenuItem>
+          <MenuItem value="Maryland">MD</MenuItem>
+          <MenuItem value="Michigan">MI</MenuItem>
+          <MenuItem value="Missoiri">MO</MenuItem>
+          <MenuItem value="New York">NY</MenuItem>
+          <MenuItem value="North Carolina">NC</MenuItem>
+          <MenuItem value="Ohio">OH</MenuItem>
+          <MenuItem value="Pennsylvania">PA</MenuItem>
+          <MenuItem value="Texas">TX</MenuItem>
+          <MenuItem value="Virginia">VA</MenuItem>
         </Select>
       </FormControl>
       <TextField

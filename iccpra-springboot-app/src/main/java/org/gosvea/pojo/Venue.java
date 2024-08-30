@@ -19,7 +19,7 @@ import java.util.Map;
 
 @Data
 public class Venue {
-    private Integer id;
+    private String id;
     @NotNull
     private Integer instructor;
     private String timeZone;
@@ -29,13 +29,14 @@ public class Venue {
     private String city;
     @NotEmpty
     private String address;
+    private String icpisManager;
     private String cancellationPolicy;
     private String paymentMode;
-    private Double nonrefundableFee;
+    private String nonrefundableFee;
     private String fobKey;
-    private Double deposit;
-    private Double membershipFee;
-    private Double usageFee;
+    private String deposit;
+    private String membershipFee;
+    private String usageFee;
     private String refundableStatus;
     private String bookMethod;
     private String registrationLink;

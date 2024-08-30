@@ -37,14 +37,14 @@ public class VenueServiceImpl implements VenueService {
     }
 
     @Override
-    public PageResponse<Venue> list(Integer pageNum, Integer pageSize,String state, String city, Integer instructor, String paymentMethod, String timeZone) {
+    public PageResponse<Venue> list(Integer pageNum, Integer pageSize,String state, String city, String icpisManager, String paymentMethod, String timeZone) {
         PageResponse<Venue> ps=new PageResponse<>();
         // 打印分页参数
         //System.out.println("Page number: " + pageNum);
         //System.out.println("Page size: " + pageSize);
 
         PageHelper.startPage(pageNum,pageSize);
-        List<Venue> lv =venueMapper.list(state,city,instructor,paymentMethod,timeZone);
+        List<Venue> lv =venueMapper.list(state,city,icpisManager,paymentMethod,timeZone);
         if(lv!=null)
         {
             for (Venue venue : lv) {
@@ -74,12 +74,12 @@ public class VenueServiceImpl implements VenueService {
     }
 
     @Override
-    public void deleteVenue(Integer venueId) {
+    public void deleteVenue(String venueId) {
         venueMapper.deleteVenue(venueId);
     }
 
     @Override
-    public void updateVenueSchedule(LocalDate date, LocalTime startTime, LocalTime endTime, Integer venueId) {
+    public void updateVenueSchedule(LocalDate date, LocalTime startTime, LocalTime endTime, String venueId) {
         venueMapper.updateVenueSchedule(date,startTime,endTime,venueId);
     }
 
@@ -89,12 +89,12 @@ public class VenueServiceImpl implements VenueService {
     }
 
     @Override
-    public void deleteVenueSchedule(Integer venueId) {
+    public void deleteVenueSchedule(String venueId) {
         venueMapper.deleteVenueSchedule(venueId);
     }
 
     @Override
-    public List<VenueSchedule> getVenueSchedule(Integer venueId) {
+    public List<VenueSchedule> getVenueSchedule(String venueId) {
         List<VenueSchedule> venueScheduleslist=new ArrayList<>();
         venueScheduleslist=venueMapper.getVenueSchedule(venueId);
 
@@ -102,7 +102,7 @@ public class VenueServiceImpl implements VenueService {
     }
 
     @Override
-    public void deleteVenueScheduleSingle(Integer id) {
+    public void deleteVenueScheduleSingle(String id) {
         venueMapper.deleteVenueScheduleSingle(id);
     }
 
@@ -139,7 +139,7 @@ public class VenueServiceImpl implements VenueService {
     }
 
     @Override
-    public void saveLatLon(double[] latlon, Integer id) {
+    public void saveLatLon(double[] latlon, String id) {
         venueMapper.saveLatLon(latlon[0],latlon[1],id);
     }
 
@@ -164,7 +164,7 @@ public class VenueServiceImpl implements VenueService {
     }
 
     @Override
-    public Venue getVenueById(Integer venueId) {
+    public Venue getVenueById(String venueId) {
         return venueMapper.getVenueById(venueId);
     }
 
@@ -179,8 +179,69 @@ public class VenueServiceImpl implements VenueService {
     }
 
     @Override
-    public Integer getVenueIdByAddress(String address) {
+    public String getVenueIdByAddress(String address) {
         return venueMapper.getVenueIdByAddress(address);
+    }
+
+    @Override
+    public  PageResponse<Venue> getNormalStatusVenues(Integer pageNum, Integer pageSize, String state, String timeZone) {
+        PageResponse<Venue> ps=new PageResponse<>();
+        // 打印分页参数
+        //System.out.println("Page number: " + pageNum);
+        //System.out.println("Page size: " + pageSize);
+
+        PageHelper.startPage(pageNum,pageSize);
+        List<Venue> lv =venueMapper.getNormalStatusVenues(state,timeZone);
+        if(lv!=null)
+        {
+            for (Venue venue : lv) {
+                Venue.VenueStatus status = venue.getVenueStatus();
+                if (status != null) {
+                    String statusUppercase = status.getValue().toUpperCase();
+                    Venue.VenueStatus updatedStatus = Venue.VenueStatus.fromValue(statusUppercase);
+                    venue.setVenueStatus(updatedStatus);
+                } else {
+                    // 处理 venueStatus 为空的情况，例如设置默认值
+                    venue.setVenueStatus(Venue.VenueStatus.NORMAL);  // 或其他默认状态
+                }
+            }
+        }
+        Page<Venue> pv=(Page<Venue>) lv;
+
+        ps.setTotalElement(pv.getTotal());
+        ps.setItems(pv.getResult());
+
+
+        return ps;
+    }
+
+    @Override
+    public Venue getVenueByInstructorId(Integer instructorId) {
+        return venueMapper.getVenueByInstructorId(instructorId);
+    }
+
+    @Override
+    public void addLatLonInformationForListVenues(List<Venue> venueList) {
+        for(Venue venue:venueList)
+        {
+            double[] latlon=getLatLon(venue.getAddress());
+            if(latlon!=null){
+                venue.setLatitude(latlon[0]);
+                venue.setLongitude(latlon[1]);
+                saveLatLon(latlon,venue.getId());
+            }
+        }
+
+    }
+
+    @Override
+    public void updtaeLatLonInformationForOneVenue(Venue venue) {
+        double[] latlon=getLatLon(venue.getAddress());
+        if(latlon!=null){
+            venue.setLatitude(latlon[0]);
+            venue.setLongitude(latlon[1]);
+            saveLatLon(latlon,venue.getId());
+        }
     }
 
 

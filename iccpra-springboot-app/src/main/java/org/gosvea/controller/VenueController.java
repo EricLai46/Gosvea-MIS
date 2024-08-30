@@ -4,9 +4,7 @@ package org.gosvea.controller;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotEmpty;
 import org.apache.ibatis.session.SqlSession;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.*;
 import org.gosvea.pojo.*;
 import org.gosvea.service.CourseService;
 import org.gosvea.service.InstructorService;
@@ -19,7 +17,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -96,12 +93,12 @@ public class VenueController {
             Integer pageSize,
             @RequestParam(required = false) String state,
             @RequestParam(required = false) String city,
-            @RequestParam(required = false) Integer instructor,
+            @RequestParam(required = false) String icpisManager,
             @RequestParam(required = false) String paymentMethod,
             @RequestParam(required = false) String timeZone) {
 
         try {
-            PageResponse<Venue> ps = venueService.list(pageNum, pageSize, state, city, instructor, paymentMethod, timeZone);
+            PageResponse<Venue> ps = venueService.list(pageNum, pageSize, state, city, icpisManager, paymentMethod, timeZone);
             return Result.success(ps);
         } catch (Exception e) {
             e.printStackTrace();
@@ -124,6 +121,13 @@ public class VenueController {
 
         try {
             venueService.updateVenue(venue);
+            //更新场地venue latlon
+            venueService.updtaeLatLonInformationForOneVenue(venue);
+            if(venue.getInstructor()!=null)
+            {
+                courseService.generateOrUpdateCourseSchedules(venue.getId(), venue.getInstructor());
+            }
+
             return Result.success();
         } catch (Exception e) {
             e.printStackTrace();
@@ -134,7 +138,7 @@ public class VenueController {
 
     //删除场地
     @DeleteMapping
-    public Result deleteVenue(Integer venueId) {
+    public Result deleteVenue(String venueId) {
         try {
             //删除场地
             venueService.deleteVenue(venueId);
@@ -157,6 +161,11 @@ public class VenueController {
         try {
 
             venueService.updateVenueSchedule(date, startTime, endTime, venueSchedule.getVenueId());
+
+            //更新course schedule
+
+           // courseService.checkVenueInstructorInformation();
+
            // checkVenueInstructorInformation();
             return Result.success("update schedule succcessfully");
         } catch (Exception e) {
@@ -167,7 +176,7 @@ public class VenueController {
 
     //获取场地schedule
     @GetMapping("/schedule")
-    public Result<List<VenueSchedule>> getVenueSchedule(Integer venueId) {
+    public Result<List<VenueSchedule>> getVenueSchedule(String venueId) {
 
         try {
             return Result.success(venueService.getVenueSchedule(venueId));
@@ -183,17 +192,25 @@ public class VenueController {
         List<Venue> venues=venueService.getAllVenues();
 
         //System.out.println(venues);
-        for(Venue venue : venues)
+//        for(Venue venue : venues)
+//        {
+//            double[] latlon=venueService.getLatLon(venue.getAddress());
+//            if(latlon!=null){
+//                venue.setLatitude(latlon[0]);
+//                venue.setLongitude(latlon[1]);
+//                venueService.saveLatLon(latlon,venue.getId());
+//            }
+//
+//        }
+        List<Venue> venueHasLaLon=new ArrayList<>();
+        for(Venue venue:venues)
         {
-            double[] latlon=venueService.getLatLon(venue.getAddress());
-            if(latlon!=null){
-                venue.setLatitude(latlon[0]);
-                venue.setLongitude(latlon[1]);
-                venueService.saveLatLon(latlon,venue.getId());
+            if(venue.getLatitude()!=null&&venue.getLongitude()!=null)
+            {
+                venueHasLaLon.add(venue);
             }
-
         }
-        return Result.success(venues);
+        return Result.success(venueHasLaLon);
     }
 
     //添加新场地schedule
@@ -206,7 +223,7 @@ public class VenueController {
 
     //删除场地schedule
     @DeleteMapping("/schedule")
-    public Result<VenueSchedule> deleteVenueScheduleSingle(Integer id) {
+    public Result<VenueSchedule> deleteVenueScheduleSingle(String id) {
         venueService.deleteVenueScheduleSingle(id);
         //checkVenueInstructorInformation();
         return Result.success();
@@ -216,59 +233,85 @@ public class VenueController {
     @PostMapping("/import")
     public ResponseEntity<?> importVenueData(@RequestParam("file") MultipartFile file) {
 
-        //需要更新update的Venue list表
-        List<Venue> updateVenuesList=new ArrayList<>();
-        //需要添加的Venue List表
-        List<Venue> insertVenuesList=new ArrayList<>();
+        List<Venue> updateVenuesList = new ArrayList<>();
+// 需要添加的Venue List表
+        List<Venue> insertVenuesList = new ArrayList<>();
 
         try (InputStream inputStream = file.getInputStream();
              Workbook workbook = new XSSFWorkbook(inputStream)) {
             Sheet sheet = workbook.getSheetAt(0);
-            //venueService.clearAllData(); // 清除所有现有数据
+
+            // 跳过表头并开始处理实际数据行
             for (Row row : sheet) {
-                if (row.getRowNum() == 0) {
-                    continue; // 跳过表头
+                if (row.getRowNum() == 0 || isRowEmpty(row)) {
+                    continue; // 跳过表头和空行
                 }
+
                 Venue venue = new Venue();
-                   // 处理ID
-                if (row.getCell(0) != null) {
-                    if (row.getCell(0).getCellType() == CellType.NUMERIC) {
-                        venue.setId((int) row.getCell(0).getNumericCellValue());
-                    } else if (row.getCell(0).getCellType() == CellType.STRING) {
-                        venue.setId(Integer.parseInt(row.getCell(0).getStringCellValue().trim()));
-                    }
-                }
 
-// 处理State
-                if (row.getCell(1) != null) {
-                    if (row.getCell(1).getCellType() == CellType.STRING) {
-                        venue.setState(row.getCell(1).getStringCellValue().trim());
+                // 处理ID
+                Cell idCell = row.getCell(0);
+                if (idCell != null && idCell.getCellType() != CellType.BLANK) {
+                    String id;
+                    if (idCell.getCellType() == CellType.NUMERIC) {
+                        id = String.valueOf(idCell.getNumericCellValue());
+                    } else if (idCell.getCellType() == CellType.STRING) {
+                        id = idCell.getStringCellValue().trim();
                     } else {
-                        // 处理其他可能的情况，比如State是数值类型
-                        venue.setState(String.valueOf(row.getCell(1).getNumericCellValue()));
+                        id = "UNKNOWN";
+                        System.out.println("Row " + row.getRowNum() + " ID has an unexpected cell type: " + idCell.getCellType());
+                    }
+                    System.out.println("Row " + row.getRowNum() + " ID: " + id);
+                    venue.setId(id);
+                } else {
+                    System.out.println("Row " + row.getRowNum() + " ID cell is null or empty");
+                    continue; // 如果ID为空或null，跳过该行
+                }
+
+                // 处理ICPISManager
+                Cell icpisManagerCell = row.getCell(1);
+                if (icpisManagerCell != null && icpisManagerCell.getCellType() != CellType.BLANK) {
+                    if (icpisManagerCell.getCellType() == CellType.NUMERIC) {
+                        venue.setIcpisManager(String.valueOf(icpisManagerCell.getNumericCellValue()));
+                    } else if (icpisManagerCell.getCellType() == CellType.STRING) {
+                        venue.setIcpisManager(icpisManagerCell.getStringCellValue().trim());
                     }
                 }
 
-// 处理City
-                if (row.getCell(2) != null) {
-                    if (row.getCell(2).getCellType() == CellType.STRING) {
-                        venue.setCity(row.getCell(2).getStringCellValue().trim());
+                // 处理State
+                Cell stateCell = row.getCell(2);
+                if (stateCell != null && stateCell.getCellType() != CellType.BLANK) {
+                    if (stateCell.getCellType() == CellType.STRING) {
+                        venue.setState(stateCell.getStringCellValue().trim());
                     } else {
-                        venue.setCity(String.valueOf(row.getCell(2).getNumericCellValue()));
+                        venue.setState(String.valueOf(stateCell.getNumericCellValue()));
                     }
                 }
 
-// 处理Address
-                if (row.getCell(3) != null) {
-                    if (row.getCell(3).getCellType() == CellType.STRING) {
-                        venue.setAddress(row.getCell(3).getStringCellValue().trim());
+                // 处理City
+                Cell cityCell = row.getCell(3);
+                if (cityCell != null && cityCell.getCellType() != CellType.BLANK) {
+                    if (cityCell.getCellType() == CellType.STRING) {
+                        venue.setCity(cityCell.getStringCellValue().trim());
                     } else {
-                        venue.setAddress(String.valueOf(row.getCell(3).getNumericCellValue()));
+                        venue.setCity(String.valueOf(cityCell.getNumericCellValue()));
                     }
                 }
 
-                if (row.getCell(4) != null && !row.getCell(4).getStringCellValue().isEmpty()) {
-                    String fullName = row.getCell(4).getStringCellValue().trim();
+                // 处理Address
+                Cell addressCell = row.getCell(4);
+                if (addressCell != null && addressCell.getCellType() != CellType.BLANK) {
+                    if (addressCell.getCellType() == CellType.STRING) {
+                        venue.setAddress(addressCell.getStringCellValue().trim());
+                    } else {
+                        venue.setAddress(String.valueOf(addressCell.getNumericCellValue()));
+                    }
+                }
+
+                // 处理Instructor
+                Cell instructorCell = row.getCell(5);
+                if (instructorCell != null && instructorCell.getCellType() == CellType.STRING && !instructorCell.getStringCellValue().isEmpty()) {
+                    String fullName = instructorCell.getStringCellValue().trim();
                     String[] nameParts = fullName.split(" ");
                     if (nameParts.length == 2) {
                         String firstName = nameParts[0];
@@ -280,95 +323,104 @@ public class VenueController {
                     }
                 }
 
-                venue.setTimeZone(row.getCell(5).getStringCellValue().trim());
-                venue.setCancellationPolicy(row.getCell(6) != null ? row.getCell(6).getStringCellValue().trim() : null);
-                venue.setPaymentMode(row.getCell(7) != null ? row.getCell(7).getStringCellValue().trim() : null);
-
-                // 检查nonrefundableFee单元格类型
-                if (row.getCell(8) != null) {
-                    if (row.getCell(8).getCellType() == CellType.NUMERIC) {
-                        venue.setNonrefundableFee(row.getCell(8).getNumericCellValue());
-                    } else if (row.getCell(8).getCellType() == CellType.STRING) {
-                        venue.setNonrefundableFee(Double.valueOf(row.getCell(8).getStringCellValue().trim()));
-                    }
+                // 处理TimeZone
+                Cell timeZoneCell = row.getCell(6);
+                if (timeZoneCell != null && timeZoneCell.getCellType() != CellType.BLANK) {
+                    String timeZone = timeZoneCell.getStringCellValue().trim();
+                    System.out.println("Time zone at row " + row.getRowNum() + ": " + timeZone);
+                    venue.setTimeZone(timeZone);
                 } else {
-                    venue.setNonrefundableFee(0.0);  // 默认值
+                    System.out.println("Time zone cell is null or empty at row " + row.getRowNum());
+                    venue.setTimeZone(""); // 或者设置为默认的时区
                 }
+
+                // 处理其他字段...
+                venue.setCancellationPolicy(row.getCell(7) != null ? row.getCell(7).getStringCellValue().trim() : null);
+                venue.setPaymentMode(row.getCell(8) != null ? row.getCell(8).getStringCellValue().trim() : null);
 
                 if (row.getCell(9) != null) {
                     if (row.getCell(9).getCellType() == CellType.NUMERIC) {
-                        venue.setFobKey(String.valueOf(row.getCell(9).getNumericCellValue()));
+                        venue.setNonrefundableFee(String.valueOf(row.getCell(9).getNumericCellValue()));
                     } else if (row.getCell(9).getCellType() == CellType.STRING) {
-                        venue.setFobKey(row.getCell(9).getStringCellValue().trim());
+                        venue.setNonrefundableFee(row.getCell(9).getStringCellValue().trim());
                     }
+                } else {
+                    venue.setNonrefundableFee("N/A");  // 默认值
                 }
 
                 if (row.getCell(10) != null) {
                     if (row.getCell(10).getCellType() == CellType.NUMERIC) {
-                        venue.setDeposit(row.getCell(10).getNumericCellValue());
+                        venue.setFobKey(String.valueOf(row.getCell(10).getNumericCellValue()));
                     } else if (row.getCell(10).getCellType() == CellType.STRING) {
-                        venue.setDeposit(Double.valueOf(row.getCell(10).getStringCellValue().trim()));
+                        venue.setFobKey(row.getCell(10).getStringCellValue().trim());
                     }
                 }
 
                 if (row.getCell(11) != null) {
                     if (row.getCell(11).getCellType() == CellType.NUMERIC) {
-                        venue.setMembershipFee(row.getCell(11).getNumericCellValue());
+                        venue.setDeposit(String.valueOf(row.getCell(11).getNumericCellValue()));
                     } else if (row.getCell(11).getCellType() == CellType.STRING) {
-                        venue.setMembershipFee(Double.valueOf(row.getCell(11).getStringCellValue().trim()));
+                        venue.setDeposit(row.getCell(11).getStringCellValue().trim());
                     }
                 }
 
                 if (row.getCell(12) != null) {
                     if (row.getCell(12).getCellType() == CellType.NUMERIC) {
-                        venue.setUsageFee(row.getCell(12).getNumericCellValue());
+                        venue.setMembershipFee(String.valueOf(row.getCell(12).getNumericCellValue()));
                     } else if (row.getCell(12).getCellType() == CellType.STRING) {
-                        venue.setUsageFee(Double.valueOf(row.getCell(12).getStringCellValue().trim()));
+                        venue.setMembershipFee(row.getCell(12).getStringCellValue().trim());
                     }
                 }
 
-                venue.setRefundableStatus(row.getCell(13) != null ? row.getCell(13).getStringCellValue().trim() : null);
-                venue.setBookMethod(row.getCell(14) != null ? row.getCell(14).getStringCellValue().trim() : null);
-                venue.setRegistrationLink(row.getCell(15) != null ? row.getCell(15).getStringCellValue().trim() : null);
+                if (row.getCell(13) != null) {
+                    if (row.getCell(13).getCellType() == CellType.NUMERIC) {
+                        venue.setUsageFee(String.valueOf(row.getCell(13).getNumericCellValue()));
+                    } else if (row.getCell(13).getCellType() == CellType.STRING) {
+                        venue.setUsageFee(row.getCell(13).getStringCellValue().trim());
+                    }
+                }
 
-                if (row.getCell(16) != null) {
-                    String statusString = row.getCell(16).getStringCellValue().trim().toUpperCase();
+                venue.setRefundableStatus(row.getCell(14) != null ? row.getCell(14).getStringCellValue().trim() : null);
+                venue.setBookMethod(row.getCell(15) != null ? row.getCell(15).getStringCellValue().trim() : null);
+                venue.setRegistrationLink(row.getCell(16) != null ? row.getCell(16).getStringCellValue().trim() : null);
+
+                if (row.getCell(17) != null) {
+                    String statusString = row.getCell(17).getStringCellValue().trim().toUpperCase();
                     try {
                         Venue.VenueStatus status = Venue.VenueStatus.valueOf(statusString);
                         venue.setVenueStatus(status);
                     } catch (IllegalArgumentException e) {
                         System.out.println("Unknown venue status: " + statusString);
-                        venue.setVenueStatus(null);
+                        venue.setVenueStatus(Venue.VenueStatus.NORMAL);
                     }
                 } else {
-                    venue.setVenueStatus(null);
+                    venue.setVenueStatus(Venue.VenueStatus.NORMAL);
                 }
 
+                // 根据ID检查现有的venue是更新还是插入
                 Venue existingVenue = venueService.getVenueById(venue.getId());
                 if (existingVenue != null) {
                     updateVenuesList.add(venue);
-
                 } else {
                     insertVenuesList.add(venue);
-
                 }
             }
 
-            //循环结束分别添加，更新venuelist
-            if(!insertVenuesList.isEmpty())
-            {
+            // 循环结束后分别添加和更新venue列表
+            if (!insertVenuesList.isEmpty()) {
                 System.out.println(insertVenuesList);
                 venueService.insertListVenues(insertVenuesList);
+                venueService.addLatLonInformationForListVenues(insertVenuesList);
             }
 
-
-            if(!updateVenuesList.isEmpty())
-            {
-                //System.out.println(updateVenuesList);
-
+            if (!updateVenuesList.isEmpty()) {
+                // System.out.println(updateVenuesList);
                 venueService.updateListVenues(updateVenuesList);
+                for(Venue venue:updateVenuesList)
+                {
+                    venueService.updtaeLatLonInformationForOneVenue(venue);
+                }
             }
-
 
             return ResponseEntity.ok().body("{\"success\": true}");
         } catch (Exception e) {
@@ -377,6 +429,16 @@ public class VenueController {
         }
     }
 
+    // 辅助方法：检查行是否为空
+    private boolean isRowEmpty(Row row) {
+        for (int c = row.getFirstCellNum(); c < row.getLastCellNum(); c++) {
+            Cell cell = row.getCell(c);
+            if (cell != null && cell.getCellType() != CellType.BLANK) {
+                return false;
+            }
+        }
+        return true;
+    }
     //生成id
     public String generateUniqueId(String state, String city, String address) throws NoSuchAlgorithmException {
         String input = state + city + address;
@@ -427,11 +489,11 @@ public class VenueController {
                 row.createCell(5).setCellValue(venue.getTimeZone() != null ? venue.getTimeZone() : "");
                 row.createCell(6).setCellValue(venue.getCancellationPolicy() != null ? venue.getCancellationPolicy() : "");
                 row.createCell(7).setCellValue(venue.getPaymentMode() != null ? venue.getPaymentMode() : "");
-                row.createCell(8).setCellValue(venue.getNonrefundableFee() != null ? venue.getNonrefundableFee() : 0.0);
+                row.createCell(8).setCellValue(venue.getNonrefundableFee() != null ? venue.getNonrefundableFee() : "N/A");
                 row.createCell(9).setCellValue(venue.getFobKey() != null ? venue.getFobKey()  : "");
-                row.createCell(10).setCellValue(venue.getDeposit()!= null ? venue.getDeposit(): 0.0);
-                row.createCell(11).setCellValue(venue.getMembershipFee() != null ? venue.getMembershipFee(): 0.0);
-                row.createCell(12).setCellValue(venue.getUsageFee()!= null ? venue.getUsageFee() : 0.0);
+                row.createCell(10).setCellValue(venue.getDeposit()!= null ? venue.getDeposit(): "N/A");
+                row.createCell(11).setCellValue(venue.getMembershipFee() != null ? venue.getMembershipFee(): "N/A");
+                row.createCell(12).setCellValue(venue.getUsageFee()!= null ? venue.getUsageFee() : "N/A");
                 row.createCell(13).setCellValue(venue.getRefundableStatus() != null ? venue.getRefundableStatus() : "");
                 row.createCell(14).setCellValue(venue.getBookMethod()!= null ? venue.getBookMethod() : "");
                 row.createCell(15).setCellValue(venue.getRegistrationLink() != null ? venue.getRegistrationLink() : "");
@@ -450,6 +512,24 @@ public class VenueController {
             e.printStackTrace();
             return ResponseEntity.badRequest().body(null);
         }
+    }
+
+    //获取所有Venue status为Normal的场地
+    @GetMapping("/normal")
+    public Result<PageResponse<Venue>> getNormalStatusVenues( Integer pageNum,
+                                                              Integer pageSize, @RequestParam(required = false) String state,
+                                                             @RequestParam(required = false) String timeZone)
+    {
+
+        try {
+            PageResponse<Venue> ps = venueService.getNormalStatusVenues(pageNum, pageSize, state,timeZone);
+            return Result.success(ps);
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            return Result.error(e.getMessage() + "\n" + getStackTrace(e));
+        }
+
     }
 
 //    //检查venue和instructor是否有匹配的时间

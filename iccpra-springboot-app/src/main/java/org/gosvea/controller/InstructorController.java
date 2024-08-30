@@ -37,6 +37,7 @@ public class InstructorController {
     @Autowired
     private VenueService venueService;
 
+
     private String[] headers={"ID","Venue","FirstName","LastName", "State","City","PhoneNumber","Email","WagePerHour","TotalClassTimes",
                                "Deposit","Rent Manikin Numbers","Finance","Rent Status","Fob Key"};
 
@@ -111,6 +112,12 @@ public class InstructorController {
    {
        try {
            instructorService.updateInstructor(instructor);
+           String venueId=instructor.getVenueId();
+           if(venueId!=null)
+           {
+               courseService.generateOrUpdateCourseSchedules(venueId,instructor.getId());
+           }
+
            return Result.success("Update the instructor information successfully");
        } catch (Exception e) {
            e.printStackTrace();
@@ -125,6 +132,9 @@ public class InstructorController {
 
        try {
            instructorService.updateInstructorSchedule(instructorSchedule);
+           //更新检查course ,ad表
+          // courseService.checkVenueInstructorInformation();
+
            //checkVenueInstructorInformation();
            return Result.success("Update the schedule of instructor successfully");
        } catch (Exception e) {
@@ -256,7 +266,7 @@ public class InstructorController {
                     String address = row.getCell(1).getStringCellValue().trim();
 
 
-                        Integer venueId = venueService.getVenueIdByAddress(address);
+                        String venueId = venueService.getVenueIdByAddress(address);
                         if (venueId != null)
                             instructor.setVenueId(venueId);
 
@@ -281,9 +291,11 @@ public class InstructorController {
                     }
                 }
 
-
+//处理state
                 instructor.setState(row.getCell(4) != null ? row.getCell(4).getStringCellValue().trim() : null);
+                //处理city
                 instructor.setCity(row.getCell(5) != null ? row.getCell(5).getStringCellValue().trim() : null);
+                //处理phonenumber
                 if (row.getCell(6) != null) {
                     if (row.getCell(6).getCellType() == CellType.STRING) {
                         instructor.setPhoneNumber(row.getCell(6).getStringCellValue().trim());
@@ -292,56 +304,70 @@ public class InstructorController {
                     }
                 }
 
-
+               //处理email
                 instructor.setEmail(row.getCell(7) != null ? row.getCell(7).getStringCellValue().trim() : null);
+                //处理wagehour
                 if (row.getCell(8) != null) {
                     if (row.getCell(8).getCellType() == CellType.STRING) {
-                        instructor.setWageHour(Integer.valueOf(row.getCell(8).getStringCellValue().trim()));
+                        instructor.setWageHour(row.getCell(8).getStringCellValue().trim());
                     } else {
-                        instructor.setWageHour((int)row.getCell(8).getNumericCellValue());
+                        instructor.setWageHour(String.valueOf(row.getCell(8).getNumericCellValue()));
                     }
                 }
+                //处理salaryinfo
                 if (row.getCell(9) != null) {
                     if (row.getCell(9).getCellType() == CellType.STRING) {
-                        instructor.setTotalClassTimes(Integer.valueOf(row.getCell(9).getStringCellValue().trim()));
+                        instructor.setSalaryInfo(row.getCell(9).getStringCellValue().trim());
                     } else {
-                        instructor.setTotalClassTimes((int)(row.getCell(9).getNumericCellValue()));
+                        instructor.setSalaryInfo(String.valueOf(row.getCell(9).getNumericCellValue()));
                     }
                 }
+                //处理totalclasstimes
                 if (row.getCell(10) != null) {
                     if (row.getCell(10).getCellType() == CellType.STRING) {
-                        instructor.setDeposit(row.getCell(10).getStringCellValue().trim());
+                        instructor.setTotalClassTimes(Integer.valueOf(row.getCell(10).getStringCellValue().trim()));
                     } else {
-                        instructor.setDeposit(String.valueOf(row.getCell(10).getNumericCellValue()));
+                        instructor.setTotalClassTimes((int)(row.getCell(10).getNumericCellValue()));
                     }
                 }
+                //处理deposit
                 if (row.getCell(11) != null) {
                     if (row.getCell(11).getCellType() == CellType.STRING) {
-                        instructor.setRentManikinNumbers(row.getCell(11).getStringCellValue().trim());
+                        instructor.setDeposit(row.getCell(11).getStringCellValue().trim());
                     } else {
-                        instructor.setRentManikinNumbers(String.valueOf(row.getCell(11).getNumericCellValue()));
+                        instructor.setDeposit(String.valueOf(row.getCell(11).getNumericCellValue()));
                     }
                 }
+                //处理rentmanikinnumbers
                 if (row.getCell(12) != null) {
                     if (row.getCell(12).getCellType() == CellType.STRING) {
-                        instructor.setFinance(row.getCell(12).getStringCellValue().trim());
+                        instructor.setRentManikinNumbers(row.getCell(12).getStringCellValue().trim());
                     } else {
-                        instructor.setFinance(String.valueOf(row.getCell(12).getNumericCellValue()));
+                        instructor.setRentManikinNumbers(String.valueOf(row.getCell(12).getNumericCellValue()));
                     }
                 }
+                //处理finance
                 if (row.getCell(13) != null) {
                     if (row.getCell(13).getCellType() == CellType.STRING) {
-                        instructor.setRentStatus(row.getCell(13).getStringCellValue().trim());
+                        instructor.setFinance(row.getCell(13).getStringCellValue().trim());
                     } else {
-                        instructor.setRentStatus(String.valueOf(row.getCell(13).getNumericCellValue()));
+                        instructor.setFinance(String.valueOf(row.getCell(13).getNumericCellValue()));
                     }
                 }
-
+                //处理rent status
                 if (row.getCell(14) != null) {
                     if (row.getCell(14).getCellType() == CellType.STRING) {
-                        instructor.setFobKey(row.getCell(14).getStringCellValue().trim());
+                        instructor.setRentStatus(row.getCell(14).getStringCellValue().trim());
                     } else {
-                        instructor.setFobKey(String.valueOf(row.getCell(14).getNumericCellValue()));
+                        instructor.setRentStatus(String.valueOf(row.getCell(14).getNumericCellValue()));
+                    }
+                }
+               //处理fobkey
+                if (row.getCell(15) != null) {
+                    if (row.getCell(15).getCellType() == CellType.STRING) {
+                        instructor.setFobKey(row.getCell(15).getStringCellValue().trim());
+                    } else {
+                        instructor.setFobKey(String.valueOf(row.getCell(15).getNumericCellValue()));
                     }
                 }
 

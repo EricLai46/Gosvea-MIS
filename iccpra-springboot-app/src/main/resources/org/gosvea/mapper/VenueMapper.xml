@@ -26,13 +26,26 @@
                  and v.payment_method=#{paymentMethod}
              </if>
 
-             <if test="instructor!=null">
-                 and v.instructor=#{instructor}
+             <if test="icpisManager!=null">
+                 and v.icpis_manager=#{icpisManager}
              </if>
 
 
          </where>
      </select>
+    <!--分类查询-->
+    <select id="getNormalStatusVenues" resultType="org.gosvea.pojo.Venue">
+        SELECT * FROM venue
+        <where>
+            venue_status = 'NORMAL'
+            <if test="state != null and state != ''">
+                AND state = #{state}
+            </if>
+            <if test="timeZone != null and timeZone != ''">
+                AND time_zone = #{timeZone}
+            </if>
+        </where>
+    </select>
     <!--更新数据库-->
     <update id="updateVenue">
         update venue
@@ -86,6 +99,9 @@
             <if test="venueStatus!=null">
                 venue_status=#{venueStatus},
             </if>
+            <if test="icpisManager!=null">
+                icpis_manager=#{icpisManager},
+            </if>
         </trim>
         where id=#{id}
     </update>
@@ -99,7 +115,7 @@
                         venue.paymentMode != null or venue.nonrefundableFee != null or venue.fobKey != null or
                         venue.deposit != null or venue.membershipFee != null or venue.usageFee != null or
                         venue.refundableStatus != null or venue.bookMethod != null or venue.registrationLink != null or
-                        venue.venueStatus != null">
+                        venue.venueStatus != null or venue.icpisManager!=null">
                     UPDATE venue
                     <trim prefix="SET" suffixOverrides=",">
                         <if test="venue.state != null">
@@ -150,6 +166,9 @@
                         <if test="venue.venueStatus != null">
                             venue_status = #{venue.venueStatus},
                         </if>
+                        <if test="venue.icpisManager!=null">
+                            icpis_manager=#{venue.icpisManager},
+                        </if>
                     </trim>
                     WHERE id = #{venue.id}
                 </when>
@@ -158,11 +177,13 @@
     </update>
         <!--批量插入Venues到数据库-->
     <insert id="insertListVenues" parameterType="list">
-        insert into venue (id,state,city,address,instructor,time_zone,cancellation_policy,payment_mode,nonrefundable_fee,fob_key,deposit,membership_fee,usage_fee,refundable_status,book_method,registration_link,venue_status)
+        insert into venue (id,icpis_manager,state,city,address,instructor,time_zone,cancellation_policy,payment_mode,nonrefundable_fee,fob_key,deposit,membership_fee,usage_fee,refundable_status,book_method,registration_link,venue_status)
         values
         <foreach collection="list" item="venue" separator=",">
-            (#{venue.id},#{venue.state},#{venue.city},#{venue.address},#{venue.instructor},#{venue.timeZone},#{venue.cancellationPolicy},#{venue.paymentMode},#{venue.nonrefundableFee},#{venue.fobKey},#{venue.deposit},#{venue.membershipFee},#{venue.usageFee},#{venue.refundableStatus},#{venue.bookMethod},#{venue.registrationLink},#{venue.venueStatus})
+            (#{venue.id},#{venue.icpisManager},#{venue.state},#{venue.city},#{venue.address},#{venue.instructor},#{venue.timeZone},#{venue.cancellationPolicy},#{venue.paymentMode},#{venue.nonrefundableFee},#{venue.fobKey},#{venue.deposit},#{venue.membershipFee},#{venue.usageFee},#{venue.refundableStatus},#{venue.bookMethod},#{venue.registrationLink},#{venue.venueStatus})
         </foreach>
     </insert>
+
+
 
 </mapper>

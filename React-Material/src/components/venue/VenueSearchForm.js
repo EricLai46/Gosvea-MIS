@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, FormControl, InputLabel, Select, MenuItem, Button } from '@mui/material';
 
-const VenueSearchForm = ({ timeZone, state, instructor, setTimeZone, setState, setInstructor, handleSearch, handleReset, handleExport,handleUpload, handleFileChange,selectedFile}) => (
+const VenueSearchForm = ({ timeZone, state, icpisManager, setTimeZone, setState, setInstructor, handleSearch, handleReset, handleExport,handleUpload, handleFileChange,selectedFile,setIcpisManager}) => (
   <Box display="flex" alignItems="center" mb={3}>
     <FormControl variant="outlined" sx={{ minWidth: 200, mr: 2 }}>
       <InputLabel>Time Zone</InputLabel>
@@ -25,20 +25,36 @@ const VenueSearchForm = ({ timeZone, state, instructor, setTimeZone, setState, s
         label="State"
       >
         <MenuItem value=""><em>Please Select</em></MenuItem>
-        <MenuItem value="ca">CA</MenuItem>
-        <MenuItem value="wa">WA</MenuItem>
-        <MenuItem value="az">AZ</MenuItem>
+        <MenuItem value="California">CA</MenuItem>
+          <MenuItem value="Washington">WA</MenuItem>
+          <MenuItem value="Arizona">AZ</MenuItem>
+          <MenuItem value="Florida">FL</MenuItem>
+          <MenuItem value="Georgia">GA</MenuItem>
+          <MenuItem value="Indiana">IN</MenuItem>
+          <MenuItem value="Maryland">MD</MenuItem>
+          <MenuItem value="Michigan">MI</MenuItem>
+          <MenuItem value="Missoiri">MO</MenuItem>
+          <MenuItem value="New York">NY</MenuItem>
+          <MenuItem value="North Carolina">NC</MenuItem>
+          <MenuItem value="Ohio">OH</MenuItem>
+          <MenuItem value="Pennsylvania">PA</MenuItem>
+          <MenuItem value="Texas">TX</MenuItem>
+          <MenuItem value="Virginia">VA</MenuItem>
       </Select>
     </FormControl>
     <FormControl variant="outlined" sx={{ minWidth: 200, mr: 2 }}>
-      <InputLabel>Instructor</InputLabel>
+      <InputLabel>ICPISManager</InputLabel>
       <Select
-        value={instructor}
-        onChange={(e) => setInstructor(e.target.value)}
-        label="Instructor"
+        value={icpisManager}
+        onChange={(e) => setIcpisManager(e.target.value)}
+        label="ICPISManager"
       >
         <MenuItem value=""><em>Please Select</em></MenuItem>
-        <MenuItem value="1">1</MenuItem>
+        <MenuItem value="Andy">Andy</MenuItem>
+        <MenuItem value="Fisher">Fisher</MenuItem>
+        <MenuItem value="Jurin">Jurin</MenuItem>
+        <MenuItem value="Kenny">Kenny</MenuItem>
+        <MenuItem value="Daniel">Daniel</MenuItem>
       </Select>
     </FormControl>
     <Button variant="contained" color="primary" onClick={handleSearch} sx={{ mr: 2 }}>

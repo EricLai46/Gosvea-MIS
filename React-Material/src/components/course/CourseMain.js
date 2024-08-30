@@ -6,7 +6,7 @@ import CourseTable from './CourseTable';
 import CoursePagination from './CoursePagination';
 import { Container, Button } from '@mui/material';
 import { useNotification } from '../NotificationContext';
-
+import CourseDialog from './CourseDialog';
 const CourseMain = () => {
   const [timeZone, setTimeZone] = useState('');
   const [state, setState] = useState('');
@@ -19,6 +19,7 @@ const CourseMain = () => {
   const [currentCourse, setCurrentCourse] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [open, setOpen] = useState(false);
   const timeZones = ['PST', 'EST', 'CST', 'MST', 'GMT', 'UTC', 'BST', 'CEST'];
   const { showNotification } = useNotification();
   
@@ -122,6 +123,7 @@ const CourseMain = () => {
       date: '',
       start_time: '',
       end_time: '',
+      
     };
 
     setCurrentCourse(newCourse);
@@ -130,6 +132,7 @@ const CourseMain = () => {
 
   const handleClickOpen = (course) => {
     setCurrentCourse(course);
+    setOpen(true);
     setIsEditMode(true);
   };
 
@@ -145,8 +148,26 @@ const CourseMain = () => {
       }
     })
       .then(response => {
-        setCourses(prev => prev.map(c => c.courseid === currentCourse.courseid ? currentCourse : c));
+        setCourses(prev => {
+          const updatedCourses = prev.map(c => {
+            if (c.id === currentCourse.id) {
+              console.log(`Updating course with id: ${currentCourse.id}`);
+              return currentCourse;
+            }
+            return c;
+          });
+  
+          // Check for duplicate keys
+          const courseIds = updatedCourses.map(c => c.id);
+          const duplicateIds = courseIds.filter((id, index) => courseIds.indexOf(id) !== index);
+          if (duplicateIds.length > 0) {
+            console.warn('Duplicate course IDs found:', duplicateIds);
+          }
+  
+          return updatedCourses;
+        });
         showNotification('Course updated successfully!', 'success');
+        setOpen(false);
         checkVenuesAndInstructors(); // Check after save
       })
       .catch(error => {
@@ -154,7 +175,7 @@ const CourseMain = () => {
         showNotification('Course update failed!', 'error');
       });
   };
-
+  
   const handleInsert = () => {
     axiosInstance.post('/course', currentCourse, {
       headers: {
@@ -180,7 +201,10 @@ const CourseMain = () => {
         console.error('Error in request', error);
       });
   };
-
+//关闭
+const handleClose = () => {
+  setOpen(false);
+};
   const handleReset = () => {
     setTimeZone('');
     setState('');
@@ -240,6 +264,17 @@ const CourseMain = () => {
         <CoursePagination totalPages={totalPages} currentPage={currentPage} handlePageChange={handlePageChange} />
 
       </Container>
+      <CourseDialog
+        open={open}
+        handleClose={handleClose}
+        currentCourse={currentCourse}
+        handleChange={handleChange}
+        handleSave={handleSave}
+        handleInsert={handleInsert}
+        handleDelete={handleDelete}
+        timeZones={timeZones}
+        
+      />
     </SidebarLayout>
   );
 };
