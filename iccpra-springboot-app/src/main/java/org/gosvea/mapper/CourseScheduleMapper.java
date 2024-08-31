@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Mapper
 public interface CourseScheduleMapper {
 
-    List<CourseSchedule> getCourseSchedule(Integer instructorId, Integer venueId, LocalDate date, LocalTime startTime, LocalTime endTime, Boolean isActive);
+    List<CourseSchedule> getCourseSchedule(Integer instructorId, Integer venueId, LocalDate date, LocalTime startTime, LocalTime endTime, Boolean isActive,Boolean isProcessed);
 
     @Update("update coursesschedule set is_active=False where id=#{courseId}")
     void deActivateCourseSchedule(Integer courseId);
@@ -43,5 +43,8 @@ public interface CourseScheduleMapper {
 
     List<CourseSchedule> findCourseSchedulesByVenueAndDateRange(String venueId, List<VenueSchedule> venueSchedules);
 
-
+    @Select("select * from coursesschedule")
+    List<CourseSchedule> getAllCourseSchedule();
+    @Update("update coursesschedule set is_processed=#{isProcessed} where id=#{courseSchedule.id}")
+    void updateCourseScheduleProcessed(CourseSchedule courseSchedule, Boolean isProcessed);
 }

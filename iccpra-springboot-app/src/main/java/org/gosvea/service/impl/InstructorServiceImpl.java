@@ -27,11 +27,11 @@ public class InstructorServiceImpl implements InstructorService {
     }
 
     @Override
-    public PageResponse<Instructor> getInstructor(Integer pageNum, Integer pageSize, String state, String city, Integer instructorId, String phoneNumber, String email, Integer wageHour) {
+    public PageResponse<Instructor> getInstructor(Integer pageNum, Integer pageSize, String state, String city, Integer instructorId, String phoneNumber, String email, Integer wageHour,String venueId,String firstname, String lastname) {
         PageResponse<Instructor> pi=new PageResponse<Instructor>();
 
         PageHelper.startPage(pageNum,pageSize);
-        List<Instructor> li=instructorMapper.getInstructor(state,city,instructorId,phoneNumber,email,wageHour);
+        List<Instructor> li=instructorMapper.getInstructor(state,city,instructorId,phoneNumber,email,wageHour,venueId,firstname,lastname);
         Page<Instructor> pgi=(Page<Instructor>)li;
 
         pi.setTotalElement(pgi.getTotal());
@@ -110,6 +110,11 @@ public class InstructorServiceImpl implements InstructorService {
     @Override
     public void insertListInstructors(List<Instructor> instructorList) {
         instructorMapper.insertListInstructors(instructorList);
+    }
+
+    @Override
+    public void clearAllData() {
+        instructorMapper.clearAllData();
     }
 
 

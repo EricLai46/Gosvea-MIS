@@ -1,9 +1,11 @@
 package org.gosvea.service.impl;
 
 import org.gosvea.mapper.VenueMapper;
+import org.gosvea.pojo.Instructor;
 import org.gosvea.pojo.PageResponse;
 import org.gosvea.pojo.Venue;
 import org.gosvea.pojo.VenueSchedule;
+import org.gosvea.service.InstructorService;
 import org.gosvea.service.VenueService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +31,9 @@ public class VenueServiceImpl implements VenueService {
     private VenueMapper venueMapper;
 
     private RestTemplate restTemplate;
+
+    @Autowired
+    private InstructorService instructorService;
     @Override
     public void add(Venue venue) {
 
@@ -57,6 +62,8 @@ public class VenueServiceImpl implements VenueService {
                     // 处理 venueStatus 为空的情况，例如设置默认值
                     venue.setVenueStatus(Venue.VenueStatus.NORMAL);  // 或其他默认状态
                 }
+
+
             }
         }
         Page<Venue> pv=(Page<Venue>) lv;
@@ -70,6 +77,13 @@ public class VenueServiceImpl implements VenueService {
 
     @Override
     public void updateVenue(Venue venue) {
+        if(venue.getInstructor()!=null)
+        {
+            Instructor instructor =instructorService.getInstructorById(venue.getInstructor());
+            instructor.setVenueId(venue.getId());
+            instructorService.updateInstructor(instructor);
+            System.out.println(instructor);
+        }
         venueMapper.updateVenue(venue);
     }
 

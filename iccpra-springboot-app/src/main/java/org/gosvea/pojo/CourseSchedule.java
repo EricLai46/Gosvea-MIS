@@ -13,7 +13,7 @@ public class CourseSchedule extends Schedule{
     private boolean isActive;
     private String address;
     private String courseTitle;
-
+    private boolean isProcessed;
     public CourseSchedule(){
 
     }
@@ -22,8 +22,9 @@ public class CourseSchedule extends Schedule{
         super(date,startTime,endTime);
         this.instructorId=instructorId;
         this.venueId=venueId;
-        this.isActive=true;
+        this.isActive=false;
         this.address=address;
         this.courseTitle=courseTitle;
+
     }
 }

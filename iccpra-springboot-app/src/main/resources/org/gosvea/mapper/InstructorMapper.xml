@@ -30,12 +30,24 @@
             <if test="wageHour!=null">
                 and wage_hour=#{wageHour}
             </if>
+            <if test="venueId!=null">
+                and venue_id=#{venueId}
+            </if>
+            <if test="lastname!=null">
+                and lastname=#{lastname}
+            </if>
+            <if test="firstname!=null">
+                and firstname=#{firstname}
+            </if>
         </where>
     </select>
 <!--更新单个Instructor-->
     <update id="updateInstructor" >
         update instructors
         <set>
+            <if test="venueId!=null">
+                venue_id=#{venueId},
+            </if>
             <if test="firstname!=null">
                 firstname=#{firstname},
             </if>
@@ -75,7 +87,7 @@
             <if test="fobKey!=null">
                 fob_key=#{fobKey},
             </if>
-            <if test="salaryInfo!+null">
+            <if test="salaryInfo!=null">
                 salary_info=#{salaryInfo},
             </if>
 

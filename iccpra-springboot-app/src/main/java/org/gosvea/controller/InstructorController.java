@@ -60,11 +60,14 @@ public class InstructorController {
             @RequestParam(required = false) Integer instructorId,
             @RequestParam(required = false) String phoneNumber,
             @RequestParam(required = false) String email,
-            @RequestParam(required = false) Integer wageHour
+            @RequestParam(required = false) Integer wageHour,
+            @RequestParam(required = false) String venueId,
+            @RequestParam(required = false) String firstname,
+            @RequestParam(required = false) String lastname
     )
     {
         try {
-            PageResponse<Instructor> ps=instructorService.getInstructor(pageNum,pageSize,state,city,instructorId,phoneNumber,email,wageHour);
+            PageResponse<Instructor> ps=instructorService.getInstructor(pageNum,pageSize,state,city,instructorId,phoneNumber,email,wageHour,venueId,firstname,lastname);
             return Result.success(ps);
         }
         catch (Exception e) {
@@ -247,6 +250,7 @@ public class InstructorController {
              Workbook workbook = new XSSFWorkbook(inputStream)) {
             Sheet sheet = workbook.getSheetAt(0);
             //venueService.clearAllData(); // 清除所有现有数据
+            instructorService.clearAllData();
             for (Row row : sheet) {
                 if (row.getRowNum() == 0) {
                     continue; // 跳过表头

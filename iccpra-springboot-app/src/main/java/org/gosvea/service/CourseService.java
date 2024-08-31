@@ -16,7 +16,7 @@ public interface CourseService {
 
     void deleteCourse(Integer instructorId, Integer venueId);
 
-    PageResponse<CourseSchedule> getCourseSchedule(Integer pageNum, Integer pageSize, Integer instructorId, Integer venueId, LocalDate date, LocalTime startTime,LocalTime endTime,Boolean isActive);
+    PageResponse<CourseSchedule> getCourseSchedule(Integer pageNum, Integer pageSize, Integer instructorId, Integer venueId, LocalDate date, LocalTime startTime,LocalTime endTime,Boolean isActive,Boolean isProcessed);
 
     void deleteAllSchedule();
     //检查venue和instructor是否有匹配的时间
@@ -28,4 +28,10 @@ public interface CourseService {
     void updateCourseSchedules(List<CourseSchedule> schedulesToUpdate);
 
     List<CourseSchedule> findCourseSchedulesByVenueAndDateRange(String venueId, List<VenueSchedule> venueSchedules);
+
+    List<CourseSchedule> getAllCourseSchedule();
+
+    void updateCourseScheduleProcessed(CourseSchedule courseSchedule,Boolean isProcessed);
+
+
 }

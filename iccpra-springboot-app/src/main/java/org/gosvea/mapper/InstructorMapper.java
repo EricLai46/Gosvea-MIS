@@ -15,7 +15,7 @@ public interface InstructorMapper {
             "values(#{venueId},#{firstname},#{lastname},#{state},#{city},#{phoneNumber},#{email},#{wageHour},#{totalClassTimes},#{deposit},#{rentManikinNumbers},#{finance},#{rentStatus},#{fobKey})")
     void addInstructor(Instructor instructor);
 
-    List<Instructor> getInstructor(String state, String city, Integer instructorId, String phoneNumber, String email, Integer wageHour);
+    List<Instructor> getInstructor(String state, String city, Integer instructorId, String phoneNumber, String email, Integer wageHour,String venueId,String firstname, String lastname);
     @Delete("delete from instructors where id=#{instructorId}")
     void deleteInstructor(Integer instructorId);
    // @Update("update instructors set venue_id=#{venueId},firstname=#{firstname},lastname=#{lastname},state=#{state},city=#{city},phone_number=#{phoneNumber},email=#{email},wage_hour=#{wageHour},total_class_times=#{totalClassTimes},deposit=#{deposit},rent_manikin_numbers=#{rentManikinNumbers},finance=#{finance},rent_status=#{rentStatus},fob_key=#{fobKey} where id=#{id}")
@@ -43,4 +43,6 @@ public interface InstructorMapper {
     void insertListInstructors(List<Instructor> instructorList);
 
     void updateListInstructors(List<Instructor> instructorList);
+    @Delete("DELETE FROM instructors")
+    void clearAllData();
 }

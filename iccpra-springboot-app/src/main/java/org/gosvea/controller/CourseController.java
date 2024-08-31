@@ -38,13 +38,14 @@ public class CourseController {
             @RequestParam(required = false)LocalDate date,
             @RequestParam(required = false)LocalTime startTime,
             @RequestParam(required = false)LocalTime endTime,
-            @RequestParam(required = false)Boolean isActive
+            @RequestParam(required = false)Boolean isActive,
+            @RequestParam(required = false)Boolean isProcessed
             )
     {
         try {
            // Map<Integer,String> warnings=checkVenueInstructorInformation();
             boolean activeStatus = (isActive != null) ? isActive : false;
-            return  Result.success(courseService.getCourseSchedule(pageNum,pageSize,instructorId,venueId,date,startTime,endTime,isActive));
+            return  Result.success(courseService.getCourseSchedule(pageNum,pageSize,instructorId,venueId,date,startTime,endTime,isActive,isProcessed));
         } catch (Exception e) {
             e.printStackTrace();
             return Result.error(e.getMessage()+"\n"+getStackTrace(e));

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, FormControl, InputLabel, Select, MenuItem, TextField, Button } from '@mui/material';
 
-const InstructorSearchForm = ({  state, setState, email, setEmail, firstname, setFirstname, lastname, setLastname, phonenumber, setPhonenumber, handleSearch, handleReset,handleExport,handleFileChange,handleUpload,selectefile }) => {
+const InstructorSearchForm = ({  state, setState, email, setEmail, firstname, setFirstname, lastname, setLastname, phonenumber, setPhonenumber, handleSearch, handleReset,handleExport,handleFileChange,handleUpload,selectefile,setVenueId,venueId }) => {
   const timeZones = ['PST', 'EST', 'CST', 'MST', 'GMT', 'UTC', 'BST', 'CEST'];
 
   return (
@@ -48,16 +48,23 @@ const InstructorSearchForm = ({  state, setState, email, setEmail, firstname, se
       />
       <TextField
         variant="outlined"
-        label="FirstName"
+        label="firstname"
         value={firstname}
         onChange={(e) => setFirstname(e.target.value)}
         sx={{ minWidth: 50, mr: 2 }}
       />
       <TextField
         variant="outlined"
-        label="PhoneNumber"
+        label="phoneNumber"
         value={phonenumber}
         onChange={(e) => setPhonenumber(e.target.value)}
+        sx={{ minWidth: 50, mr: 2 }}
+      />
+        <TextField
+        variant="outlined"
+        label="venueId"
+        value={venueId}
+        onChange={(e) => setVenueId(e.target.value)}
         sx={{ minWidth: 50, mr: 2 }}
       />
       <Button variant="contained" color="primary" onClick={handleSearch} sx={{ mr: 2 }}>

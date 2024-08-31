@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, FormControl, InputLabel, Select, MenuItem, Button } from '@mui/material';
 
-const CourseSearchForm = ({ timeZone, state, instructor, setTimeZone, setState, setInstructor, handleSearch, handleReset }) => (
+const CourseSearchForm = ({ timeZone, state, instructor, setTimeZone, setState, setInstructor, handleSearch, handleReset,isActive,isProcessed,setIsActive,setIsProcessed }) => (
   <Box display="flex" alignItems="center" mb={3}>
     <FormControl variant="outlined" sx={{ minWidth: 200, mr: 2 }}>
       <InputLabel>Time Zone</InputLabel>
@@ -30,7 +30,7 @@ const CourseSearchForm = ({ timeZone, state, instructor, setTimeZone, setState, 
         <MenuItem value="az">AZ</MenuItem>
       </Select>
     </FormControl>
-    <FormControl variant="outlined" sx={{ minWidth: 200, mr: 2 }}>
+    {/* <FormControl variant="outlined" sx={{ minWidth: 200, mr: 2 }}>
       <InputLabel>Instructor</InputLabel>
       <Select
         value={instructor}
@@ -38,7 +38,31 @@ const CourseSearchForm = ({ timeZone, state, instructor, setTimeZone, setState, 
         label="Instructor"
       >
         <MenuItem value=""><em>Please Select</em></MenuItem>
-        <MenuItem value="1">1</MenuItem>
+        <MenuItem value="1256">1</MenuItem>
+      </Select>
+    </FormControl> */}
+    <FormControl variant="outlined" sx={{ minWidth: 200, mr: 2 }}>
+      <InputLabel>IsPublished</InputLabel>
+      <Select
+        value={isActive}
+        onChange={(e) => setIsActive(e.target.value)}
+        label="isPublisded"
+      >
+        <MenuItem value=""><em>Please Select</em></MenuItem>
+        <MenuItem value="true">true</MenuItem>
+        <MenuItem value="false">false</MenuItem>
+      </Select>
+    </FormControl>
+    <FormControl variant="outlined" sx={{ minWidth: 200, mr: 2 }}>
+      <InputLabel>IsProcessed</InputLabel>
+      <Select
+        value={isProcessed}
+        onChange={(e) => setIsProcessed(e.target.value)}
+        label="isProcessed"
+      >
+        <MenuItem value=""><em>Please Select</em></MenuItem>
+        <MenuItem value="true">true</MenuItem>
+        <MenuItem value="false">false</MenuItem>
       </Select>
     </FormControl>
     <Button variant="contained" color="primary" onClick={handleSearch} sx={{ mr: 2 }}>

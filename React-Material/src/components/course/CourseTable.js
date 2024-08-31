@@ -14,6 +14,7 @@ const CourseTable = ({ currentItems, handleClickOpen }) => (
           <TableCell>Course Start Time</TableCell>
           <TableCell>Course End Time</TableCell>
           <TableCell>Course Published</TableCell>
+          <TableCell>Course Processed</TableCell>
           <TableCell>Actions</TableCell>
         </TableRow>
       </TableHead>
@@ -30,6 +31,7 @@ const CourseTable = ({ currentItems, handleClickOpen }) => (
               <TableCell>{course.endTime}</TableCell>
               {console.log("sss",course)}
               <TableCell>{String(course.active)}</TableCell>
+              <TableCell>{String(course.processed)}</TableCell>
               <TableCell>
                 <Button variant="outlined" onClick={() => handleClickOpen(course)}>Edit</Button>
               </TableCell>

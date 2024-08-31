@@ -25,6 +25,9 @@
             <if test="isActive != null">
                 AND is_active = #{isActive}
             </if>
+            <if test="isProcessed!=null">
+                AND is_processed=#{isProcessed}
+            </if>
         </where>
     </select>
 

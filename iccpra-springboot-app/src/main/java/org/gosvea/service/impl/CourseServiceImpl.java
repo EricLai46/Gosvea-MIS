@@ -47,13 +47,13 @@ public class CourseServiceImpl implements CourseService {
     }
     //获取courseschedule
     @Override
-    public PageResponse<CourseSchedule> getCourseSchedule(Integer pageNum, Integer pageSize, Integer instructorId, Integer venueId, LocalDate date, LocalTime startTime, LocalTime endTime, Boolean isActive) {
+    public PageResponse<CourseSchedule> getCourseSchedule(Integer pageNum, Integer pageSize, Integer instructorId, Integer venueId, LocalDate date, LocalTime startTime, LocalTime endTime, Boolean isActive,Boolean isProcessed) {
         PageResponse<CourseSchedule> prc=new PageResponse<>();
         PageHelper.startPage(pageNum,pageSize);
 
         Boolean activeStatus = (isActive != null) ? isActive : false;
 
-        List<CourseSchedule> lic=courseScheduleMapper.getCourseSchedule(instructorId,venueId,date,startTime,endTime,isActive);
+        List<CourseSchedule> lic=courseScheduleMapper.getCourseSchedule(instructorId,venueId,date,startTime,endTime,isActive,isProcessed);
         Page<CourseSchedule> pgc=(Page<CourseSchedule>) lic;
         prc.setItems(pgc.getResult());
         prc.setTotalElement(pgc.getTotal());
@@ -282,6 +282,16 @@ public Map<Integer, String> generateOrUpdateCourseSchedules(String venueId, Inte
 
     public List<CourseSchedule> findCourseSchedulesByVenueAndDateRange(String venueId, List<VenueSchedule> venueSchedules) {
         return courseScheduleMapper.findCourseSchedulesByVenueAndDateRange(venueId,venueSchedules);
+    }
+
+    @Override
+    public List<CourseSchedule> getAllCourseSchedule() {
+        return courseScheduleMapper.getAllCourseSchedule();
+    }
+
+    @Override
+    public void updateCourseScheduleProcessed(CourseSchedule courseSchedule, Boolean isProcessed) {
+        courseScheduleMapper.updateCourseScheduleProcessed(courseSchedule,isProcessed);
     }
 
     public void deleteCourseSchedules(List<CourseSchedule> schedulesToDelete) {

@@ -28,7 +28,7 @@ const InstructorMain = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalInstructors,setTotalInstructors]=useState(0);
   const [selectedFile,setSelectedFile]=useState(null);
-
+  const [venueId,setVenueId]=useState('');
   useEffect(() => {
     fetchInstructors();
     handleSearch();
@@ -72,6 +72,7 @@ const InstructorMain = () => {
       firstname: firstname,
       lastname: lastname,
       email: email,
+      venueId:venueId
     };
 
     Object.keys(params).forEach(key => {
@@ -276,6 +277,8 @@ const handleUpload=()=>{
           handleFileChange={handleFileChange}
           handleUpload={handleUpload}
           selectedFile={selectedFile}
+          venueId={venueId}
+          setVenueId={setVenueId}
         />
         <InstructorTable currentItems={instructors} handleClickOpen={handleClickOpen} />
         <InstructorPagination totalPages={totalPages} currentPage={currentPage} handlePageChange={handlePageChange} />

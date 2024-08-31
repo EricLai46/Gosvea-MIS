@@ -20,6 +20,9 @@ const CourseMain = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [open, setOpen] = useState(false);
+  const [isProcessed,setIsProcessed]=useState();
+  const [isPublished,setIsPublished]=useState();
+  const [isActive,setIsActive]=useState(false);
   const timeZones = ['PST', 'EST', 'CST', 'MST', 'GMT', 'UTC', 'BST', 'CEST'];
   const { showNotification } = useNotification();
   
@@ -72,6 +75,8 @@ const CourseMain = () => {
       pageSize: itemsPerPage,
       instructor: '',
       date: '',
+      isActive: isActive,
+      isProcessed: isProcessed,
     };
 
     Object.keys(params).forEach(key => {
@@ -259,6 +264,10 @@ const handleClose = () => {
           setInstructor={setInstructor}
           handleSearch={handleSearch}
           handleReset={handleReset}
+          isActive={isActive}
+          isProcessed={isProcessed}
+          setIsActive={setIsActive}
+          setIsProcessed={setIsProcessed}
         />
         <CourseTable currentItems={currentItems} handleClickOpen={handleClickOpen} />
         <CoursePagination totalPages={totalPages} currentPage={currentPage} handlePageChange={handlePageChange} />
