@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Mapper
 public interface CourseScheduleMapper {
 
-    List<CourseSchedule> getCourseSchedule(Integer instructorId, Integer venueId, LocalDate date, LocalTime startTime, LocalTime endTime, Boolean isActive,Boolean isProcessed);
+    List<CourseSchedule> getCourseSchedule(String icpisManager, String venueId, LocalDate date, LocalTime startTime, LocalTime endTime, Boolean isActive,Boolean isProcessed,LocalDate fromDate,LocalDate toDate);
 
     @Update("update coursesschedule set is_active=False where id=#{courseId}")
     void deActivateCourseSchedule(Integer courseId);
@@ -30,7 +30,7 @@ public interface CourseScheduleMapper {
     @Delete("delete from coursesschedule where instructor_id=#{instructorId} and venue_id=#{venueId}")
     void deleteCourse(Integer instructorId, Integer venueId);
 
-     @Update("update coursesschedule set instructor_id=#{instructorId},venue_id=#{venueId},start_time=#{startTime},end_time=#{endTime},date=#{date},is_active=#{isActive} where id=#{id}")
+     @Update("update coursesschedule set instructor_id=#{instructorId},venue_id=#{venueId},start_time=#{startTime},end_time=#{endTime},date=#{date},is_active=#{isActive},is_enrollwareAdded=#{isEnrollwareAdded},comments=#{comments} where id=#{id}")
     void updateCourseInformation(CourseSchedule courseSchedule);
     @Delete("delete from coursesschedule")
     void deleteAllSchedule();

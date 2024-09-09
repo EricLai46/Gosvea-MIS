@@ -28,7 +28,7 @@ const VenueMain = () => {
   const [venueStatus]=useState('');
   const [totalPages, setTotalPages] = useState(1); // 添加 totalPages 状态
   const [selectedFile,setSelectedFile]=useState(null);
-
+  const [venueId,setVenueId]=useState('');
   useEffect(() => {
     fetchVenues();
     handleSearch();
@@ -72,6 +72,7 @@ const VenueMain = () => {
       icpisManager: icpisManager,
       paymentMode: '',
       timeZone: timeZone,
+      venueId:venueId
     };
 
     Object.keys(params).forEach((key) => {
@@ -195,6 +196,7 @@ const VenueMain = () => {
     setVenues([]);
     setCurrentPage(1);
     setIcpisManager('');
+    setVenueId('');
     showNotification('Reset successfully!', 'success');
   };
 //翻页
@@ -273,6 +275,8 @@ const VenueMain = () => {
           handleUpload={handleUpload}
           selectedFile={selectedFile}
           setIcpisManager={setIcpisManager}
+          venueId={venueId}
+          setVenueId={setVenueId}
         />
         <VenueTable currentItems={venues} handleClickOpen={handleClickOpen} />
         <VenuePagination totalPages={totalPages} currentPage={currentPage} handlePageChange={handlePageChange}/>

@@ -25,8 +25,11 @@ const CourseMain = () => {
   const [isActive,setIsActive]=useState(false);
   const timeZones = ['PST', 'EST', 'CST', 'MST', 'GMT', 'UTC', 'BST', 'CEST'];
   const { showNotification } = useNotification();
-  
-
+  const [icpisManager,setIcpisManager]=useState('');
+  const [venueId,setVenueId]=useState('');
+  const [fromDate, setFromDate] = useState(null);
+  const [toDate, setToDate] = useState(null);
+  const [totalPages, setTotalPages] = useState(1); // 添加 totalPages 状态
   useEffect(() => {
     // Fetch venues and schedules data when the component mounts
    // fetchVenues();
@@ -73,10 +76,14 @@ const CourseMain = () => {
     let params = {
       pageNum: currentPage,
       pageSize: itemsPerPage,
-      instructor: '',
+      icpisManager: icpisManager,
       date: '',
       isActive: isActive,
       isProcessed: isProcessed,
+      fromDate:fromDate,
+      toDate:toDate,
+      venueId:venueId,
+      icpisManager:icpisManager
     };
 
     Object.keys(params).forEach(key => {
@@ -89,10 +96,11 @@ const CourseMain = () => {
     .then(response => {
       console.log("Full response:", response.data); 
       if (response.data.message === "success") {
-        // 成功时处理数据和警告
-        console.log(response);
+        
+        
         setCourses(response.data.data ? response.data.data.items : []);
-        console.log("Warnings (success):", response.data.warnings); // 打印 warnings
+        setTotalPages(Math.ceil(response.data.data.totalElement / itemsPerPage));
+        
   
         if (response.data.warnings && Object.keys(response.data.warnings).length > 0) {
           Object.entries(response.data.warnings).forEach(([key, value]) => {
@@ -173,7 +181,8 @@ const CourseMain = () => {
         });
         showNotification('Course updated successfully!', 'success');
         setOpen(false);
-        checkVenuesAndInstructors(); // Check after save
+        checkVenuesAndInstructors();
+        handleSearch(); // Check after save
       })
       .catch(error => {
         console.error('Error in request:', error);
@@ -216,6 +225,8 @@ const handleClose = () => {
     setInstructor('');
     setCourses([]);
     setCurrentPage(1);
+    setFromDate(null);
+    setToDate(null);
     showNotification('Reset successfully!', 'success');
   };
 
@@ -247,10 +258,6 @@ const handleClose = () => {
     });
   };
 
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = courses.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(courses.length / itemsPerPage);
 
   return (
     <SidebarLayout>
@@ -268,8 +275,16 @@ const handleClose = () => {
           isProcessed={isProcessed}
           setIsActive={setIsActive}
           setIsProcessed={setIsProcessed}
+          setIcpisManager={setIcpisManager}
+          icpisManager={icpisManager}
+          venueId={venueId}
+          setVenueId={setVenueId}
+          fromDate={fromDate}
+          setFromDate={setFromDate}
+          toDate={toDate}
+          setToDate={setToDate}
         />
-        <CourseTable currentItems={currentItems} handleClickOpen={handleClickOpen} />
+        <CourseTable currentItems={courses} handleClickOpen={handleClickOpen} />
         <CoursePagination totalPages={totalPages} currentPage={currentPage} handlePageChange={handlePageChange} />
 
       </Container>

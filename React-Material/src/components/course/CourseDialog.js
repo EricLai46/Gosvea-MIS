@@ -6,27 +6,49 @@ const CourseDialog = ({ open, handleClose, isEditMode, currentCourse, handleChan
 
   const [instructors, setInstructors] = useState([]);
   const [isChecked, setIsChecked] = useState(currentCourse.active);
-
+  const [isEnrollwareChecked, setIsEnrollwareChecked] = useState(currentCourse.isEnrollwareAdded);
+  const [comments, setComments] = useState(currentCourse.comments || ''); 
   useEffect(() => {
     // 当 open 或 currentCourse 发生变化时更新 isChecked
     if (open && currentCourse) {
-      setIsChecked(currentCourse.active ); // 1 表示 true
+      setIsChecked(currentCourse.active ); 
+      setIsEnrollwareChecked(currentCourse.isEnrollwareAdded); 
+      setComments(currentCourse.comments || ''); // 1 表示 true
     }
     
   }, [open, currentCourse]);
 
   // 当用户点击 Checkbox 时，更新状态
   const handleCheckboxChange = (event) => {
-    const checked = event.target.checked;
-    setIsChecked(checked);
+    const { name, checked } = event.target;
+    if (name === 'active') {
+      setIsChecked(checked);
+      handleChange({
+        target: {
+          name: 'active',
+          value: checked ? 1 : 0  
+        }
+      });
+    } else if (name === 'enrollwareAdded') {
+      setIsEnrollwareChecked(checked);
+      handleChange({
+        target: {
+          name: 'enrollwareAdded',
+          value: checked ? 1 : 0  
+        }
+      });
+    }
+  };
+  const handleCommentsChange = (event) => {
+    const { value } = event.target;
+    setComments(value);
     handleChange({
       target: {
-        name: 'active',
-        value: checked ? 1 : 0  // 将布尔值转换为 1 或 0, 1 为 true, 0 为 false
+        name: 'comments',
+        value
       }
     });
   };
-
   useEffect(() => {
     if (open && currentCourse) {
       axiosInstance.get('/instructor/instructorid', {
@@ -158,7 +180,32 @@ const CourseDialog = ({ open, handleClose, isEditMode, currentCourse, handleChan
                   color="primary"
                 />
               }
-              label="Is Published" 
+              label="AD Published?" 
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={isEnrollwareChecked} 
+                  onChange={handleCheckboxChange}
+                  name="enrollwareAdded" 
+                  color="primary"
+                />
+              }
+              label="Added on Enrollware?" 
+            />
+          </Grid>
+             <Grid item xs={12}>
+            <TextField
+              label="Comments"
+              name="comments"
+              value={currentCourse.comments}
+              onChange={handleCommentsChange}
+              multiline
+              rows={4} 
+              fullWidth
+              variant="outlined" // 样式
             />
           </Grid>
         </Grid>

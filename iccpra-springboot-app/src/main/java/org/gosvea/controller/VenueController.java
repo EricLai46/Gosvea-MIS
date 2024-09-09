@@ -95,10 +95,11 @@ public class VenueController {
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String icpisManager,
             @RequestParam(required = false) String paymentMethod,
-            @RequestParam(required = false) String timeZone) {
+            @RequestParam(required = false) String timeZone,
+            @RequestParam(required = false) String venueId) {
 
         try {
-            PageResponse<Venue> ps = venueService.list(pageNum, pageSize, state, city, icpisManager, paymentMethod, timeZone);
+            PageResponse<Venue> ps = venueService.list(pageNum, pageSize, state, city, icpisManager, paymentMethod, timeZone,venueId);
             return Result.success(ps);
         } catch (Exception e) {
             e.printStackTrace();
@@ -318,7 +319,7 @@ public class VenueController {
                         String lastName = nameParts[1];
                         Integer instructorId = instructorService.findIdByName(firstName, lastName);
                         if (instructorId != null) {
-                            venue.setInstructor(instructorId);
+                            venue.setInstructor(String.valueOf(instructorId));
                         }
                     }
                 }

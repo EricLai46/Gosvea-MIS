@@ -29,7 +29,9 @@
              <if test="icpisManager!=null">
                  and v.icpis_manager=#{icpisManager}
              </if>
-
+             <if test="venueId!=null">
+                 and v.id=#{venueId}
+             </if>
 
          </where>
      </select>

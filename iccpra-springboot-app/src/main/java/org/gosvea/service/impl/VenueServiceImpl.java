@@ -42,14 +42,14 @@ public class VenueServiceImpl implements VenueService {
     }
 
     @Override
-    public PageResponse<Venue> list(Integer pageNum, Integer pageSize,String state, String city, String icpisManager, String paymentMethod, String timeZone) {
+    public PageResponse<Venue> list(Integer pageNum, Integer pageSize,String state, String city, String icpisManager, String paymentMethod, String timeZone,String venueId) {
         PageResponse<Venue> ps=new PageResponse<>();
         // 打印分页参数
         //System.out.println("Page number: " + pageNum);
         //System.out.println("Page size: " + pageSize);
 
         PageHelper.startPage(pageNum,pageSize);
-        List<Venue> lv =venueMapper.list(state,city,icpisManager,paymentMethod,timeZone);
+        List<Venue> lv =venueMapper.list(state,city,icpisManager,paymentMethod,timeZone,venueId);
         if(lv!=null)
         {
             for (Venue venue : lv) {
@@ -256,6 +256,11 @@ public class VenueServiceImpl implements VenueService {
             venue.setLongitude(latlon[1]);
             saveLatLon(latlon,venue.getId());
         }
+    }
+
+    @Override
+    public List<Venue> getAllSpecStatusVenues(Venue.VenueStatus venueStatus) {
+        return venueMapper.getAllSpecStatusVenues(venueStatus);
     }
 
 

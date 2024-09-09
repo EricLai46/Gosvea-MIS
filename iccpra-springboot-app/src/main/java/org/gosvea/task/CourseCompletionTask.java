@@ -2,8 +2,10 @@ package org.gosvea.task;
 
 import org.gosvea.pojo.CourseSchedule;
 import org.gosvea.pojo.Instructor;
+import org.gosvea.pojo.Venue;
 import org.gosvea.service.CourseService;
 import org.gosvea.service.InstructorService;
+import org.gosvea.service.VenueService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -27,81 +29,85 @@ public class CourseCompletionTask {
 
     @Autowired
     private CourseService courseService;
-    @Scheduled(fixedRate = 60000*60*24) // 每天执行一次
+
+    @Autowired
+    private VenueService venueService;
+    @Scheduled(cron = "0 0 0 * * ?") // 每天午夜执行一次
     public void checkCourseCompletion() {
         LocalDate currentDate = LocalDate.now();
-        List<CourseSchedule> schedules =courseService.getAllCourseSchedule();
-       // System.out.println(schedules);
+        List<CourseSchedule> schedules = courseService.getAllCourseSchedule();
+
         for (CourseSchedule schedule : schedules) {
-           // System.out.println("endtime"+schedule.getDate().isBefore(currentDate));
-            //System.out.println(schedule.isActive());
-            if (schedule.getDate().isBefore(currentDate) && schedule.isActive()&&!schedule.isProcessed()) {
-                // 更新总上课次数
-
-                Instructor instructor=instructorService.getInstructorById(schedule.getInstructorId());
-               // System.out.println(instructor);
-                System.out.println("previous toltal class times:"+instructor.getTotalClassTimes());
-                instructor.setTotalClassTimes(instructor.getTotalClassTimes()+1);
-                System.out.println("Right now total class times:"+instructor.getTotalClassTimes());
-                // 检查并更新 wage_hour
-
-                //检查是否有salary梯度
-                if(instructor.getSalaryInfo()!=null)
-                {
-
-                    String salaryinfos=instructor.getSalaryInfo();
-                    Pattern pattern = Pattern.compile("\\d+");
-                    Matcher matcher = pattern.matcher(salaryinfos);
-
-                    // 使用 ArrayList 存储提取出的数字
-                    ArrayList<Integer> numbers = new ArrayList<>();
-
-                    // 找到所有匹配的数字并存入 ArrayList
-                    while (matcher.find()) {
-                        numbers.add(Integer.parseInt(matcher.group()));
-                    }
-
-                    int wageIncrease = 0;
-
-                    for(int i=2;i< numbers.size();i++)
-                    {
-                        if(instructor.getTotalClassTimes()==numbers.get(i))
-                        {
-                            String wageHour = instructor.getWageHour();
-                            String numericPart = wageHour.replaceAll("[^\\d]", "");  // 只保留数字字符
-
-                            if (!numericPart.isEmpty()) {
-                                int currentWage = Integer.parseInt(numericPart);
-                                int threshold = numbers.get(1);
-
-                                if (currentWage < threshold && currentWage + 5 <= threshold) {
-                                    wageIncrease += 5;
-                                }
-                            } else {
-                                System.out.println("Error: Unable to extract numeric value from wageHour: " + wageHour);
-                            }
-                        }
-                    }
-                    String wageHour = instructor.getWageHour();  // 例如 "40/h"
-
-                    // 提取纯数字部分
-                    String numericPart = wageHour.replaceAll("[^\\d]", "");  // 只保留数字字符
-
-                    if (!numericPart.isEmpty()) {
-                        int currentWage = Integer.parseInt(numericPart);  // 将纯数字部分转换为整数
-                        instructor.setWageHour((currentWage + wageIncrease) + "/h");
-                        System.out.println(instructor.getWageHour());
-                    } else {
-                        System.out.println("Error: Unable to extract numeric value from wageHour: " + wageHour);
-                    }
-                    //schedule.setCourseMarkedAsCompleted(true); // 标记课程已处理
+            if (schedule.getDate().isBefore(currentDate) && schedule.isActive() && !schedule.isProcessed()) {
+                Instructor instructor = instructorService.getInstructorById(schedule.getInstructorId());
+                if (instructor != null) {
+                    instructor.setTotalClassTimes(instructor.getTotalClassTimes() + 1);
+                    updateInstructorWage(instructor);
                     instructorService.updateInstructor(instructor);
-                    courseService.updateCourseScheduleProcessed(schedule,true);
+                    courseService.updateCourseScheduleProcessed(schedule, true);
                 }
-
-
-
             }
         }
+    }
+
+    private void updateInstructorWage(Instructor instructor) {
+        if (instructor.getSalaryInfo() != null) {
+            String salaryinfos = instructor.getSalaryInfo();
+            Pattern pattern = Pattern.compile("\\d+");
+            Matcher matcher = pattern.matcher(salaryinfos);
+
+            ArrayList<Integer> numbers = new ArrayList<>();
+            while (matcher.find()) {
+                numbers.add(Integer.parseInt(matcher.group()));
+            }
+
+            int wageIncrease = 0;
+            for (int i = 2; i < numbers.size(); i++) {
+                if (instructor.getTotalClassTimes() == numbers.get(i)) {
+                    String wageHour = instructor.getWageHour();
+                    String numericPart = wageHour.replaceAll("[^\\d]", "");
+                    if (!numericPart.isEmpty()) {
+                        int currentWage = Integer.parseInt(numericPart);
+                        int threshold = numbers.get(1);
+
+                        if (currentWage < threshold && currentWage + 5 <= threshold) {
+                            wageIncrease += 5;
+                        }
+                    }
+                }
+            }
+
+            String wageHour = instructor.getWageHour();
+            String numericPart = wageHour.replaceAll("[^\\d]", "");
+            if (!numericPart.isEmpty()) {
+                int currentWage = Integer.parseInt(numericPart);
+                instructor.setWageHour((currentWage + wageIncrease) + "/h");
+            }
+        }
+    }
+
+
+    @Scheduled(cron = "0 0 1 * * ?")
+    public void CheckIfInvestigationSiteShouldBeNormal()
+    {
+        //获取所有观察点的信息
+        List<Venue> investigationVenueList=venueService.getAllSpecStatusVenues(Venue.VenueStatus.INVESTIGATION);
+        for(Venue venue:investigationVenueList)
+        {
+            if(venue.getInstructor()!=null)
+            {
+                Instructor instructor=instructorService.getInstructorById(venue.getInstructor());
+                if(instructor!=null)
+                {
+                    if(instructor.getTotalClassTimes()>=2)
+                    {
+                        venue.setVenueStatus(Venue.VenueStatus.NORMAL);
+                        venueService.updateVenue(venue);
+                    }
+
+                }
+            }
+        }
+
     }
 }

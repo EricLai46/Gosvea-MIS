@@ -44,8 +44,9 @@ const VenueMap = () => {
       console.log("Venues array after setVenues:", venues);
     }, [venues]);  
 
-    const getIconByStatus = (status) => {
+    const getIconByStatus = (status,icpisManager) => {
       let color;
+      let shapeStyle;
       switch (status) {
         case 'NORMAL':
           color = 'green';
@@ -65,9 +66,27 @@ const VenueMap = () => {
         default:
           color = 'blue'; 
       }
+      switch(icpisManager){
+        case 'Jurin':
+          shapeStyle= '50%';
+          break;
+        case 'Fisher':
+          shapeStyle='0%';
+          break;
+        case 'Andy':
+          shapeStyle='0 50% 5-% 0';
+          break;
+        case 'Kenny':
+          shapeStyle = 'clip-path: polygon(50% 0%, 100% 38%, 81% 100%, 19% 100%, 0% 38%);';
+        case 'Daniel':
+          shapeStyle = 'clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);';
+          break;
+          default: // 默认圆形
+          shapeStyle = 'border-radius: 50%;';
+      }
       return L.divIcon({
         className: 'custom-icon',
-        html: `<div style="background-color:${color}; width:20px; height:20px; border-radius:50%;"></div>`,
+        html: `<div style="background-color:${color}; width:20px; height:20px;  ${shapeStyle}"></div>`,
       });
     };
     
@@ -90,7 +109,8 @@ const VenueMap = () => {
               Instructor Issue: ${countVenuesByStatus('INSTRUCTORISSUE')}<br />
               Venue Issue: ${countVenuesByStatus('VENUEISSUE')}<br />
               Closed: ${countVenuesByStatus('CLOSED')}<br />
-              Investigation: ${countVenuesByStatus('INVESTIGATION')}
+              Investigation: ${countVenuesByStatus('INVESTIGATION')}<br />
+              Total: ${countVenuesByStatus('NORMAL')+countVenuesByStatus('INSTRUCTORISSUE')+countVenuesByStatus('VENUEISSUE')+countVenuesByStatus('CLOSED')+countVenuesByStatus('INVESTIGATION')}
             </div>
           `;
           return div;
@@ -120,13 +140,14 @@ const VenueMap = () => {
               <Marker
                 key={venue.id}
                 position={[venue.latitude, venue.longitude]}
-                icon={getIconByStatus(venue.venueStatus)}
+                icon={getIconByStatus(venue.venueStatus,venue.icpisManager)}
               >
                 <Tooltip>
                   <span>
                     <strong>{venue.name}</strong><br />
                     Status: {venue.venueStatus}<br />
-                    Address: {venue.address}
+                    Address: {venue.address}<br />
+                    ICPISManager:{venue.icpisManager}
                   </span>
                 </Tooltip>
               </Marker>

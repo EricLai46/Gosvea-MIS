@@ -57,10 +57,10 @@ public class InstructorController {
             Integer pageSize,
             @RequestParam(required = false) String state,
             @RequestParam(required = false) String city,
-            @RequestParam(required = false) Integer instructorId,
+            @RequestParam(required = false) String instructorId,
             @RequestParam(required = false) String phoneNumber,
             @RequestParam(required = false) String email,
-            @RequestParam(required = false) Integer wageHour,
+            @RequestParam(required = false) String wageHour,
             @RequestParam(required = false) String venueId,
             @RequestParam(required = false) String firstname,
             @RequestParam(required = false) String lastname
@@ -88,7 +88,7 @@ public class InstructorController {
     }
   //删除Instructor
    @DeleteMapping
-    public Result deleteInstructor(Integer instructorId)
+    public Result deleteInstructor(String instructorId)
    {
        instructorService.deleteInstructor(instructorId);
        return Result.success("Delete the instructor successfully");
@@ -103,7 +103,7 @@ public class InstructorController {
 
    //通过instructorid来获取 instructor信息
    @GetMapping("/instructorid")
-   public Instructor getInstructorById(Integer instructor)
+   public Instructor getInstructorById(String instructor)
    {
        return instructorService.getInstructorById(instructor);
    }
@@ -148,7 +148,7 @@ public class InstructorController {
 
    //获取instructor schedule
    @GetMapping("/schedule")
-    public Result<List<InstructorSchedule>> getInstructorSchedule(Integer instructorId)
+    public Result<List<InstructorSchedule>> getInstructorSchedule(String instructorId)
    {
 
        try {
@@ -161,7 +161,7 @@ public class InstructorController {
 
    //删除Instructor schedule
     @DeleteMapping("/schedule")
-    public Result<InstructorSchedule> deleteInstructorSchedule(Integer id)
+    public Result<InstructorSchedule> deleteInstructorSchedule(String id)
     {
         instructorService.deleteInstructorSchedule(id);
         //checkVenueInstructorInformation();
@@ -259,9 +259,9 @@ public class InstructorController {
                 // 处理ID
                 if (row.getCell(0) != null) {
                     if (row.getCell(0).getCellType() == CellType.NUMERIC) {
-                        instructor.setId((int) row.getCell(0).getNumericCellValue());
+                        instructor.setId(String.valueOf(row.getCell(0).getNumericCellValue()));
                     } else if (row.getCell(0).getCellType() == CellType.STRING) {
-                        instructor.setId(Integer.parseInt(row.getCell(0).getStringCellValue().trim()));
+                        instructor.setId(row.getCell(0).getStringCellValue().trim());
                     }
                 }
 

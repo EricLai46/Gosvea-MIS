@@ -1,9 +1,9 @@
 import React from 'react';
-import { Box, FormControl, InputLabel, Select, MenuItem, Button } from '@mui/material';
+import { Box, FormControl, InputLabel, Select, MenuItem, Button,TextField } from '@mui/material';
 
-const VenueSearchForm = ({ timeZone, state, icpisManager, setTimeZone, setState, setInstructor, handleSearch, handleReset, handleExport,handleUpload, handleFileChange,selectedFile,setIcpisManager}) => (
+const VenueSearchForm = ({ venueId, state, icpisManager, setVenueId, setState, setInstructor, handleSearch, handleReset, handleExport,handleUpload, handleFileChange,selectedFile,setIcpisManager}) => (
   <Box display="flex" alignItems="center" mb={3}>
-    <FormControl variant="outlined" sx={{ minWidth: 200, mr: 2 }}>
+    {/* <FormControl variant="outlined" sx={{ minWidth: 200, mr: 2 }}>
       <InputLabel>Time Zone</InputLabel>
       <Select
         value={timeZone}
@@ -16,7 +16,7 @@ const VenueSearchForm = ({ timeZone, state, icpisManager, setTimeZone, setState,
         <MenuItem value="MST">MST</MenuItem>
         <MenuItem value="EST">EST</MenuItem>
       </Select>
-    </FormControl>
+    </FormControl> */}
     <FormControl variant="outlined" sx={{ minWidth: 200, mr: 2 }}>
       <InputLabel>State</InputLabel>
       <Select
@@ -57,6 +57,13 @@ const VenueSearchForm = ({ timeZone, state, icpisManager, setTimeZone, setState,
         <MenuItem value="Daniel">Daniel</MenuItem>
       </Select>
     </FormControl>
+    <TextField
+        variant="outlined"
+        label="venueId"
+        value={venueId}
+        onChange={(e) => setVenueId(e.target.value)}
+        sx={{ minWidth: 50, mr: 2 }}
+      />
     <Button variant="contained" color="primary" onClick={handleSearch} sx={{ mr: 2 }}>
       Search
     </Button>

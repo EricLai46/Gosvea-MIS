@@ -26,6 +26,19 @@ const VenueDialog = ({ open, handleClose, isEditMode, currentVenue, handleChange
         <DialogContentText>
           {isEditMode ? "Edit the information of the venue." : "Add the information of the venue"}
         </DialogContentText>
+        
+        <Grid container spacing={-5}></Grid>
+        <Grid item xs={6}>
+            <TextField
+              margin="dense"
+              label="ID"
+              type="text"
+              fullWidth
+              name="id"
+              value={currentVenue.id}
+              onChange={handleChange}
+            />
+       </Grid>
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <TextField

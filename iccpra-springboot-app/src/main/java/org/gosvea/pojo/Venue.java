@@ -21,7 +21,7 @@ import java.util.Map;
 public class Venue {
     private String id;
     @NotNull
-    private Integer instructor;
+    private String instructor;
     private String timeZone;
     @NotEmpty
     private String state;

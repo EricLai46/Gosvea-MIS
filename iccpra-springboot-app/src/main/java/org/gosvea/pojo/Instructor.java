@@ -8,7 +8,7 @@ import java.util.List;
 
 @Data
 public class Instructor {
-    private Integer id;
+    private String id;
 
     private String venueId;
     @NotEmpty

@@ -27,7 +27,7 @@ public class InstructorServiceImpl implements InstructorService {
     }
 
     @Override
-    public PageResponse<Instructor> getInstructor(Integer pageNum, Integer pageSize, String state, String city, Integer instructorId, String phoneNumber, String email, Integer wageHour,String venueId,String firstname, String lastname) {
+    public PageResponse<Instructor> getInstructor(Integer pageNum, Integer pageSize, String state, String city, String instructorId, String phoneNumber, String email, String wageHour,String venueId,String firstname, String lastname) {
         PageResponse<Instructor> pi=new PageResponse<Instructor>();
 
         PageHelper.startPage(pageNum,pageSize);
@@ -41,7 +41,7 @@ public class InstructorServiceImpl implements InstructorService {
     }
 
     @Override
-    public void deleteInstructor(Integer instructorId) {
+    public void deleteInstructor(String instructorId) {
         instructorMapper.deleteInstructor(instructorId);
     }
 
@@ -56,7 +56,7 @@ public class InstructorServiceImpl implements InstructorService {
     }
 
     @Override
-    public List<InstructorSchedule> getInstructorSchedule(Integer instructorId) {
+    public List<InstructorSchedule> getInstructorSchedule(String instructorId) {
         List<InstructorSchedule> instructorScheduleList=new ArrayList<>();
 
         instructorScheduleList=instructorMapper.getInstructorSchedudle(instructorId);
@@ -72,7 +72,7 @@ public class InstructorServiceImpl implements InstructorService {
     }
 
     @Override
-    public void deleteInstructorSchedule(Integer id) {
+    public void deleteInstructorSchedule(String id) {
         instructorMapper.deleteInstructorSchedule(id);
     }
 
@@ -82,7 +82,7 @@ public class InstructorServiceImpl implements InstructorService {
     }
 
     @Override
-    public Instructor getInstructorById(Integer instructor) {
+    public Instructor getInstructorById(String instructor) {
 
         return instructorMapper.getInstructorById(instructor);
     }

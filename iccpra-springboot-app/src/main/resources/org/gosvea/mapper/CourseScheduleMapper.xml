@@ -7,15 +7,23 @@
     <select id="getCourseSchedule" resultType="org.gosvea.pojo.CourseSchedule">
         SELECT * FROM coursesschedule
         <where>
-            <if test="instructorId != null">
-                instructor_id = #{instructorId}
-            </if>
-            <if test="venueId != null">
-                AND venue_id = #{venueId}
-            </if>
-            <if test="date != null">
-                AND date = #{date}
-            </if>
+            <!-- 处理 fromDate 和 toDate 的逻辑 -->
+            <choose>
+                <!-- 如果 fromDate 和 toDate 都不为空，使用 BETWEEN -->
+                <when test="fromDate != null and toDate != null">
+                    AND date BETWEEN #{fromDate} AND #{toDate}
+                </when>
+
+                <!-- 如果 only fromDate 不为空，使用 date >= fromDate -->
+                <when test="fromDate != null">
+                    AND date >= #{fromDate}
+                </when>
+
+<!--                &lt;!&ndash; 如果 only toDate 不为空，使用 date <= toDate &ndash;&gt;-->
+<!--                <when test=" toDate != null">-->
+<!--                    AND date <= #{toDate}-->
+<!--                </when>-->
+            </choose>
             <if test="startTime != null">
                 AND start_time = #{startTime}
             </if>
@@ -28,15 +36,21 @@
             <if test="isProcessed!=null">
                 AND is_processed=#{isProcessed}
             </if>
+            <if test="venueId!=null">
+                AND venue_id=#{venueId}
+            </if>
+            <if test="icpisManager!=null">
+                AND icpis_manager=#{icpisManager}
+            </if>
         </where>
     </select>
 
     <!--批量插入courseschedules到数据库-->
     <insert id="insertCourseSchedules" parameterType="list">
-        insert into coursesschedule (instructor_id,venue_id,date,start_time,end_time,is_active,address,course_title)
+        insert into coursesschedule (instructor_id,venue_id,date,start_time,end_time,is_active,address,course_title,price,icpis_manager,registration_link,time_zone,is_enrollwareAdded)
         values
         <foreach collection="list" item="courseschedule" separator=",">
-            (#{courseschedule.instructorId},#{courseschedule.venueId},#{courseschedule.date},#{courseschedule.startTime},#{courseschedule.endTime},#{courseschedule.isActive},#{courseschedule.address},#{courseschedule.courseTitle})
+            (#{courseschedule.instructorId},#{courseschedule.venueId},#{courseschedule.date},#{courseschedule.startTime},#{courseschedule.endTime},#{courseschedule.isActive},#{courseschedule.address},#{courseschedule.courseTitle},#{courseschedule.price},#{courseschedule.icpisManager},#{courseschedule.registrationLink},#{courseschedule.timeZone},#{courseschedule.isEnrollwareAdded})
         </foreach>
     </insert>
 
@@ -70,9 +84,26 @@
                         <if test="courseschedule.courseTitle != null">
                             course_title = #{courseschedule.courseTitle},
                         </if>
-
+                        <if test="courseschedule.price!=null">
+                            price=#{courseschedule.price},
+                        </if>
+                        <if test="courseschedule.icpisManager!=null">
+                            icpis_manager=#{courseschedule.icpisManager},
+                        </if>
+                        <if test="courseschedule.registrationLink!=null">
+                            registration_link=#{courseschedule.registrationLink},
+                        </if>
+                        <if test="courseschedule.timeZone!=null">
+                            time_zone=#{courseschedule.timeZone},
+                        </if>
+                        <if test="courseschedule.isEnrollwareAdded!=null">
+                            is_enrollwareAdded=#{courseschedule.isEnrollwareAdded},
+                        </if>
+                        <if test="courseschedule.comments!=null">
+                            comments=#{courseschedule.comments}
+                        </if>
                     </trim>
-                    WHERE id = #{venue.id}
+                    WHERE id = #{courseschedule.id}
 
         </foreach>
     </update>

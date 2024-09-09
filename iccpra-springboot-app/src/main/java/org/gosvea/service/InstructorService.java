@@ -11,23 +11,23 @@ import java.util.Map;
 public interface InstructorService {
     void addInstructor(Instructor instructor);
 
-    PageResponse<Instructor> getInstructor(Integer pageNum, Integer pageSize, String state, String city, Integer instructorId, String phoneNumber, String email, Integer wageHour,String venueId,String firstname,String lastname);
+    PageResponse<Instructor> getInstructor(Integer pageNum, Integer pageSize, String state, String city, String instructorId, String phoneNumber, String email, String wageHour,String venueId,String firstname,String lastname);
 
-    void deleteInstructor(Integer instructorId);
+    void deleteInstructor(String instructorId);
 
     void updateInstructor(Instructor instructor);
 
     void updateInstructorSchedule(InstructorSchedule instructorSchedule);
 
-    List<InstructorSchedule> getInstructorSchedule(Integer instructorId);
+    List<InstructorSchedule> getInstructorSchedule(String instructorId);
 
     List<Map<String,Object>> getInstructorNameList();
 
-    void deleteInstructorSchedule(Integer id);
+    void deleteInstructorSchedule(String id);
 
     void addInstructorSchedule(InstructorSchedule instructorSchedule);
 
-    Instructor getInstructorById(Integer instructor);
+    Instructor getInstructorById(String instructor);
 
     List<Instructor> getAllInstructors();
 

@@ -47,13 +47,13 @@ public class CourseServiceImpl implements CourseService {
     }
     //获取courseschedule
     @Override
-    public PageResponse<CourseSchedule> getCourseSchedule(Integer pageNum, Integer pageSize, Integer instructorId, Integer venueId, LocalDate date, LocalTime startTime, LocalTime endTime, Boolean isActive,Boolean isProcessed) {
+    public PageResponse<CourseSchedule> getCourseSchedule(Integer pageNum, Integer pageSize, String icpisManager, String venueId, LocalDate date, LocalTime startTime, LocalTime endTime, Boolean isActive,Boolean isProcessed,LocalDate fromDate,LocalDate toDate) {
         PageResponse<CourseSchedule> prc=new PageResponse<>();
         PageHelper.startPage(pageNum,pageSize);
 
         Boolean activeStatus = (isActive != null) ? isActive : false;
 
-        List<CourseSchedule> lic=courseScheduleMapper.getCourseSchedule(instructorId,venueId,date,startTime,endTime,isActive,isProcessed);
+        List<CourseSchedule> lic=courseScheduleMapper.getCourseSchedule(icpisManager,venueId,date,startTime,endTime,isActive,isProcessed,fromDate,toDate);
         Page<CourseSchedule> pgc=(Page<CourseSchedule>) lic;
         prc.setItems(pgc.getResult());
         prc.setTotalElement(pgc.getTotal());
@@ -185,7 +185,7 @@ public class CourseServiceImpl implements CourseService {
 //        }
 //        return commonSchedules;
 //    }
-public Map<Integer, String> generateOrUpdateCourseSchedules(String venueId, Integer instructorId) {
+public Map<Integer, String> generateOrUpdateCourseSchedules(String venueId, String instructorId) {
     Map<Integer, String> warnings = new HashMap<>();
 
     Venue venue = venueService.getVenueById(venueId);
@@ -198,7 +198,7 @@ public Map<Integer, String> generateOrUpdateCourseSchedules(String venueId, Inte
     }
 
     if (instructor == null) {
-        warnings.put(instructorId, "Instructor ID " + instructorId + " does not exist.");
+        warnings.put(Integer.valueOf(instructorId), "Instructor ID " + instructorId + " does not exist.");
         return warnings;
     }
 
@@ -211,7 +211,7 @@ public Map<Integer, String> generateOrUpdateCourseSchedules(String venueId, Inte
     }
 
     if (instructorSchedules.isEmpty()) {
-        warnings.put(instructorId, "Instructor ID " + instructorId + " has no schedules defined.");
+        warnings.put(Integer.valueOf(instructorId), "Instructor ID " + instructorId + " has no schedules defined.");
     }
 
     // 批量查询所有可能的课程安排
@@ -240,18 +240,22 @@ public Map<Integer, String> generateOrUpdateCourseSchedules(String venueId, Inte
                     if (!existingSchedule.getInstructorId().equals(instructorId) ||
                             !existingSchedule.getStartTime().equals(venueSchedule.getStartTime()) ||
                             !existingSchedule.getEndTime().equals(venueSchedule.getEndTime()) ||
-                            !existingSchedule.getCourseTitle().equals(venueSchedule.getCourseTitle())) { // 添加对 courseTitle 的比较
+                            !existingSchedule.getCourseTitle().equals(venueSchedule.getCourseTitle())||(existingSchedule.getRegistrationLink()==null||!existingSchedule.getRegistrationLink().equals(venue.getRegistrationLink()))||!existingSchedule.getTimeZone().equals(venue.getTimeZone())||
+                            !existingSchedule.getIcpisManager().equals(venue.getIcpisManager())) { // 添加对 courseTitle 的比较
 
                         existingSchedule.setInstructorId(instructorId);
                         existingSchedule.setStartTime(venueSchedule.getStartTime());
                         existingSchedule.setEndTime(venueSchedule.getEndTime());
-                        existingSchedule.setCourseTitle(venueSchedule.getCourseTitle()); // 更新 courseTitle
+                        existingSchedule.setCourseTitle(venueSchedule.getCourseTitle());
+                        existingSchedule.setRegistrationLink(venue.getRegistrationLink());
+                        existingSchedule.setIcpisManager(venue.getIcpisManager());
+                        existingSchedule.setTimeZone(venue.getTimeZone());// 更新 courseTitle
                         schedulesToUpdate.add(existingSchedule);
                     }
                 } else {
                     CourseSchedule newSchedule = new CourseSchedule(instructorId, venueId,
                             venueSchedule.getDate(), venueSchedule.getStartTime(), venueSchedule.getEndTime(),
-                            venue.getAddress(), venueSchedule.getCourseTitle());
+                            venue.getAddress(), venueSchedule.getCourseTitle(),venueSchedule.getPrice(),venue.getRegistrationLink(),venue.getTimeZone(),"",venue.getIcpisManager(),false);
                     schedulesToInsert.add(newSchedule);
                 }
                 break;

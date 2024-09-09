@@ -9,11 +9,11 @@ import java.time.LocalTime;
 @Data
 public class InstructorSchedule extends Schedule{
 
-    private Integer instructorId;
+    private String instructorId;
     public InstructorSchedule(){
 
     }
-    public InstructorSchedule(Integer instructorId, LocalDate date, LocalTime startTime,LocalTime endTime)
+    public InstructorSchedule(String instructorId, LocalDate date, LocalTime startTime,LocalTime endTime)
     {
         super(date,startTime,endTime);
         this.instructorId=instructorId;

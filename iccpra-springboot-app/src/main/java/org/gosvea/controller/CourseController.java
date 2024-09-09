@@ -6,6 +6,7 @@ import org.gosvea.service.CourseService;
 import org.gosvea.service.InstructorService;
 import org.gosvea.service.VenueService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.PrintWriter;
@@ -33,19 +34,21 @@ public class CourseController {
     public Result<PageResponse<CourseSchedule>> getCourseSchedule(
             Integer pageNum,
             Integer pageSize,
-            @RequestParam(required = false)Integer instructorId,
-            @RequestParam(required = false)Integer venueId,
+            @RequestParam(required = false)String icpisManager,
+            @RequestParam(required = false)String venueId,
             @RequestParam(required = false)LocalDate date,
             @RequestParam(required = false)LocalTime startTime,
             @RequestParam(required = false)LocalTime endTime,
             @RequestParam(required = false)Boolean isActive,
-            @RequestParam(required = false)Boolean isProcessed
+            @RequestParam(required = false)Boolean isProcessed,
+            @RequestParam(required = false)@DateTimeFormat(pattern = "yyyy-MM-dd")LocalDate fromDate,
+            @RequestParam(required = false)@DateTimeFormat(pattern = "yyyy-MM-dd")LocalDate toDate
             )
     {
         try {
            // Map<Integer,String> warnings=checkVenueInstructorInformation();
             boolean activeStatus = (isActive != null) ? isActive : false;
-            return  Result.success(courseService.getCourseSchedule(pageNum,pageSize,instructorId,venueId,date,startTime,endTime,isActive,isProcessed));
+            return  Result.success(courseService.getCourseSchedule(pageNum,pageSize,icpisManager,venueId,date,startTime,endTime,isActive,isProcessed,fromDate,toDate));
         } catch (Exception e) {
             e.printStackTrace();
             return Result.error(e.getMessage()+"\n"+getStackTrace(e));

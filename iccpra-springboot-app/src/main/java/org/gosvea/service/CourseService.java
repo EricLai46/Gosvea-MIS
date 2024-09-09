@@ -16,13 +16,13 @@ public interface CourseService {
 
     void deleteCourse(Integer instructorId, Integer venueId);
 
-    PageResponse<CourseSchedule> getCourseSchedule(Integer pageNum, Integer pageSize, Integer instructorId, Integer venueId, LocalDate date, LocalTime startTime,LocalTime endTime,Boolean isActive,Boolean isProcessed);
+    PageResponse<CourseSchedule> getCourseSchedule(Integer pageNum, Integer pageSize, String icpisManager, String venueId, LocalDate date, LocalTime startTime, LocalTime endTime, Boolean isActive,Boolean isProcessed,LocalDate fromDate,LocalDate toDate);
 
     void deleteAllSchedule();
     //检查venue和instructor是否有匹配的时间
    //Map<Integer,String> checkVenueInstructorInformation(Integer venueId, Integer instructorId);
 
-    Map<Integer, String> generateOrUpdateCourseSchedules(String venueId, Integer instructorId);
+    Map<Integer, String> generateOrUpdateCourseSchedules(String venueId, String instructorId);
     void deleteCourseSchedules(List<CourseSchedule> schedulesToDelete);
     void insertCourseSchedules(List<CourseSchedule> schedulesToInsert);
     void updateCourseSchedules(List<CourseSchedule> schedulesToUpdate);

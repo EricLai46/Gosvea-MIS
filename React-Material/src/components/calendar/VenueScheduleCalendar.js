@@ -14,6 +14,7 @@ const VenueScheduleCalendar = ({ venueId }) => {
         start: '',
         end: '',
         isWeekly: false,
+        price: 0
     });
     const [selectedDate, setSelectedDate] = useState('');
 
@@ -25,12 +26,13 @@ const VenueScheduleCalendar = ({ venueId }) => {
         try {
             const response = await axiosInstance.get(`/venue/schedule?venueId=${venueId}`);
             const availableTimes = response.data.data;
-            //console.log(response.data.data);
+            console.log(response.data.data);
             // Convert the data to FullCalendar event format
             const eventsData = availableTimes.map(time => ({
                 title: time.courseTitle,
                 start: `${time.date}T${time.startTime}`,
                 end: time.endTime ? `${time.date}T${time.endTime}` : undefined,
+                price: time.price,
                 backgroundColor: 'lightgreen',
                 id: time.id,
                 extendedProps: {
@@ -71,6 +73,7 @@ const VenueScheduleCalendar = ({ venueId }) => {
                 venueId: venueId,
                 startTime: newEvent.start,
                 endTime: newEvent.end,
+                price: newEvent.price
             });
             currentDate = addWeeks(currentDate, 1);
         }
@@ -84,7 +87,8 @@ const VenueScheduleCalendar = ({ venueId }) => {
                 start: `${response.data.date}T${response.data.startTime}`,
                 end: response.data.endTime ? `${response.data.date}T${response.data.endTime}` : undefined,
                 backgroundColor: 'lightgreen',
-                id: response.data.id
+                id: response.data.id,
+                price: response.data.price
             }))]);
             setOpenDialog(false);
             fetchEvents();
@@ -102,6 +106,7 @@ const VenueScheduleCalendar = ({ venueId }) => {
             <b>{eventInfo.timeText}</b>
             <i>{eventInfo.event.title}</i>
             <div>{eventInfo.event.extendedProps.endTime ? `End: ${eventInfo.event.extendedProps.endTime}` : ''}</div>
+            <div>{eventInfo.event.extendedProps.price ? `Price: $${eventInfo.event.extendedProps.price}` : ''}</div>
         </div>
     );
     return (
@@ -145,6 +150,15 @@ const VenueScheduleCalendar = ({ venueId }) => {
                         value={newEvent.end}
                         onChange={handleInputChange}
                     />
+                    <TextField
+                        margin='dense'
+                        name="price"
+                        label="Price"
+                        type="number"
+                        value={newEvent.price}
+                        onChange={handleInputChange}
+                        inputProps={{ min: 0 }} 
+                      />
                     <FormControlLabel
                         control={
                             <Checkbox
