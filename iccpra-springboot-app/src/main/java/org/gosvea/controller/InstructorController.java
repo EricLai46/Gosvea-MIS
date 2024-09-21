@@ -1,11 +1,9 @@
 package org.gosvea.controller;
 
 
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.gosvea.dto.InstructorDTO;
 import org.gosvea.pojo.*;
 import org.gosvea.service.CourseService;
 import org.gosvea.service.InstructorService;
@@ -22,12 +20,13 @@ import java.io.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/instructor")
-@CrossOrigin(origins =  {"http://54.175.129.180:80", "http://allcprmanage.com","http://localhost:3000"}, allowedHeaders = "*")
+@CrossOrigin(origins =  {"http://54.175.129.180:80", "http://allcprmanage.com"}, allowedHeaders = "*")
 //@CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
 public class InstructorController {
 
@@ -111,20 +110,55 @@ public class InstructorController {
 
    //更新Instructor信息
    @PutMapping
-    public Result updateInstructor(@RequestBody Instructor instructor)
+    public Result updateInstructor(@RequestBody InstructorDTO instructorDTO)
    {
+//       try {
+//           instructorService.updateInstructor(instructor);
+//          List<Venue> currentVenues=venueService.getVenueByInstructorId(instructor.getId());
+//          List<Venue> newVenues=instructor.getVenues();
+//
+//          if(instructorService.isVenueListChanged(currentVenues,newVenues))
+//          {
+//              venueService.deleteInstructorVenueRelationsByInstructorId(instructor.getId());
+//
+//              if(newVenues!=null&&!newVenues.isEmpty())
+//              {
+//                  for(Venue venue:newVenues)
+//                  {
+//                      venueService.addInstructorVenueRelation(instructor.getId(),venue.getId());
+//                  }
+//              }
+//          }
+//          if(newVenues!=null&&!newVenues.isEmpty())
+//          {
+//              for(Venue venue:newVenues)
+//              {
+//                  courseService.generateOrUpdateCourseSchedules(venue.getId(), instructor.getId());
+//              }
+//          }
+//
+//           return Result.success("Update the instructor information successfully");
+//       } catch (Exception e) {
+//           e.printStackTrace();
+//
+//           return Result.error(e.getMessage() + "\n" + getStackTrace(e));
+//       }
        try {
-           instructorService.updateInstructor(instructor);
-           String venueId=instructor.getVenueId();
-           if(venueId!=null)
-           {
-               courseService.generateOrUpdateCourseSchedules(venueId,instructor.getId());
-           }
+           // 获取现有的 Venue 实体
+           System.out.println(instructorDTO);
+           Instructor instructor = instructorService.getInstructorById(instructorDTO.getId());
+           System.out.println("venue "+instructor);
+           List<String> instructorDTOvenueIds=instructorDTO.getVenueIds();
 
-           return Result.success("Update the instructor information successfully");
+           for(String venueDToInstructorId:instructorDTOvenueIds) {
+               Venue venue = venueService.getVenueById(venueDToInstructorId);
+               if (venue != null) {
+                   courseService.generateOrUpdateCourseSchedules(venue.getId(), instructor.getId());
+               }
+           }
+           instructorService.updateInstructor(instructor); return Result.success();
        } catch (Exception e) {
            e.printStackTrace();
-
            return Result.error(e.getMessage() + "\n" + getStackTrace(e));
        }
    }
@@ -183,54 +217,63 @@ public class InstructorController {
         try (Workbook workbook = new XSSFWorkbook();
              ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 
-            Sheet sheet = workbook.createSheet("Venues");
+            Sheet sheet = workbook.createSheet("Instructors");
+
             // 创建表头
             Row header = sheet.createRow(0);
-
-            for(int i=0;i<headers.length;i++) {
-
+            for (int i = 0; i < headers.length; i++) {
                 header.createCell(i).setCellValue(headers[i]);
             }
 
-
-            // 从数据库获取数据
+            // 从数据库获取所有讲师
             List<Instructor> instructors = instructorService.getAllInstructors();
             int rowIdx = 1;
+
+            // 遍历每个讲师
             for (Instructor instructor : instructors) {
                 Row row = sheet.createRow(rowIdx++);
-                System.out.println(instructor);
-                row.createCell(0).setCellValue(instructor.getId() != null ? String.valueOf(instructor.getId()) : "1");
-                String venueName = "";
-                if (instructor.getVenueId() != null) {
-                    Venue venue = venueService.getVenueById(instructor.getVenueId());
-                    if (venue != null) {
-                        venueName = venue.getAddress();
+
+                // 获取与讲师关联的多个场地
+                List<Venue> venues = venueService.getVenueByInstructorId(instructor.getId());
+                StringBuilder venueNames = new StringBuilder();
+
+                // 将多个场地的地址组合成一个字符串
+                if (venues != null && !venues.isEmpty()) {
+                    for (Venue venue : venues) {
+                        if (venueNames.length() > 0) {
+                            venueNames.append(", ");
+                        }
+                        venueNames.append(venue.getAddress());
                     }
                 }
-                row.createCell(1).setCellValue(venueName);
+
+                // 填写讲师及其关联的场地信息
+                row.createCell(0).setCellValue(instructor.getId() != null ? String.valueOf(instructor.getId()) : "1");
+                row.createCell(1).setCellValue(venueNames.toString());
                 row.createCell(2).setCellValue(instructor.getFirstname() != null ? instructor.getFirstname() : "");
                 row.createCell(3).setCellValue(instructor.getLastname() != null ? instructor.getLastname() : "");
                 row.createCell(4).setCellValue(instructor.getState() != null ? instructor.getState() : "");
                 row.createCell(5).setCellValue(instructor.getCity() != null ? instructor.getCity() : "");
                 row.createCell(6).setCellValue(instructor.getPhoneNumber() != null ? instructor.getPhoneNumber() : "");
-                row.createCell(7).setCellValue(instructor.getEmail() != null ? instructor.getEmail()  : "");
-                row.createCell(8).setCellValue(instructor.getWageHour() != null ? String.valueOf(instructor.getWageHour()): "");
-                row.createCell(9).setCellValue(instructor.getTotalClassTimes() != null ? String.valueOf(instructor.getTotalClassTimes())   : "");
-                row.createCell(10).setCellValue(instructor.getDeposit()!= null ? String.valueOf(instructor.getDeposit()): "");
-                row.createCell(11).setCellValue(instructor.getRentManikinNumbers() != null ? String.valueOf(instructor.getRentManikinNumbers()): "");
-                row.createCell(12).setCellValue(instructor.getFinance()!= null ? String.valueOf(instructor.getFinance()) : "");
-                row.createCell(13).setCellValue(instructor.getRentStatus() != null ? instructor.getRentStatus()  : "");
-                row.createCell(14).setCellValue(instructor.getFobKey()!= null ? instructor.getFobKey() : "");
-
+                row.createCell(7).setCellValue(instructor.getEmail() != null ? instructor.getEmail() : "");
+                row.createCell(8).setCellValue(instructor.getWageHour() != null ? String.valueOf(instructor.getWageHour()) : "");
+                row.createCell(9).setCellValue(instructor.getTotalClassTimes() != null ? String.valueOf(instructor.getTotalClassTimes()) : "");
+                row.createCell(10).setCellValue(instructor.getDeposit() != null ? String.valueOf(instructor.getDeposit()) : "");
+                row.createCell(11).setCellValue(instructor.getRentManikinNumbers() != null ? String.valueOf(instructor.getRentManikinNumbers()) : "");
+                row.createCell(12).setCellValue(instructor.getFinance() != null ? String.valueOf(instructor.getFinance()) : "");
+                row.createCell(13).setCellValue(instructor.getRentStatus() != null ? instructor.getRentStatus() : "");
+                row.createCell(14).setCellValue(instructor.getFobKey() != null ? instructor.getFobKey() : "");
             }
 
+            // 写入数据到输出流
             workbook.write(out);
             InputStreamResource file = new InputStreamResource(new ByteArrayInputStream(out.toByteArray()));
 
             return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=venues.xlsx")
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=instructors.xlsx")
                     .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                     .body(file);
+
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().body(null);
@@ -238,176 +281,121 @@ public class InstructorController {
     }
 
     //文件上传
-    @PostMapping("/import")
-    public ResponseEntity<?> importInstructorData(@RequestParam("file") MultipartFile file) {
+//    @PostMapping("/import")
+//    public ResponseEntity<?> importInstructorData(@RequestParam("file") MultipartFile file) {
+//        // 需要更新的 Instructor 列表
+//        List<Instructor> updateInstructorsList = new ArrayList<>();
+//        // 需要插入的 Instructor 列表
+//        List<Instructor> insertInstructorsList = new ArrayList<>();
+//        // 存放中间表关联的 venue_id 和 instructor_id
+//        Map<String, List<String>> instructorVenueMap = new HashMap<>();
+//
+//        try (InputStream inputStream = file.getInputStream();
+//             Workbook workbook = new XSSFWorkbook(inputStream)) {
+//            Sheet sheet = workbook.getSheetAt(0);
+//
+//            for (Row row : sheet) {
+//                if (row.getRowNum() == 0) {
+//                    continue; // 跳过表头
+//                }
+//
+//                Instructor instructor = new Instructor();
+//
+//                // 处理 ID
+//                if (row.getCell(0) != null) {
+//                    instructor.setId(getStringCellValue(row.getCell(0)));
+//                }
+//
+//                // 处理 venue Id, 可能是多对多关系，所以需要处理多个场地
+//                if (row.getCell(1) != null && !row.getCell(1).getStringCellValue().isEmpty()) {
+//                    String venueAddress = row.getCell(1).getStringCellValue().trim();
+//                    String venueId = venueService.getVenueIdByAddress(venueAddress);
+//
+//                    if (venueId != null) {
+//                        instructorVenueMap.computeIfAbsent(instructor.getId(), k -> new ArrayList<>()).add(venueId);
+//                    }
+//                }
+//
+//                // 处理其它 Instructor 字段
+//                instructor.setFirstname(getStringCellValue(row.getCell(2)));
+//                instructor.setLastname(getStringCellValue(row.getCell(3)));
+//                instructor.setState(getStringCellValue(row.getCell(4)));
+//                instructor.setCity(getStringCellValue(row.getCell(5)));
+//                instructor.setPhoneNumber(getStringCellValue(row.getCell(6)));
+//                instructor.setEmail(getStringCellValue(row.getCell(7)));
+//                instructor.setWageHour(getStringCellValue(row.getCell(8)));
+//                instructor.setSalaryInfo(getStringCellValue(row.getCell(9)));
+//                instructor.setTotalClassTimes(getIntCellValue(row.getCell(10)));
+//                instructor.setDeposit(getStringCellValue(row.getCell(11)));
+//                instructor.setRentManikinNumbers(getStringCellValue(row.getCell(12)));
+//                instructor.setFinance(getStringCellValue(row.getCell(13)));
+//                instructor.setRentStatus(getStringCellValue(row.getCell(14)));
+//                instructor.setFobKey(getStringCellValue(row.getCell(15)));
+//
+//                // 检查讲师是否已经存在
+//                Instructor existingInstructor = instructorService.getInstructorById(instructor.getId());
+//                if (existingInstructor != null) {
+//                    updateInstructorsList.add(instructor);
+//                } else {
+//                    insertInstructorsList.add(instructor);
+//                }
+//            }
+//
+//            // 批量插入新讲师
+//            if (!insertInstructorsList.isEmpty()) {
+//                instructorService.insertListInstructors(insertInstructorsList);
+//            }
+//
+//            // 批量更新现有讲师
+//            if (!updateInstructorsList.isEmpty()) {
+//                instructorService.updateListInstructors(updateInstructorsList);
+//            }
+//
+//            // 更新讲师与场地的关联关系 (instructor_venue 表)
+//            for (Map.Entry<String, List<String>> entry : instructorVenueMap.entrySet()) {
+//                String instructorId = entry.getKey();
+//                List<String> venueIds = entry.getValue();
+//
+//                // 删除旧的关联
+//                venueService.deleteInstructorVenueRelationsByInstructorId(instructorId);
+//
+//                // 插入新的关联
+//                for (String venueId : venueIds) {
+//                    venueService.addInstructorVenueRelation(instructorId, venueId);
+//                }
+//            }
+//
+//            return ResponseEntity.ok().body("{\"success\": true}");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return ResponseEntity.badRequest().body("{\"success\": false, \"error\": \"An error occurred while processing the file.\"}");
+//        }
+//    }
 
-        //需要更新update的Instructor list表
-        List<Instructor> updateVenuesList=new ArrayList<>();
-        //需要添加的Instructor List表
-        List<Instructor> insertVenuesList=new ArrayList<>();
-
-        try (InputStream inputStream = file.getInputStream();
-             Workbook workbook = new XSSFWorkbook(inputStream)) {
-            Sheet sheet = workbook.getSheetAt(0);
-            //venueService.clearAllData(); // 清除所有现有数据
-            instructorService.clearAllData();
-            for (Row row : sheet) {
-                if (row.getRowNum() == 0) {
-                    continue; // 跳过表头
-                }
-                Instructor instructor = new Instructor();
-                // 处理ID
-                if (row.getCell(0) != null) {
-                    if (row.getCell(0).getCellType() == CellType.NUMERIC) {
-                        instructor.setId(String.valueOf(row.getCell(0).getNumericCellValue()));
-                    } else if (row.getCell(0).getCellType() == CellType.STRING) {
-                        instructor.setId(row.getCell(0).getStringCellValue().trim());
-                    }
-                }
-
-// 处理venue Id
-                if (row.getCell(1) != null && !row.getCell(1).getStringCellValue().isEmpty()) {
-                    String address = row.getCell(1).getStringCellValue().trim();
-
-
-                        String venueId = venueService.getVenueIdByAddress(address);
-                        if (venueId != null)
-                            instructor.setVenueId(venueId);
-
-
-                }
-
-// 处理firstname
-                if (row.getCell(2) != null) {
-                    if (row.getCell(2).getCellType() == CellType.STRING) {
-                        instructor.setFirstname(row.getCell(2).getStringCellValue().trim());
-                    } else {
-                        instructor.setFirstname(String.valueOf(row.getCell(2).getNumericCellValue()));
-                    }
-                }
-
-// 处理lastname
-                if (row.getCell(3) != null) {
-                    if (row.getCell(3).getCellType() == CellType.STRING) {
-                        instructor.setLastname(row.getCell(3).getStringCellValue().trim());
-                    } else {
-                        instructor.setLastname(String.valueOf(row.getCell(3).getNumericCellValue()));
-                    }
-                }
-
-//处理state
-                instructor.setState(row.getCell(4) != null ? row.getCell(4).getStringCellValue().trim() : null);
-                //处理city
-                instructor.setCity(row.getCell(5) != null ? row.getCell(5).getStringCellValue().trim() : null);
-                //处理phonenumber
-                if (row.getCell(6) != null) {
-                    if (row.getCell(6).getCellType() == CellType.STRING) {
-                        instructor.setPhoneNumber(row.getCell(6).getStringCellValue().trim());
-                    } else {
-                        instructor.setPhoneNumber(String.valueOf(row.getCell(6).getNumericCellValue()));
-                    }
-                }
-
-               //处理email
-                instructor.setEmail(row.getCell(7) != null ? row.getCell(7).getStringCellValue().trim() : null);
-                //处理wagehour
-                if (row.getCell(8) != null) {
-                    if (row.getCell(8).getCellType() == CellType.STRING) {
-                        instructor.setWageHour(row.getCell(8).getStringCellValue().trim());
-                    } else {
-                        instructor.setWageHour(String.valueOf(row.getCell(8).getNumericCellValue()));
-                    }
-                }
-                //处理salaryinfo
-                if (row.getCell(9) != null) {
-                    if (row.getCell(9).getCellType() == CellType.STRING) {
-                        instructor.setSalaryInfo(row.getCell(9).getStringCellValue().trim());
-                    } else {
-                        instructor.setSalaryInfo(String.valueOf(row.getCell(9).getNumericCellValue()));
-                    }
-                }
-                //处理totalclasstimes
-                if (row.getCell(10) != null) {
-                    if (row.getCell(10).getCellType() == CellType.STRING) {
-                        instructor.setTotalClassTimes(Integer.valueOf(row.getCell(10).getStringCellValue().trim()));
-                    } else {
-                        instructor.setTotalClassTimes((int)(row.getCell(10).getNumericCellValue()));
-                    }
-                }
-                //处理deposit
-                if (row.getCell(11) != null) {
-                    if (row.getCell(11).getCellType() == CellType.STRING) {
-                        instructor.setDeposit(row.getCell(11).getStringCellValue().trim());
-                    } else {
-                        instructor.setDeposit(String.valueOf(row.getCell(11).getNumericCellValue()));
-                    }
-                }
-                //处理rentmanikinnumbers
-                if (row.getCell(12) != null) {
-                    if (row.getCell(12).getCellType() == CellType.STRING) {
-                        instructor.setRentManikinNumbers(row.getCell(12).getStringCellValue().trim());
-                    } else {
-                        instructor.setRentManikinNumbers(String.valueOf(row.getCell(12).getNumericCellValue()));
-                    }
-                }
-                //处理finance
-                if (row.getCell(13) != null) {
-                    if (row.getCell(13).getCellType() == CellType.STRING) {
-                        instructor.setFinance(row.getCell(13).getStringCellValue().trim());
-                    } else {
-                        instructor.setFinance(String.valueOf(row.getCell(13).getNumericCellValue()));
-                    }
-                }
-                //处理rent status
-                if (row.getCell(14) != null) {
-                    if (row.getCell(14).getCellType() == CellType.STRING) {
-                        instructor.setRentStatus(row.getCell(14).getStringCellValue().trim());
-                    } else {
-                        instructor.setRentStatus(String.valueOf(row.getCell(14).getNumericCellValue()));
-                    }
-                }
-               //处理fobkey
-                if (row.getCell(15) != null) {
-                    if (row.getCell(15).getCellType() == CellType.STRING) {
-                        instructor.setFobKey(row.getCell(15).getStringCellValue().trim());
-                    } else {
-                        instructor.setFobKey(String.valueOf(row.getCell(15).getNumericCellValue()));
-                    }
-                }
-
-
-
-                Instructor existingInstructor = instructorService.getInstructorById(instructor.getId());
-                if (existingInstructor != null) {
-                    updateVenuesList.add(instructor);
-
-                } else {
-                    insertVenuesList.add(instructor);
-
-                }
+    private String getStringCellValue(Cell cell) {
+        if (cell != null) {
+            if (cell.getCellType() == CellType.STRING) {
+                return cell.getStringCellValue().trim();
+            } else if (cell.getCellType() == CellType.NUMERIC) {
+                return String.valueOf(cell.getNumericCellValue());
             }
-
-            //循环结束分别添加，更新venuelist
-            if(!insertVenuesList.isEmpty())
-            {
-                System.out.println(insertVenuesList);
-               instructorService.insertListInstructors(insertVenuesList);
-            }
-
-
-            if(!updateVenuesList.isEmpty())
-            {
-                //System.out.println(updateVenuesList);
-
-               instructorService.updateListInstructors(updateVenuesList);
-            }
-
-
-            return ResponseEntity.ok().body("{\"success\": true}");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().body("{\"success\": false, \"error\": \"An error occurred while processing the file.\"}");
         }
+        return null;
+    }
+
+    private Integer getIntCellValue(Cell cell) {
+        if (cell != null) {
+            if (cell.getCellType() == CellType.NUMERIC) {
+                return (int) cell.getNumericCellValue();
+            } else if (cell.getCellType() == CellType.STRING) {
+                try {
+                    return Integer.parseInt(cell.getStringCellValue().trim());
+                } catch (NumberFormatException e) {
+                    return null;
+                }
+            }
+        }
+        return null;
     }
 
 //    //检查venue和instructor是否有匹配的时间

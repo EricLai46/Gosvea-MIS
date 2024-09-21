@@ -1,9 +1,7 @@
 package org.gosvea.service;
 
-import org.gosvea.pojo.PageResponse;
-import org.gosvea.pojo.Result;
-import org.gosvea.pojo.Venue;
-import org.gosvea.pojo.VenueSchedule;
+import org.apache.ibatis.annotations.Param;
+import org.gosvea.pojo.*;
 import org.springframework.scheduling.annotation.Async;
 
 import java.time.LocalDate;
@@ -49,11 +47,21 @@ public interface VenueService {
 
     PageResponse<Venue> getNormalStatusVenues(Integer pageNum, Integer pageSize,String state,String timeZone);
 
-    Venue getVenueByInstructorId(Integer instructorId);
+    List<Venue> getVenueByInstructorId(String instructorId);
     @Async
     void addLatLonInformationForListVenues(List<Venue> venueList);
     @Async
     void updtaeLatLonInformationForOneVenue(Venue venue);
 
     List<Venue> getAllSpecStatusVenues(Venue.VenueStatus venueStatus);
+
+    void addInstructorVenueRelation(List<String> instructorIds, String venueId);
+
+    void deleteInstructorVenueRelationsByInstructorId(String id);
+
+    void deleteInstructorVenueRelationsByVenueId(@Param("venueId") String venueId);
+
+    boolean isInstructrorListChanged(List<String> currentInstructorIds,List<String> previousInstructorIds);
+
+    boolean verifyVenueId(String id);
 }

@@ -30,7 +30,7 @@ const VenueMap = () => {
       const response = await axiosInstance.get('/venue/venuemap');
       if (response.data.message === "success") {
         setVenues(response.data.data); // 直接设置 venues
-        console.log("Venue data:", response);
+        console.log("Venue data:",venues);
         showNotification('Venue Information loaded successfully!', 'success');
       } else {
         showNotification('Get Venue Information failed!', 'error');
@@ -41,7 +41,7 @@ const VenueMap = () => {
   };
     // 输出 venues 数组的内容
     useEffect(() => {
-      console.log("Venues array after setVenues:", venues);
+      //console.log("Venues array after setVenues:", venues);
     }, [venues]);  
 
     const getIconByStatus = (status,icpisManager) => {
@@ -68,13 +68,13 @@ const VenueMap = () => {
       }
       switch(icpisManager){
         case 'Jurin':
-          shapeStyle= '50%';
+          shapeStyle = 'border-radius: 50%;';
           break;
         case 'Fisher':
-          shapeStyle='0%';
+          shapeStyle = 'border-radius: 0%;'; // Square
           break;
         case 'Andy':
-          shapeStyle='0 50% 5-% 0';
+          shapeStyle = 'border-radius: 0 50% 50% 0;'; // Custom rounded corners
           break;
         case 'Kenny':
           shapeStyle = 'clip-path: polygon(50% 0%, 100% 38%, 81% 100%, 19% 100%, 0% 38%);';
@@ -115,11 +115,46 @@ const VenueMap = () => {
           `;
           return div;
         };
-  
+        const icpismanagerControl=L.control({position:'bottomright'});
+         icpismanagerControl.onAdd=function(){
+          const div=L.DomUtil.create('div','icpismanager-control');
+          div.innerHTML = `
+          <div style="background-color:white; padding:10px; border-radius:5px; font-family:Arial, sans-serif; font-size:12px;">
+            <strong>ICPIS Manager Shape Styles:</strong><br /><br />
+            
+            <div>
+              <strong>Andy:
+              <div style="display:inline-block; width:30px; height:30px; background-color:lightgray; border-radius: 0 50% 50% 0; vertical-align:middle;"></div>
+            </div>
+            
+            <div>
+              <strong>Daniel:
+              <div style="display:inline-block; width:30px; height:30px; background-color:lightgray; clip-path: polygon(50% 0%, 100% 38%, 81% 100%, 19% 100%, 0% 38%); vertical-align:middle;"></div>
+            </div>
+            
+            <div>
+              <strong>Fisher:
+              <div style="display:inline-block; width:30px; height:30px; background-color:lightgray; border-radius: 0%; vertical-align:middle;"></div>
+            </div>
+            
+            <div>
+              <strong>Jurin:
+              <div style="display:inline-block; width:30px; height:30px; background-color:lightgray; border-radius: 50%; vertical-align:middle;"></div>
+            </div>
+            
+            <div>
+              <strong>Kenny:</strong> 
+              <div style="display:inline-block; width:30px; height:30px; background-color:lightgray; clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); vertical-align:middle;"></div>
+            </div>
+          </div>
+        `;
+          return div;
+         };
         customControl.addTo(map);
-  
+        icpismanagerControl.addTo(map);
         return () => {
           customControl.remove();
+          icpismanagerControl.remove();
         };
       }, [map]);
   

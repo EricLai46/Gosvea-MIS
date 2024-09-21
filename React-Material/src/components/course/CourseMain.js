@@ -4,7 +4,7 @@ import SidebarLayout from '../SidebarLayout';
 import CourseSearchForm from './CourseSearchForm';
 import CourseTable from './CourseTable';
 import CoursePagination from './CoursePagination';
-import { Container, Button } from '@mui/material';
+import { Container, Button,Typography,Box } from '@mui/material';
 import { useNotification } from '../NotificationContext';
 import CourseDialog from './CourseDialog';
 const CourseMain = () => {
@@ -22,7 +22,7 @@ const CourseMain = () => {
   const [open, setOpen] = useState(false);
   const [isProcessed,setIsProcessed]=useState();
   const [isPublished,setIsPublished]=useState();
-  const [isActive,setIsActive]=useState(false);
+  const [isActive,setIsActive]=useState();
   const timeZones = ['PST', 'EST', 'CST', 'MST', 'GMT', 'UTC', 'BST', 'CEST'];
   const { showNotification } = useNotification();
   const [icpisManager,setIcpisManager]=useState('');
@@ -30,11 +30,11 @@ const CourseMain = () => {
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
   const [totalPages, setTotalPages] = useState(1); // 添加 totalPages 状态
+  const [totalCourses,setTotalCourses]=useState(0);
   useEffect(() => {
-    // Fetch venues and schedules data when the component mounts
-   // fetchVenues();
-   // fetchSchedules();
-  }, []);
+    //fetchVenues();
+    handleSearch();
+  }, [currentPage]);
 
   useEffect(() => {
     // Automatically check venues and instructors after fetching data
@@ -100,8 +100,8 @@ const CourseMain = () => {
         
         setCourses(response.data.data ? response.data.data.items : []);
         setTotalPages(Math.ceil(response.data.data.totalElement / itemsPerPage));
-        
-  
+        setTotalCourses(response.data.data.totalElement);
+        console.log(totalCourses);
         if (response.data.warnings && Object.keys(response.data.warnings).length > 0) {
           Object.entries(response.data.warnings).forEach(([key, value]) => {
             showNotification(value, 'warning');
@@ -285,7 +285,18 @@ const handleClose = () => {
           setToDate={setToDate}
         />
         <CourseTable currentItems={courses} handleClickOpen={handleClickOpen} />
-        <CoursePagination totalPages={totalPages} currentPage={currentPage} handlePageChange={handlePageChange} />
+        <Box display="flex" justifyContent="space-between">
+      {/* 左侧的分页 */}
+      <CoursePagination totalPages={totalPages} currentPage={currentPage} handlePageChange={handlePageChange} />
+
+      {/* 右侧的额外数据容器 */}
+      <Container sx={{ ml:80, p: 1, border: '1px solid grey', borderRadius: '2px' }}>
+        <Typography variant="h6">AD Details</Typography>
+        <Typography>The amount of AD:{totalCourses? totalCourses : 0} </Typography>
+        <Typography>Unit Price: $55</Typography>
+        <Typography>Totoal Price:${totalCourses ? totalCourses* 55 : 0} </Typography>
+      </Container>
+    </Box>
 
       </Container>
       <CourseDialog

@@ -22,7 +22,7 @@ public interface CourseService {
     //检查venue和instructor是否有匹配的时间
    //Map<Integer,String> checkVenueInstructorInformation(Integer venueId, Integer instructorId);
 
-    Map<Integer, String> generateOrUpdateCourseSchedules(String venueId, String instructorId);
+    Map<String, String> generateOrUpdateCourseSchedules(String venueId, String instructorId);
     void deleteCourseSchedules(List<CourseSchedule> schedulesToDelete);
     void insertCourseSchedules(List<CourseSchedule> schedulesToInsert);
     void updateCourseSchedules(List<CourseSchedule> schedulesToUpdate);
@@ -34,4 +34,7 @@ public interface CourseService {
     void updateCourseScheduleProcessed(CourseSchedule courseSchedule,Boolean isProcessed);
 
 
+    List<CourseSchedule> getCourseCalendar(String venueId);
+
+    List<Venue> getAllVenueIdAndAddress();
 }

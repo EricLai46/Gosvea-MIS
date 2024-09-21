@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class InstructorServiceImpl implements InstructorService {
@@ -98,7 +100,7 @@ public class InstructorServiceImpl implements InstructorService {
     }
 
     @Override
-    public Integer findIdByName(String firstName, String lastName) {
+    public String findIdByName(String firstName, String lastName) {
         return  instructorMapper.findIdByName(firstName,lastName);
     }
 
@@ -115,6 +117,36 @@ public class InstructorServiceImpl implements InstructorService {
     @Override
     public void clearAllData() {
         instructorMapper.clearAllData();
+    }
+
+    @Override
+    public boolean isVenueListChanged(List<Venue> currentVenues, List<Venue> newVenues) {
+        if(currentVenues==null||newVenues==null)
+        {
+            return !(currentVenues==null&&newVenues==null);
+        }
+        if(currentVenues.size()!= newVenues.size())
+        {
+            return true;
+        }
+        Set<String> currentVenueIds=currentVenues.stream().map(Venue::getId).collect(Collectors.toSet());
+        Set<String> newVenueIds=newVenues.stream().map(Venue::getId).collect(Collectors.toSet());
+        return !currentVenueIds.equals(newVenueIds);
+    }
+
+    @Override
+    public List<Instructor> getInstructorsByVenueId(String id) {
+       return instructorMapper.getInstructorsByVenueId(id);
+    }
+
+    @Override
+    public List<String> getInstructorIdsByVenueId(String venueId) {
+        return instructorMapper.getInstructorIdsByVenueId(venueId);
+    }
+
+    @Override
+    public String getInstructorIdByInstructorName(String firstname, String lastname) {
+        return instructorMapper.getInstructorIdByInstructorName(firstname,lastname);
     }
 
 

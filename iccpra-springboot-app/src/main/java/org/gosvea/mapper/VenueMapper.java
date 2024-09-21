@@ -12,9 +12,13 @@ import java.util.List;
 
 @Mapper
 public interface VenueMapper {
-
-    @Insert("insert into venue(state, city, instructor, address, time_zone, cancellation_policy, payment_mode, nonrefundable_fee, fob_key, deposit, membership_fee, usage_fee, refundable_status, book_method, registration_link) " +
-            "values(#{state}, #{city}, #{instructor}, #{address}, #{timeZone}, #{cancellationPolicy}, #{paymentMode}, #{nonrefundableFee}, #{fobKey}, #{deposit}, #{membershipFee}, #{usageFee}, #{refundableStatus}, #{bookMethod}, #{registrationLink})")
+//
+//    @Insert("insert into venue(state, city, instructor, address, time_zone, cancellation_policy, payment_mode, nonrefundable_fee, fob_key, deposit, membership_fee, usage_fee, refundable_status, book_method, registration_link) " +
+//            "values(#{state}, #{city}, #{instructor}, #{address}, #{timeZone}, #{cancellationPolicy}, #{paymentMode}, #{nonrefundableFee}, #{fobKey}, #{deposit}, #{membershipFee}, #{usageFee}, #{refundableStatus}, #{bookMethod}, #{registrationLink})")
+//    void add(Venue venue);
+    //修改后的
+    @Insert("insert into venue(id,state, city, address, time_zone, cancellation_policy, payment_mode, nonrefundable_fee, fob_key, deposit, membership_fee, usage_fee, refundable_status, book_method, registration_link,venue_status) " +
+            "values(#{id},#{state}, #{city}, #{address}, #{timeZone}, #{cancellationPolicy}, #{paymentMode}, #{nonrefundableFee}, #{fobKey}, #{deposit}, #{membershipFee}, #{usageFee}, #{refundableStatus}, #{bookMethod}, #{registrationLink},#{venueStatus})")
     void add(Venue venue);
 
     List<Venue> list(String state, String city, String icpisManager, String paymentMethod, String timeZone,String venueId);
@@ -63,8 +67,29 @@ public interface VenueMapper {
     String getVenueIdByAddress(String address);
 
     List<Venue> getNormalStatusVenues(String state, String timeZone);
-    @Select("select * from venue where instructor=#{instructorId}")
-    Venue getVenueByInstructorId(Integer instructorId);
+//    @Select("select * from venue where instructor=#{instructorId}")
+//    Venue getVenueByInstructorId(Integer instructorId);
+
+    //修改的
+    @Select("select v.* from venue v join instructor_venue iv on v.id = iv.venue_id where iv.instructor_id = #{instructorId}")
+    List<Venue> getVenueByInstructorId(String instructorId);
     @Select("select * from venue where venue_status=#{venueStatus}")
     List<Venue> getAllSpecStatusVenues(Venue.VenueStatus venueStatus);
+
+
+    @Insert({
+            "<script>",
+            "insert into instructor_venue (instructor_id, venue_id) values ",
+            "<foreach collection='instructorId' item='id' separator=','>",
+            "(#{id}, #{venueId})",
+            "</foreach>",
+            "</script>"
+    })
+    void addInstructorVenueRelation(@Param("instructorId") List<String> instructorId, @Param("venueId") String venueId);
+    @Delete("delete from instructor_venue where venue_id=#{venueId}")
+    void deleteInstructorVenueRelationsByVenueId(@Param("venueId") String venueId);
+    @Delete("delete from instructor_venue where instructor_id=#{instructorId}")
+    void deleteInstructorVenueRealtionsByInstructorId(@Param("instructorId") String instructorId);
+    @Select("select id from venue where id=#{id}")
+    String verifyVenueId(String id);
 }

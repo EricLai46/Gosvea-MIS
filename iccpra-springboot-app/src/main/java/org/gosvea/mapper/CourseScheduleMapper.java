@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.*;
 import org.gosvea.pojo.CourseSchedule;
+import org.gosvea.pojo.Venue;
 import org.gosvea.pojo.VenueSchedule;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -47,4 +48,8 @@ public interface CourseScheduleMapper {
     List<CourseSchedule> getAllCourseSchedule();
     @Update("update coursesschedule set is_processed=#{isProcessed} where id=#{courseSchedule.id}")
     void updateCourseScheduleProcessed(CourseSchedule courseSchedule, Boolean isProcessed);
+    @Select("select date,start_time,end_time,course_title,price,is_active from coursesschedule where venue_id=#{venueId}")
+    List<CourseSchedule> getCourseCalendar(String venueId);
+    @Select("select id,address from venue")
+    List<Venue> getAllVenueIdAndAddress();
 }

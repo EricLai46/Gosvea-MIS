@@ -16,9 +16,9 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import org.json.JSONArray;
 
 
@@ -50,6 +50,7 @@ public class VenueServiceImpl implements VenueService {
 
         PageHelper.startPage(pageNum,pageSize);
         List<Venue> lv =venueMapper.list(state,city,icpisManager,paymentMethod,timeZone,venueId);
+        //System.out.println(lv.get(0).getInstructors() );
         if(lv!=null)
         {
             for (Venue venue : lv) {
@@ -77,13 +78,23 @@ public class VenueServiceImpl implements VenueService {
 
     @Override
     public void updateVenue(Venue venue) {
-        if(venue.getInstructor()!=null)
-        {
-            Instructor instructor =instructorService.getInstructorById(venue.getInstructor());
-            instructor.setVenueId(venue.getId());
-            instructorService.updateInstructor(instructor);
-            System.out.println(instructor);
-        }
+//        // 更新场地关联的讲师
+//        if (venue.getInstructors() != null && !venue.getInstructors().isEmpty()) {
+//            // 先删除旧的关联
+//            venueMapper.deleteInstructorVenueRelationsByVenueId(venue.getId());
+//
+//            // 插入新的关联
+//            for (Instructor instructor : venue.getInstructors()) {
+//                // 确保讲师存在，或者根据业务逻辑决定如何处理不存在的讲师
+//                Instructor existingInstructor = instructorService.getInstructorById(instructor.getId());
+//                if (existingInstructor != null) {
+//                    venueMapper.addInstructorVenueRelation(instructor.getId(), venue.getId());
+//                } else {
+//                    // 处理讲师不存在的情况
+//                    System.out.println("Instructor with ID " + instructor.getId() + " does not exist.");
+//                }
+//            }
+//        }
         venueMapper.updateVenue(venue);
     }
 
@@ -230,7 +241,7 @@ public class VenueServiceImpl implements VenueService {
     }
 
     @Override
-    public Venue getVenueByInstructorId(Integer instructorId) {
+    public List<Venue> getVenueByInstructorId(String instructorId) {
         return venueMapper.getVenueByInstructorId(instructorId);
     }
 
@@ -261,6 +272,48 @@ public class VenueServiceImpl implements VenueService {
     @Override
     public List<Venue> getAllSpecStatusVenues(Venue.VenueStatus venueStatus) {
         return venueMapper.getAllSpecStatusVenues(venueStatus);
+    }
+
+    @Override
+    public void addInstructorVenueRelation(List<String> instructorIds, String venueId) {
+        venueMapper.addInstructorVenueRelation(instructorIds,venueId);
+    }
+
+    @Override
+    public void deleteInstructorVenueRelationsByInstructorId(String id) {
+        venueMapper.deleteInstructorVenueRealtionsByInstructorId(id);
+    }
+
+    @Override
+    public void deleteInstructorVenueRelationsByVenueId(String venueId) {
+        venueMapper.deleteInstructorVenueRelationsByVenueId(venueId);
+    }
+
+    @Override
+    public boolean isInstructrorListChanged(List<String> currentInstructorIds,List<String> previousInstructorIds) {
+        if(currentInstructorIds==null&&previousInstructorIds==null)
+        {
+            return !(currentInstructorIds==null&&previousInstructorIds==null);
+        }
+        if(currentInstructorIds.size()!=previousInstructorIds.size())
+        {
+            return true;
+        }
+        Collections.sort(currentInstructorIds);
+        Collections.sort(previousInstructorIds);
+
+
+
+        return !currentInstructorIds.equals(previousInstructorIds);
+    }
+
+    @Override
+    public boolean verifyVenueId(String id) {
+        String venueId= venueMapper.verifyVenueId(id);
+        if(venueId==null)
+            return true;
+        else
+            return false;
     }
 
 

@@ -3,22 +3,23 @@ import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, T
 import VenueScheduleCalendar from '../calendar/VenueScheduleCalendar';
 import axiosInstance from '../AxiosInstance';
 
-const VenueDialog = ({ open, handleClose, isEditMode, currentVenue, handleChange, handleSave, handleInsert, handleDelete, timeZones }) => {
-
-  const [instructors, setInstructors] = useState([]);
-
-  useEffect(() => {
-    if (open) {
-      axiosInstance.get('/instructor/instructorname')
-        .then(response => {
-          setInstructors(response.data);
-        })
-        .catch(error => {
-          console.error('Error fetching instructors:', error);
-        });
+const VenueDialog = ({ open, handleClose, isEditMode, currentVenue, handleChange, handleSave, handleInsert, handleDelete, timeZones,instructors,setInstructors,icpisManager }) => {
+  const [isChecking, setIsChecking] = useState(false);
+  const [error, setError] = useState('');
+  const [idValid, setIdValid] = useState(true); // State for ID validation
+  const checkIdExists = async () => {
+    try {
+      setIsChecking(true);
+      const response = await axiosInstance.get(`/venue/checkIdExists/${currentVenue.id}`);
+      setIsChecking(false);
+      return response.data.exists; // Assumes API returns { exists: true/false }
+    } catch (error) {
+      setIsChecking(false);
+      console.error("Error checking venue ID", error);
+      setError("Error checking venue ID");
+      return false;
     }
-  }, [open]);
-
+  };
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
       <DialogTitle>{isEditMode ? "Edit Venue" : "Add a Venue"}</DialogTitle>
@@ -80,24 +81,31 @@ const VenueDialog = ({ open, handleClose, isEditMode, currentVenue, handleChange
               onChange={handleChange}
             />
           </Grid>
-
           <Grid item xs={6}>
-            <FormControl margin="dense" fullWidth>
-              <InputLabel>Instructor</InputLabel>
-              <Select
-                name="instructor"
-                value={currentVenue.instructor || ''}
-                onChange={handleChange}
-              >
-                {instructors.map(instructor => (
-                  <MenuItem key={instructor.id} value={instructor.id}>
-                    {instructor.fullname}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
+  <FormControl margin="dense" fullWidth>
+    <InputLabel>Instructors</InputLabel>
+    <Select
+      name="instructors"
+      multiple
+      value={Array.isArray(currentVenue.instructors) ? currentVenue.instructors.map(i => i.id) : []}
+      onChange={handleChange}
+      renderValue={(selected) => selected.map(id => {
+        const instructor = instructors.find(i => i.id === id);
+        console.log("current venues instructors", currentVenue.instructors);
+        console.log('Selected ID:', id);
+        console.log('Found instructor:', instructor);
 
+        return instructor ? instructor.fullname : '';  // 如果找到对应的instructor，显示其fullname
+      }).join(', ')}  // 使用逗号分隔多个instructor的fullname
+    >
+      {instructors.map(instructor => (
+        <MenuItem key={instructor.id} value={instructor.id}>
+          {instructor.fullname}  
+        </MenuItem>
+      ))}
+    </Select>
+  </FormControl>
+</Grid>
           <Grid item xs={6}>
             <TextField
               margin="dense"
@@ -109,7 +117,22 @@ const VenueDialog = ({ open, handleClose, isEditMode, currentVenue, handleChange
               onChange={handleChange}
             />
           </Grid>
-
+          <Grid item xs={6}>
+            <FormControl margin="dense" fullWidth>
+              <InputLabel>ICPIS Manager</InputLabel>
+              <Select
+                name="icpisManager"
+                value={currentVenue.icpisManager}
+                onChange={handleChange}
+              >
+            <MenuItem value="Fisher">Fisher</MenuItem>
+          <MenuItem value="Jurin">Jurin</MenuItem>
+          <MenuItem value="Andy">Andy</MenuItem>
+          <MenuItem value="Kenny">Kenny</MenuItem>
+          <MenuItem value="Daniel">Daniel</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
           <Grid item xs={6}>
             <TextField
               margin="dense"

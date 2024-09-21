@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotEmpty;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.poi.ss.usermodel.*;
+import org.gosvea.dto.VenueDTO;
 import org.gosvea.pojo.*;
 import org.gosvea.service.CourseService;
 import org.gosvea.service.InstructorService;
@@ -39,7 +40,7 @@ import java.io.ByteArrayOutputStream;
 
 @RestController
 @RequestMapping("/venue")
-@CrossOrigin(origins =  {"http://54.175.129.180:80", "http://allcprmanage.com","http://localhost:3000"}, allowedHeaders = "*")
+@CrossOrigin(origins =  {"http://54.175.129.180:80", "http://allcprmanage.com"}, allowedHeaders = "*")
 //@CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
 public class VenueController {
 
@@ -69,19 +70,70 @@ public class VenueController {
 //            return Result.error("not login");
 //        }
 //    }
+
+    //检测场地id是否重复
+    @GetMapping("/verifyVenueId/{id}")
+    public  Boolean verifyVenueId(@PathVariable String id)
+    {
+        try{
+           return venueService.verifyVenueId(id);
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+
+
+
     //添加新场地
     @PostMapping
     public Result add(@RequestBody Venue venue) {
         try {
-            //生成新场地
+            // 生成新场地
             venueService.add(venue);
-            //生成新场地默认schedule
-            //venueService.addVenueSchedule(venue.getId());
+            System.out.println("venue"+venue.getInstructors());
+            // 获取关联的讲师列表
+//            List<Instructor> instructors = venue.getInstructors();
+//            if (instructors != null && !instructors.isEmpty()) {
+//                // 遍历每个讲师，建立与场地的关联
+//                for (Instructor instructor : instructors) {
+//                    // 确保讲师已存在于数据库中，如果没有，需要先添加讲师
+//                    Instructor existingInstructor = instructorService.getInstructorById(instructor.getId());
+//                    if (existingInstructor == null) {
+//                        // 处理讲师不存在的情况，可能需要抛出异常或添加讲师
+//                        return Result.error("Instructor with ID " + instructor.getId() + " does not exist.");
+//                    }
+//                    // 建立场地和讲师之间的关联关系
+//                    venueService.addInstructorVenueRelation(venue.getId(), instructor.getId());
+//                }
+//            }
+            List<String> instructorIds=new ArrayList<>();
+            List<Instructor> instructorList=venue.getInstructors();
+
+            if(instructorList!=null)
+            {
+                for(Instructor instructor:instructorList)
+                {
+                    String instructorid=instructorService.getInstructorIdByInstructorName(instructor.getFirstname(),instructor.getLastname());
+                    if(instructorid!=null)
+                    {
+                        instructorIds.add(instructorid);
+                    }
+                }
+            }
+
+
+
+            venueService.addInstructorVenueRelation(instructorIds, venue.getId());
+            // 如果需要生成新场地的默认日程，可以在这里调用
+            // venueService.addVenueSchedule(venue.getId());
+
             return Result.success();
         } catch (Exception e) {
-//            throw new RuntimeException(e);
             e.printStackTrace();
-
             return Result.error(e.getMessage() + "\n" + getStackTrace(e));
         }
     }
@@ -118,25 +170,87 @@ public class VenueController {
 
     //更新场地
     @PutMapping
-    public Result updateVenue(@RequestBody Venue venue) {
-
+    public Result updateVenue(@RequestBody VenueDTO venueDTO) {
         try {
-            venueService.updateVenue(venue);
-            //更新场地venue latlon
+            // 获取现有的 Venue 实体
+            System.out.println("venueDTO"+venueDTO);
+            Venue venue = venueService.getVenueById(venueDTO.getId());
+            System.out.println("venue "+venue);
+            List<String> venueDTOInstructorIds=venueDTO.getInstructorIds();
             venueService.updtaeLatLonInformationForOneVenue(venue);
-            if(venue.getInstructor()!=null)
+
+            List<String> previousInstructorIds=instructorService.getInstructorIdsByVenueId(venue.getId());
+            System.out.println("previous instructor Id"+previousInstructorIds);
+            //检查是否改变了instructor和venue的关系
+            if(venueService.isInstructrorListChanged(venueDTOInstructorIds,previousInstructorIds))
             {
-                courseService.generateOrUpdateCourseSchedules(venue.getId(), venue.getInstructor());
+                //删除旧的关联
+                venueService.deleteInstructorVenueRelationsByVenueId(venueDTO.getId());
+                //添加新的关联
+
+                    venueService.addInstructorVenueRelation(venueDTOInstructorIds, venue.getId());
+
+
             }
+
+           List<String>  afterInstructorIds=instructorService.getInstructorIdsByVenueId(venue.getId());
+            //重新生成新的course schedule
+            for(String afterInstructorId:afterInstructorIds)
+            {
+                Instructor instructor=instructorService.getInstructorById(afterInstructorId);
+                if(instructor!=null)
+                {
+                    //生成course schedule
+                    courseService.generateOrUpdateCourseSchedules(venue.getId(), instructor.getId());
+
+                }
+            }
+//            if(venue.getInstructors()!=null)
+//            {
+//                System.out.println("venue instructors"+venue.getInstructors());
+//                // 获取当前 Venue 关联的 Instructor 列表
+//                List<Instructor> currentInstructors = venue.getInstructors();
+//                // 处理 instructorIds 列表
+//                List<Instructor> newInstructors = new ArrayList<>();
+//                for (String instructorId : venueDTO.getInstructorIds()) {
+//                    List<Instructor> instructors = instructorService.getInstructorById(instructorId);
+//                    if (instructors != null && !instructors.isEmpty()) {
+//                        for (Instructor instructor : instructors) {
+//                            newInstructors.add(instructor);
+//                            courseService.generateOrUpdateCourseSchedules(venue.getId(), instructor.getId());
+//                        }
+//                    }
+//                }
+//
+//                // 检查是否 Instructor 列表发生变化
+//                if (venueService.isInstructrorListChanged(currentInstructors, newInstructors)) {
+//                    // 删除旧的关联关系
+//                    venueService.deleteInstructorVenueRelationsByVenueId(venue.getId());
+//                    System.out.println("aa");
+//                    // 添加新的关联关系
+//                    for (Instructor instructor : newInstructors) {
+//                        venueService.addInstructorVenueRelation(instructor.getId(), venue.getId());
+//                        System.out.println("ss");
+//                    }
+//                }
+//
+//                // 更新 Venue 实体的 Instructor 列表
+//                venue.setInstructors(newInstructors);
+//            }
+
+
+            // 更新 Venue
+            venue.setIcpisManager(venueDTO.getIcpisManager());
+            venue.setAddress(venueDTO.getAddress());
+            venueService.updtaeLatLonInformationForOneVenue(venue);
+            venueService.updateVenue(venue);
 
             return Result.success();
         } catch (Exception e) {
             e.printStackTrace();
-
             return Result.error(e.getMessage() + "\n" + getStackTrace(e));
         }
     }
-
     //删除场地
     @DeleteMapping
     public Result deleteVenue(String venueId) {
@@ -211,6 +325,7 @@ public class VenueController {
                 venueHasLaLon.add(venue);
             }
         }
+        System.out.println("The Venue hasLalon"+venueHasLaLon);
         return Result.success(venueHasLaLon);
     }
 
@@ -317,9 +432,13 @@ public class VenueController {
                     if (nameParts.length == 2) {
                         String firstName = nameParts[0];
                         String lastName = nameParts[1];
-                        Integer instructorId = instructorService.findIdByName(firstName, lastName);
-                        if (instructorId != null) {
-                            venue.setInstructor(String.valueOf(instructorId));
+                        String instructorId = instructorService.findIdByName(firstName, lastName);
+                        Instructor instructor=instructorService.getInstructorById(instructorId);
+                        if(instructor!=null)
+                        {
+
+                                venue.getInstructors().add(instructor);
+
                         }
                     }
                 }
@@ -459,49 +578,58 @@ public class VenueController {
         try (Workbook workbook = new XSSFWorkbook();
              ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 
+            // 创建工作表
             Sheet sheet = workbook.createSheet("Venues");
+
             // 创建表头
             Row header = sheet.createRow(0);
-
-            for(int i=0;i<headers.length;i++) {
-
+            for (int i = 0; i < headers.length; i++) {
                 header.createCell(i).setCellValue(headers[i]);
             }
-
 
             // 从数据库获取数据
             List<Venue> venues = venueService.getAllVenues();
             int rowIdx = 1;
+
+            // 遍历每个场地
             for (Venue venue : venues) {
                 Row row = sheet.createRow(rowIdx++);
-                System.out.println(venue);
+
+                // 填写基本信息
                 row.createCell(0).setCellValue(venue.getId() != null ? String.valueOf(venue.getId()) : "1");
                 row.createCell(1).setCellValue(venue.getState() != null ? venue.getState() : "");
                 row.createCell(2).setCellValue(venue.getCity() != null ? venue.getCity() : "");
                 row.createCell(3).setCellValue(venue.getAddress() != null ? venue.getAddress() : "");
-                String instructorName = "";
-                if (venue.getInstructor() != null) {
-                    Instructor instructor = instructorService.getInstructorById(venue.getInstructor());
-                    if (instructor != null) {
-                        instructorName = instructor.getFirstname() + " " + instructor.getLastname();
+
+                // 获取并处理关联的讲师
+                List<Instructor> instructors = instructorService.getInstructorsByVenueId(venue.getId());
+                StringBuilder instructorNames = new StringBuilder();
+                if (instructors != null && !instructors.isEmpty()) {
+                    for (Instructor instructor : instructors) {
+                        if (instructorNames.length() > 0) {
+                            instructorNames.append(", ");
+                        }
+                        instructorNames.append(instructor.getFirstname()).append(" ").append(instructor.getLastname());
                     }
                 }
-                row.createCell(4).setCellValue(instructorName);
+                row.createCell(4).setCellValue(instructorNames.toString());
+
+                // 填写其余的字段
                 row.createCell(5).setCellValue(venue.getTimeZone() != null ? venue.getTimeZone() : "");
                 row.createCell(6).setCellValue(venue.getCancellationPolicy() != null ? venue.getCancellationPolicy() : "");
                 row.createCell(7).setCellValue(venue.getPaymentMode() != null ? venue.getPaymentMode() : "");
                 row.createCell(8).setCellValue(venue.getNonrefundableFee() != null ? venue.getNonrefundableFee() : "N/A");
-                row.createCell(9).setCellValue(venue.getFobKey() != null ? venue.getFobKey()  : "");
-                row.createCell(10).setCellValue(venue.getDeposit()!= null ? venue.getDeposit(): "N/A");
-                row.createCell(11).setCellValue(venue.getMembershipFee() != null ? venue.getMembershipFee(): "N/A");
-                row.createCell(12).setCellValue(venue.getUsageFee()!= null ? venue.getUsageFee() : "N/A");
+                row.createCell(9).setCellValue(venue.getFobKey() != null ? venue.getFobKey() : "");
+                row.createCell(10).setCellValue(venue.getDeposit() != null ? venue.getDeposit() : "N/A");
+                row.createCell(11).setCellValue(venue.getMembershipFee() != null ? venue.getMembershipFee() : "N/A");
+                row.createCell(12).setCellValue(venue.getUsageFee() != null ? venue.getUsageFee() : "N/A");
                 row.createCell(13).setCellValue(venue.getRefundableStatus() != null ? venue.getRefundableStatus() : "");
-                row.createCell(14).setCellValue(venue.getBookMethod()!= null ? venue.getBookMethod() : "");
+                row.createCell(14).setCellValue(venue.getBookMethod() != null ? venue.getBookMethod() : "");
                 row.createCell(15).setCellValue(venue.getRegistrationLink() != null ? venue.getRegistrationLink() : "");
-                row.createCell(16).setCellValue(String.valueOf(venue.getVenueStatus()!= null ? venue.getVenueStatus() : ""));
-
+                row.createCell(16).setCellValue(String.valueOf(venue.getVenueStatus() != null ? venue.getVenueStatus() : ""));
             }
 
+            // 写入输出流
             workbook.write(out);
             InputStreamResource file = new InputStreamResource(new ByteArrayInputStream(out.toByteArray()));
 
@@ -509,6 +637,7 @@ public class VenueController {
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=venues.xlsx")
                     .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                     .body(file);
+
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().body(null);

@@ -2,8 +2,8 @@ import axios from 'axios';
 
 // 创建一个axios实例
 const axiosInstance = axios.create({
-   //baseURL: 'http://54.175.129.180:8080', // 后端API的基础URL
-  baseURL: 'http://localhost:8080',
+   baseURL: 'http://54.175.129.180:8080', // 后端API的基础URL
+  //baseURL: 'http://localhost:8080',
 });
 
 // 添加请求拦截器

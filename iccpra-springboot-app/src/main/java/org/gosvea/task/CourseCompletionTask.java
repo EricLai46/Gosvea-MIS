@@ -32,6 +32,7 @@ public class CourseCompletionTask {
 
     @Autowired
     private VenueService venueService;
+
     @Scheduled(cron = "0 0 0 * * ?") // 每天午夜执行一次
     public void checkCourseCompletion() {
         LocalDate currentDate = LocalDate.now();
@@ -40,13 +41,17 @@ public class CourseCompletionTask {
         for (CourseSchedule schedule : schedules) {
             if (schedule.getDate().isBefore(currentDate) && schedule.isActive() && !schedule.isProcessed()) {
                 Instructor instructor = instructorService.getInstructorById(schedule.getInstructorId());
-                if (instructor != null) {
-                    instructor.setTotalClassTimes(instructor.getTotalClassTimes() + 1);
-                    updateInstructorWage(instructor);
-                    instructorService.updateInstructor(instructor);
-                    courseService.updateCourseScheduleProcessed(schedule, true);
+
+                        if (instructor != null) {
+                            instructor.setTotalClassTimes(instructor.getTotalClassTimes() + 1);
+                            updateInstructorWage(instructor);
+                            instructorService.updateInstructor(instructor);
+                            courseService.updateCourseScheduleProcessed(schedule, true);
+                        }
+
                 }
-            }
+
+
         }
     }
 
@@ -88,26 +93,24 @@ public class CourseCompletionTask {
 
 
     @Scheduled(cron = "0 0 1 * * ?")
-    public void CheckIfInvestigationSiteShouldBeNormal()
-    {
+    public void CheckIfInvestigationSiteShouldBeNormal() {
         //获取所有观察点的信息
-        List<Venue> investigationVenueList=venueService.getAllSpecStatusVenues(Venue.VenueStatus.INVESTIGATION);
-        for(Venue venue:investigationVenueList)
-        {
-            if(venue.getInstructor()!=null)
-            {
-                Instructor instructor=instructorService.getInstructorById(venue.getInstructor());
-                if(instructor!=null)
-                {
-                    if(instructor.getTotalClassTimes()>=2)
-                    {
+        List<Venue> investigationVenueList = venueService.getAllSpecStatusVenues(Venue.VenueStatus.INVESTIGATION);
+        for (Venue venue : investigationVenueList) {
+            // 获取与该场地关联的所有讲师
+            List<Instructor> instructors = instructorService.getInstructorsByVenueId(venue.getId());
+
+            if (instructors != null ) {
+                // 遍历讲师列表，检查是否有讲师的课程次数 >= 2
+                for (Instructor instructor : instructors) {
+                    if (instructor.getTotalClassTimes() >= 2) {
+                        // 将场地状态改为NORMAL
                         venue.setVenueStatus(Venue.VenueStatus.NORMAL);
                         venueService.updateVenue(venue);
+                        break; // 找到一个满足条件的讲师后，跳出循环
                     }
-
                 }
             }
         }
-
     }
 }

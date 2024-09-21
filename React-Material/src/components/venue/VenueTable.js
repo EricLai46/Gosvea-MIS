@@ -35,7 +35,14 @@ const VenueTable = ({ currentItems, handleClickOpen }) => (
                 <TableCell>{venue.address}</TableCell>
                 <TableCell>{venue.timeZone}</TableCell>
                 <TableCell>{venue.state}</TableCell>
-                <TableCell>{venue.instructorName}</TableCell>
+                <TableCell>
+                 {venue.instructors.map((instructor, index) => (
+                <span key={instructor.id}>
+                  {instructor.firstname} {instructor.lastname}
+                {index < venue.instructors.length - 1 && ', '}
+                </span>
+                  ))}
+                </TableCell>
                 <TableCell>{venue.city}</TableCell>
                 <TableCell>{venue.cancellationPolicy}</TableCell>
                 <TableCell>{venue.paymentMode}</TableCell>

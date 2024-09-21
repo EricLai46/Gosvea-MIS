@@ -29,10 +29,20 @@ const VenueMain = () => {
   const [totalPages, setTotalPages] = useState(1); // 添加 totalPages 状态
   const [selectedFile,setSelectedFile]=useState(null);
   const [venueId,setVenueId]=useState('');
+  const [instructors, setInstructors] = useState([]); // 新增 instructors 状态
   useEffect(() => {
+    fetchInstructors();
     fetchVenues();
     handleSearch();
   }, [currentPage]);
+  const fetchInstructors = async () => {
+    try {
+      const response = await axiosInstance.get('/instructor/instructorname');
+      setInstructors(response.data); // 设置 instructors 数据
+    } catch (error) {
+      console.error('Error fetching instructors:', error);
+    }
+  };
 //获取venues信息
   const fetchVenues = async () => {
     try {
@@ -82,29 +92,40 @@ const VenueMain = () => {
     });
 
     axiosInstance
-      .get('/venue', { params })
-      .then((response) => {
-        if (response.data.message === 'success') {
-          setVenues(response.data.data.items);
-          showNotification('Venues information searched successfully!', 'success');
-          setTotalVenues(response.data.totalElements);
-          setTotalPages(Math.ceil(response.data.data.totalElement / itemsPerPage));
-        } else {
-          showNotification('Venues information searched failed!', 'error');
-        }
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-      })
-      .finally(() => {
-        setIsLoading(false);
-        console.log(`totalpages,${totalPages}`);
-      });
-  };
-
+    .get('/venue', { params })
+    .then((response) => {
+      if (response.data.message === 'success') {
+        console.log('Full Response:', response.data);
+  
+        // 处理 venues 数据
+        const venues = response.data.data.items.map(venue => {
+          // 直接使用返回的 instructors 列表
+          return {
+            ...venue,
+            instructors: venue.instructors || [],  // 如果没有 instructors 则设置为空数组
+          };
+        });
+  
+        // 更新状态
+        setVenues(venues);
+        showNotification('Venues information searched successfully!', 'success');
+        setTotalVenues(response.data.totalElements);
+        setTotalPages(Math.ceil(response.data.data.totalElement / itemsPerPage));
+      } else {
+        showNotification('Venues information searched failed!', 'error');
+      }
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    })
+    .finally(() => {
+      setIsLoading(false);
+      console.log(`totalpages,${totalPages}`);
+    });
+  }
   const handleAdd = () => {
     const newVenue = {
-      id: null,
+      id: '',
       state: '',
       city: '',
       address: '',
@@ -119,7 +140,8 @@ const VenueMain = () => {
       refundableStatus: '',
       bookMethod: '',
       registrationLink: '',
-      instructor: null,
+      icpisManager:'',
+      instructor: [],
       venueStatus: null,
     };
 
@@ -138,28 +160,85 @@ const VenueMain = () => {
     setOpen(false);
   };
 //变化
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setCurrentVenue((prev) => ({ ...prev, [name]: value }));
-  };
+const handleChange = (event) => {
+  const { name, value } = event.target;
+
+  // 如果是 instructors 列表，更新 currentVenue.instructors
+  if (name === 'instructors') {
+    const selectedInstructors = value.map(id => instructors.find(i => i.id === id));
+    setCurrentVenue({
+      ...currentVenue,
+      instructors:  selectedInstructors,  // 更新为用户选择的 instructor ID 列表
+    });
+  } else {
+    setCurrentVenue({
+      ...currentVenue,
+      [name]: value,  // 更新其他字段
+    });
+  }
+};
 //保存
-  const handleSave = () => {
-    axiosInstance
-      .put('/venue', currentVenue, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-      .then((response) => {
-        setVenues((prev) => prev.map((v) => (v.id === currentVenue.id ? currentVenue : v)));
-        setOpen(false);
-        showNotification('Venues information updated successfully!', 'success');
-      })
-      .catch((error) => {
-        console.error('Bad request:', error);
-        showNotification('Venues information update failed!', 'error');
-      });
-  };
+const handleSave = () => {
+// 从 currentVenue 中提取 instructor 对象，并生成 instructorIds 列表
+const instructorIds = Array.isArray(currentVenue.instructors) 
+? currentVenue.instructors.map(instructor => instructor.id) 
+: []; // 提取 ID
+const venueStatus=currentVenue.venueStatus;
+const icpisManager=currentVenue.icpisManager;
+const address=currentVenue.address;
+const timezone=currentVenue.timeZone;
+const state=currentVenue.state;
+const city=currentVenue.city;
+const cancellationpolicy=currentVenue.cancellationPolicy;
+const paymentmode=currentVenue.paymentMode;
+const nonrefundablefee=currentVenue.nonrefundableFee;
+const fobkey=currentVenue.fobKey;
+const deposit=currentVenue.deposit;
+const membershipfee=currentVenue.membershipFee;
+const usageFee=currentVenue.usageFee;
+const refundablestatus=currentVenue.refundableStatus;
+const bookmethod=currentVenue.bookMethod;
+const registrationlink=currentVenue.registrationLink;
+// 构建符合 VenueDTO 格式的对象
+const venueDTO = {
+  ...currentVenue,
+  instructorIds: instructorIds,  // 替换 instructor 对象为 ID 列表
+  venueStatus:venueStatus,
+  icpisManager:icpisManager,
+  address:address,
+  timeZone:timezone,
+  state:state,
+  city:city,
+  cancellationPolicy:cancellationpolicy,
+  paymentMode:paymentmode,
+  nonrefundableFee:nonrefundablefee,
+  fobKey:fobkey,
+  deposit:deposit,
+  membershipFee:membershipfee,
+  usageFee:usageFee,
+  refundableStatus:refundablestatus,
+  bookMethod:bookmethod,
+  registrationLink:registrationlink
+};
+//console.log(JSON.stringify(venueDTO, null, 2));
+//console.log('Venue DTO:', venueDTO);  // 调试时查看传递的 DTO 数据
+//console.log("currentVenue.instructors:", currentVenue.icpisManager);  // 调试 instructors 原始数据
+
+// 发送请求
+axiosInstance.put('/venue', venueDTO, {
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+.then(response => {
+  setVenues((prev) => prev.map((v) => (v.id === currentVenue.id ? currentVenue : v)));
+  setOpen(false);
+  showNotification('Venues information updated successfully!', 'success');
+})
+.catch(error => {
+  // 处理错误
+});
+};
 //添加新场地
   const handleInsert = () => {
     axiosInstance
@@ -294,7 +373,8 @@ const VenueMain = () => {
         handleInsert={handleInsert}
         handleDelete={handleDelete}
         timeZones={timeZones}
-        
+        instructors={instructors}
+        icpisManager={icpisManager}
       />
     </SidebarLayout>
   );

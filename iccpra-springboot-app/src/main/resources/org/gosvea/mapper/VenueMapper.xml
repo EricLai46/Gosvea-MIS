@@ -3,38 +3,64 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.gosvea.mapper.VenueMapper">
+
+    <resultMap id="VenueResultMap" type="org.gosvea.pojo.Venue">
+        <id property="id" column="id"/>
+        <result property="state" column="state"/>
+        <result property="city" column="city"/>
+        <result property="icpisManager" column="icpis_manager"/>
+        <result property="instructorNames" column="instructorNames"/>
+        <result property="address" column="address"/>
+        <result property="timeZone" column="time_zone"/>
+        <result property="cancellationPolicy" column="cancellation_policy"/>
+        <result property="paymentMode" column="payment_mode"/>
+        <result property="nonrefundableFee" column="nonrefundable_fee"/>
+        <result property="fobKey" column="fob_key"/>
+        <result property="deposit" column="deposit"/>
+        <result property="membershipFee" column="membership_fee"/>
+        <result property="usageFee" column="usage_fee"/>
+        <result property="refundableStatus" column="refundable_status"/>
+        <result property="bookMethod" column="book_method"/>
+        <result property="registrationLink" column="registration_link"/>
+        <collection property="instructors" ofType="org.gosvea.pojo.Instructor">
+            <id property="id" column="instructor_id"/>
+            <result property="firstname" column="firstname"/>
+            <result property="lastname" column="lastname"/>
+
+            <result property="" column=""/>
+        </collection>
+    </resultMap>
      <!--分类查询-->
-     <select id="list" resultType="org.gosvea.pojo.Venue">
-         SELECT v.*, CONCAT(i.firstname, ' ', i.lastname) AS instructorName
-         FROM venue v
-         LEFT JOIN instructors i ON v.instructor = i.id
-         <where >
-             <if test="state!=null">
-                 v.state=#{state}
-             </if>
-             <if test="city!=null">
-                 and v.city=#{city}
-
-             </if>
-
-             <if test="timeZone!=null">
-                 and v.time_zone=#{timeZone}
-
-             </if>
-
-             <if test="paymentMethod!=null">
-                 and v.payment_method=#{paymentMethod}
-             </if>
-
-             <if test="icpisManager!=null">
-                 and v.icpis_manager=#{icpisManager}
-             </if>
-             <if test="venueId!=null">
-                 and v.id=#{venueId}
-             </if>
-
-         </where>
-     </select>
+    <select id="list" resultMap="VenueResultMap">
+        SELECT v.*,
+        i.id AS instructor_id,
+        i.firstname,
+        i.lastname
+        FROM venue v
+        LEFT JOIN instructor_venue iv ON v.id = iv.venue_id
+        LEFT JOIN instructors i ON iv.instructor_id = i.id
+        <where>
+            <if test="state != null">
+                v.state = #{state}
+            </if>
+            <if test="city != null">
+                AND v.city = #{city}
+            </if>
+            <if test="timeZone != null">
+                AND v.time_zone = #{timeZone}
+            </if>
+            <if test="paymentMethod != null">
+                AND v.payment_method = #{paymentMethod}
+            </if>
+            <if test="icpisManager != null">
+                AND v.icpis_manager = #{icpisManager}
+            </if>
+            <if test="venueId != null">
+                AND v.id = #{venueId}
+            </if>
+        </where>
+        ORDER BY v.city
+    </select>
     <!--分类查询-->
     <select id="getNormalStatusVenues" resultType="org.gosvea.pojo.Venue">
         SELECT * FROM venue
@@ -94,9 +120,9 @@
             <if test="registrationLink != null">
                 registration_link = #{registrationLink},
             </if>
-            <if test="instructor!=null">
-                instructor=#{instructor},
-            </if>
+<!--            <if test="instructor!=null">-->
+<!--                instructor=#{instructor},-->
+<!--            </if>-->
 
             <if test="venueStatus!=null">
                 venue_status=#{venueStatus},
@@ -126,9 +152,9 @@
                         <if test="venue.city != null">
                             city = #{venue.city},
                         </if>
-                        <if test="venue.instructor != null">
-                            instructor = #{venue.instructor},
-                        </if>
+<!--                        <if test="venue.instructor != null">-->
+<!--                            instructor = #{venue.instructor},-->
+<!--                        </if>-->
                         <if test="venue.address != null">
                             address = #{venue.address},
                         </if>
@@ -179,10 +205,10 @@
     </update>
         <!--批量插入Venues到数据库-->
     <insert id="insertListVenues" parameterType="list">
-        insert into venue (id,icpis_manager,state,city,address,instructor,time_zone,cancellation_policy,payment_mode,nonrefundable_fee,fob_key,deposit,membership_fee,usage_fee,refundable_status,book_method,registration_link,venue_status)
+        insert into venue (id,icpis_manager,state,city,address,time_zone,cancellation_policy,payment_mode,nonrefundable_fee,fob_key,deposit,membership_fee,usage_fee,refundable_status,book_method,registration_link,venue_status)
         values
         <foreach collection="list" item="venue" separator=",">
-            (#{venue.id},#{venue.icpisManager},#{venue.state},#{venue.city},#{venue.address},#{venue.instructor},#{venue.timeZone},#{venue.cancellationPolicy},#{venue.paymentMode},#{venue.nonrefundableFee},#{venue.fobKey},#{venue.deposit},#{venue.membershipFee},#{venue.usageFee},#{venue.refundableStatus},#{venue.bookMethod},#{venue.registrationLink},#{venue.venueStatus})
+            (#{venue.id},#{venue.icpisManager},#{venue.state},#{venue.city},#{venue.address},#{venue.timeZone},#{venue.cancellationPolicy},#{venue.paymentMode},#{venue.nonrefundableFee},#{venue.fobKey},#{venue.deposit},#{venue.membershipFee},#{venue.usageFee},#{venue.refundableStatus},#{venue.bookMethod},#{venue.registrationLink},#{venue.venueStatus})
         </foreach>
     </insert>
 

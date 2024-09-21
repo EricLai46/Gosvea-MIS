@@ -50,6 +50,14 @@ const InstructorMain = () => {
         },
       });
       if (response.data.message === 'success') {
+         // 处理 venues 数据
+         const instructorDTOs = response.data.data.items.map(instructor => {
+          // 直接使用返回的 instructors 列表
+          return {
+            ...instructor,
+           venueIds: instructor.venueIds || [],  // 如果没有 instructors 则设置为空数组
+          };
+        });
         setInstructors(response.data.data.items);
        
       } else {

@@ -2,16 +2,12 @@ import * as React from 'react';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import ListSubheader from '@mui/material/ListSubheader';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import AccountBoxIcon from '@mui/icons-material/AccountBox';
+
 import AddLocationIcon from '@mui/icons-material/AddLocation';
 import PeopleIcon from '@mui/icons-material/People';
-import AnalyticsIcon from '@mui/icons-material/Analytics';
-import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
-import TodayIcon from '@mui/icons-material/Today';
-import EventIcon from '@mui/icons-material/Event';
-import DateRangeIcon from '@mui/icons-material/DateRange';
+
 import SchoolIcon from '@mui/icons-material/School';
 import { Link } from 'react-router-dom';
 
@@ -46,6 +42,12 @@ export const mainListItems = (
         <SchoolIcon />
       </ListItemIcon> 
       <ListItemText primary="Courses" />
+    </ListItemButton >
+    <ListItemButton component={Link} to="/ADCalendarMain">
+      <ListItemIcon>
+        <CalendarMonthIcon/>
+      </ListItemIcon> 
+      <ListItemText primary="AD Calendar" />
     </ListItemButton >
     {/* <ListItemButton component={Link} to="/advertisementmain">
       <ListItemIcon>

@@ -1,8 +1,7 @@
 package org.gosvea.pojo;
 
 
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -21,7 +20,7 @@ import java.util.Map;
 public class Venue {
     private String id;
     @NotNull
-    private String instructor;
+    //private String instructor;
     private String timeZone;
     @NotEmpty
     private String state;
@@ -44,9 +43,15 @@ public class Venue {
 
     private Double latitude;
     private Double longitude;
-    private  String instructorName;
+    private  String instructorNames;
     // VenueStatus 枚举类型的属性
     private VenueStatus venueStatus;
+
+
+    @ManyToMany(mappedBy = "venues",fetch = FetchType.LAZY)
+
+    private List<Instructor> instructors;
+
 
     // 静态的时区映射
     private static final Map<String, String> TIME_ZONE_MAP = new HashMap<>();
@@ -67,6 +72,8 @@ public class Venue {
 
         return scheduleList.stream().anyMatch(schedule -> schedule.getDate().isBefore(reminderDate));
     }
+
+
 
     // VenueStatus 枚举类
     public enum VenueStatus {
@@ -109,4 +116,5 @@ public class Venue {
     public void setVenueStatus(VenueStatus venueStatus) {
         this.venueStatus = venueStatus;
     }
+
 }

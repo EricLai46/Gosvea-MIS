@@ -185,20 +185,20 @@ public class CourseServiceImpl implements CourseService {
 //        }
 //        return commonSchedules;
 //    }
-public Map<Integer, String> generateOrUpdateCourseSchedules(String venueId, String instructorId) {
-    Map<Integer, String> warnings = new HashMap<>();
+public Map<String, String> generateOrUpdateCourseSchedules(String venueId, String instructorId) {
+    Map<String, String> warnings = new HashMap<>();
 
     Venue venue = venueService.getVenueById(venueId);
     Instructor instructor = instructorService.getInstructorById(instructorId);
     System.out.println("venue: "+venue);
     System.out.println("Instructor: "+instructor);
     if (venue == null) {
-        warnings.put(Integer.valueOf(venueId), "Venue ID " + venueId + " does not exist.");
+        warnings.put(venueId, "Venue ID " + venueId + " does not exist.");
         return warnings;
     }
 
     if (instructor == null) {
-        warnings.put(Integer.valueOf(instructorId), "Instructor ID " + instructorId + " does not exist.");
+        warnings.put(instructorId, "Instructor ID " + instructorId + " does not exist.");
         return warnings;
     }
 
@@ -207,11 +207,11 @@ public Map<Integer, String> generateOrUpdateCourseSchedules(String venueId, Stri
     List<InstructorSchedule> instructorSchedules = instructorService.getInstructorSchedule(instructorId);
 
     if (venueSchedules.isEmpty()) {
-        warnings.put(Integer.valueOf(venueId), "Venue ID " + venueId + " has no schedules defined.");
+        warnings.put(venueId, "Venue ID " + venueId + " has no schedules defined.");
     }
 
     if (instructorSchedules.isEmpty()) {
-        warnings.put(Integer.valueOf(instructorId), "Instructor ID " + instructorId + " has no schedules defined.");
+        warnings.put(instructorId, "Instructor ID " + instructorId + " has no schedules defined.");
     }
 
     // 批量查询所有可能的课程安排
@@ -296,6 +296,16 @@ public Map<Integer, String> generateOrUpdateCourseSchedules(String venueId, Stri
     @Override
     public void updateCourseScheduleProcessed(CourseSchedule courseSchedule, Boolean isProcessed) {
         courseScheduleMapper.updateCourseScheduleProcessed(courseSchedule,isProcessed);
+    }
+
+    @Override
+    public List<CourseSchedule> getCourseCalendar(String venueId) {
+        return courseScheduleMapper.getCourseCalendar(venueId);
+    }
+
+    @Override
+    public List<Venue> getAllVenueIdAndAddress() {
+        return courseScheduleMapper.getAllVenueIdAndAddress();
     }
 
     public void deleteCourseSchedules(List<CourseSchedule> schedulesToDelete) {

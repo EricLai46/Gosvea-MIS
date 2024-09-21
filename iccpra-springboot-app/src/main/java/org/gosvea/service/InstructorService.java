@@ -27,13 +27,13 @@ public interface InstructorService {
 
     void addInstructorSchedule(InstructorSchedule instructorSchedule);
 
-    Instructor getInstructorById(String instructor);
+   Instructor getInstructorById(String instructor);
 
     List<Instructor> getAllInstructors();
 
     List<String> getAllInstructorNames();
 
-    Integer findIdByName(String firstName, String lastName);
+    String findIdByName(String firstName, String lastName);
 
 
     void updateListInstructors(List<Instructor> instructorList);
@@ -41,4 +41,13 @@ public interface InstructorService {
     void insertListInstructors(List<Instructor> instructorList);
 
     void clearAllData();
+
+    boolean isVenueListChanged(List<Venue> currentVenues, List<Venue> newVenues);
+
+    List<Instructor> getInstructorsByVenueId(String id);
+
+    List<String> getInstructorIdsByVenueId(String venueId);
+
+
+    String getInstructorIdByInstructorName(String firstname,String lastname);
 }

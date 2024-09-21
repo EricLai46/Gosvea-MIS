@@ -17,7 +17,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/course")
-@CrossOrigin(origins =  {"http://54.175.129.180:80", "http://allcprmanage.com","http://localhost:3000"}, allowedHeaders = "*")
+@CrossOrigin(origins =  {"http://54.175.129.180:80", "http://allcprmanage.com"}, allowedHeaders = "*")
 //@CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
 public class CourseController {
 
@@ -191,7 +191,21 @@ public class CourseController {
 //        }
 //        return commonSchedules;
 //    }
+    //获取当前场地的广告日历
+    @GetMapping("/coursecalendar")
+    public List<CourseSchedule> getCourseCalendar(String venueId)
+    {
+        return courseService.getCourseCalendar(venueId);
 
+
+    }
+
+    //获取所有场地地址以及id
+    @GetMapping("/coursevenueIdaddress")
+    public List<Venue> getAllVenueIdAndAddress()
+    {
+        return courseService.getAllVenueIdAndAddress();
+    }
 
 
 }
