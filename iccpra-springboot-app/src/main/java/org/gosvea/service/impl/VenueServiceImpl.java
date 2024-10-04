@@ -42,14 +42,14 @@ public class VenueServiceImpl implements VenueService {
     }
 
     @Override
-    public PageResponse<Venue> list(Integer pageNum, Integer pageSize,String state, String city, String icpisManager, String paymentMethod, String timeZone,String venueId) {
+    public PageResponse<Venue> list(Integer pageNum, Integer pageSize,String state, String city, String icpisManager, String timeZone,String venueId) {
         PageResponse<Venue> ps=new PageResponse<>();
         // 打印分页参数
         //System.out.println("Page number: " + pageNum);
         //System.out.println("Page size: " + pageSize);
 
         PageHelper.startPage(pageNum,pageSize);
-        List<Venue> lv =venueMapper.list(state,city,icpisManager,paymentMethod,timeZone,venueId);
+        List<Venue> lv =venueMapper.list(state,city,icpisManager,timeZone,venueId);
         //System.out.println(lv.get(0).getInstructors() );
         if(lv!=null)
         {
@@ -314,6 +314,41 @@ public class VenueServiceImpl implements VenueService {
             return true;
         else
             return false;
+    }
+
+    @Override
+    public PageResponse<Venue> icpislist(Integer pageNum, Integer pageSize, String state, String city, String icpisname, String timeZone, String venueId) {
+        PageResponse<Venue> ps=new PageResponse<>();
+        // 打印分页参数
+        //System.out.println("Page number: " + pageNum);
+        //System.out.println("Page size: " + pageSize);
+
+        PageHelper.startPage(pageNum,pageSize);
+        List<Venue> lv =venueMapper.icpislist(state,city,icpisname,timeZone,venueId);
+        //System.out.println(lv.get(0).getInstructors() );
+        if(lv!=null)
+        {
+            for (Venue venue : lv) {
+                Venue.VenueStatus status = venue.getVenueStatus();
+                if (status != null) {
+                    String statusUppercase = status.getValue().toUpperCase();
+                    Venue.VenueStatus updatedStatus = Venue.VenueStatus.fromValue(statusUppercase);
+                    venue.setVenueStatus(updatedStatus);
+                } else {
+                    // 处理 venueStatus 为空的情况，例如设置默认值
+                    venue.setVenueStatus(Venue.VenueStatus.NORMAL);  // 或其他默认状态
+                }
+
+
+            }
+        }
+        Page<Venue> pv=(Page<Venue>) lv;
+
+        ps.setTotalElement(pv.getTotal());
+        ps.setItems(pv.getResult());
+
+
+        return ps;
     }
 
 

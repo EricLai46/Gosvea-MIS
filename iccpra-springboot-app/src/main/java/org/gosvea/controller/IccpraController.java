@@ -11,6 +11,7 @@ import org.gosvea.service.IccpraService;
 import org.gosvea.utils.JwtUtil;
 import org.gosvea.utils.ThreadLocalUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,14 +52,28 @@ public class IccpraController {
         {
             return Result.error("No this Icpie");
         }
-        if(password.equals(loginicpie.getPassword()))
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+        String hashedPassword = passwordEncoder.encode(password);
+        if(passwordEncoder.matches(password, hashedPassword))
         {
+
             Map<String,Object> claims=new HashMap<>();
             claims.put("id",loginicpie.getId());
             claims.put("firstname",loginicpie.getFirstname());
             claims.put("icpiename",loginicpie.getIcpiename());
+            claims.put("role",loginicpie.getRole());
             String token=JwtUtil.genToken(claims);
-            return Result.success(token);
+
+
+            if (JwtUtil.hasRole(token, "ROLE_ICPIE")) {
+                System.out.println("ss");
+                return Result.success( token);
+            } else {
+                System.out.println("ff");
+                return Result.success( token);
+            }
+            //return Result.success(token);
         }
 
         return Result.error("Password incorrect");

@@ -3,9 +3,9 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.gosvea.mapper.InstructorMapper">
-    <!--分类查询-->
+    <!--ICPIE分类查询-->
     <select id="getInstructor" resultType="org.gosvea.pojo.Instructor">
-        select i.*
+        select DISTINCT i.*
         from instructors i
         join instructor_venue iv on i.id=iv.instructor_id
         <where >
@@ -26,9 +26,6 @@
                 and i.phone_number=#{phoneNumber}
             </if>
 
-            <if test="email!=null">
-                and i.email=#{email}
-            </if>
             <if test="wageHour!=null">
                 and i.wage_hour=#{wageHour}
             </if>
@@ -41,6 +38,52 @@
             </if>
             <if test="venueId!=null">
                 iv.venue_id = #{venueId}
+            </if>
+        </where>
+    </select>
+    <!--ICPIS分类查询-->
+    <select id="getInstructorByIcpisName" resultType="org.gosvea.pojo.Instructor">
+        SELECT DISTINCT i.id,
+        i.firstname,
+        i.lastname,
+        i.state,
+        i.city,
+        i.phone_number,
+        i.email,
+        i.fob_key
+        from instructors i
+        LEFT JOIN instructor_venue iv ON i.id = iv.instructor_id
+        LEFT JOIN venue v ON iv.venue_id = v.id
+        <where >
+            <if test="state!=null">
+                i.state=#{state}
+            </if>
+            <if test="city!=null">
+                and i.city=#{city}
+
+            </if>
+
+            <if test="instructorId!=null">
+                and i.id=#{instructorId}
+
+            </if>
+
+            <if test="phoneNumber!=null">
+                and i.phone_number=#{phoneNumber}
+            </if>
+
+
+            <if test="lastname!=null">
+                and i.lastname=#{lastname}
+            </if>
+            <if test="firstname!=null">
+                and i.firstname=#{firstname}
+            </if>
+            <if test="venueId!=null">
+               and iv.venue_id = #{venueId}
+            </if>
+            <if test="icpisname != null">
+                AND (i.icpis_manager = #{icpisname} OR v.icpis_manager = #{icpisname})
             </if>
         </where>
     </select>

@@ -10,61 +10,51 @@ import PeopleIcon from '@mui/icons-material/People';
 
 import SchoolIcon from '@mui/icons-material/School';
 import { Link } from 'react-router-dom';
+import {jwtDecode} from 'jwt-decode';
 
+// 从 localStorage 中获取 token
+const token = localStorage.getItem('token');
+let userRole = null;
+if (token) {
+  const decodedToken = jwtDecode(token);
+  userRole = decodedToken.claims.role;
+}
+
+// 函数封装菜单项的显示逻辑
+const renderMenuItem = (requiredRole, link, icon, label) => {
+  // 如果用户角色是 ROLE_ICPIE 或者用户角色和菜单要求的角色匹配，则渲染菜单项
+  if (userRole === 'ROLE_ICPIE' || userRole === requiredRole) {
+    return (
+      <ListItemButton component={Link} to={link}>
+        <ListItemIcon>{icon}</ListItemIcon>
+        <ListItemText primary={label} />
+      </ListItemButton>
+    );
+  }
+  return null;
+};
+
+// 主菜单项的渲染
 export const mainListItems = (
   <React.Fragment>
+    {/* 无需角色控制的菜单 */}
     <ListItemButton component={Link} to="/dashboard">
       <ListItemIcon>
         <DashboardIcon />
       </ListItemIcon>
       <ListItemText primary="Dashboard" />
     </ListItemButton>
-    {/* <ListItemButton>
-      <ListItemIcon>
-        <AdminPanelSettingsIcon/>
-      </ListItemIcon>
-      <ListItemText primary="ICPIEs"/>
-    </ListItemButton> */}
-    <ListItemButton component={Link} to="/venuemain">
-      <ListItemIcon>
-        <AddLocationIcon />
-      </ListItemIcon>
-      <ListItemText primary="Venues" />
-    </ListItemButton>
-    <ListItemButton  component={Link} to="/instructormain">
-      <ListItemIcon>
-        <PeopleIcon />
-      </ListItemIcon>
-      <ListItemText primary="Instructors" />
-    </ListItemButton>
-    <ListItemButton component={Link} to="/coursemain">
-      <ListItemIcon>
-        <SchoolIcon />
-      </ListItemIcon> 
-      <ListItemText primary="Courses" />
-    </ListItemButton >
-    <ListItemButton component={Link} to="/ADCalendarMain">
-      <ListItemIcon>
-        <CalendarMonthIcon/>
-      </ListItemIcon> 
-      <ListItemText primary="AD Calendar" />
-    </ListItemButton >
-    {/* <ListItemButton component={Link} to="/advertisementmain">
-      <ListItemIcon>
-        <AddLocationIcon />
-      </ListItemIcon>
-      <ListItemText primary="AD" />
-    </ListItemButton> */}
-    {/* <ListItemButton>
-      <ListItemIcon>
-        <AnalyticsIcon />
-      </ListItemIcon>
 
-      <ListItemText primary="Profile" />
-    </ListItemButton> */}
+    {/* 基于角色动态控制的菜单项 */}
+    {renderMenuItem('ROLE_ICPIS', '/venuemain', <AddLocationIcon />, 'Venues')}
+    {renderMenuItem('ROLE_ICPIS', '/instructormain', <PeopleIcon />, 'Instructors')}
+ 
+    
+    {/* AD Calendar 仅限 ROLE_ICPIE 用户 */}
+    {renderMenuItem('ROLE_ICPIE', '/ADCalendarMain', <CalendarMonthIcon />, 'AD Calendar')}
+    {renderMenuItem('ROLE_ICPIE', '/coursemain', <SchoolIcon />, 'Courses')}
   </React.Fragment>
 );
-
 // export const secondaryListItems = (
 //   <React.Fragment>
 //     <ListSubheader component="div" inset>

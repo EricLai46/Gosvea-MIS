@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, FormControl, InputLabel, Select, MenuItem, TextField, Button } from '@mui/material';
 
-const InstructorSearchForm = ({  state, setState, email, setEmail, firstname, setFirstname, lastname, setLastname, phonenumber, setPhonenumber, handleSearch, handleReset,handleExport,handleFileChange,handleUpload,selectefile,setVenueId,venueId }) => {
+const InstructorSearchForm = ({  state, setState, firstname, setFirstname, lastname, setLastname, phonenumber, setPhonenumber, handleSearch, handleReset,handleExport,handleFileChange,handleUpload,setCity,setVenueId,venueId,city }) => {
   const timeZones = ['PST', 'EST', 'CST', 'MST', 'GMT', 'UTC', 'BST', 'CEST'];
 
   return (
@@ -34,9 +34,9 @@ const InstructorSearchForm = ({  state, setState, email, setEmail, firstname, se
       </FormControl>
       <TextField
         variant="outlined"
-        label="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        label="City"
+        value={city}
+        onChange={(e) => setCity(e.target.value)}
         sx={{ minWidth: 50, mr: 2 }}
       />
       <TextField
@@ -83,14 +83,14 @@ const InstructorSearchForm = ({  state, setState, email, setEmail, firstname, se
       style={{ display: 'none' }}
       id="upload-file"
     />
-    <label htmlFor="upload-file">
+    {/* <label htmlFor="upload-file">
       <Button variant="outlined" component="span" sx={{ mr: 2 }}>
         Upload
       </Button>
     </label>
       <Button variant='outlined'onClick={handleExport}>
         Export
-      </Button>
+      </Button> */}
       <Box sx={{ flexGrow: 1 }} />
     </Box>
   );

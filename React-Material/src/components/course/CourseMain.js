@@ -31,6 +31,7 @@ const CourseMain = () => {
   const [toDate, setToDate] = useState(null);
   const [totalPages, setTotalPages] = useState(1); // 添加 totalPages 状态
   const [totalCourses,setTotalCourses]=useState(0);
+  const token = localStorage.getItem("token"); 
   useEffect(() => {
     //fetchVenues();
     handleSearch();
@@ -91,8 +92,18 @@ const CourseMain = () => {
         delete params[key];
       }
     });
+    const token = localStorage.getItem('token');
+    console.log("Stored JWT in localStorage:", token);
+    
+    const authHeader = 'Bearer ' + token;
+    console.log("Authorization header to be sent:", authHeader); 
 
-    axiosInstance.get('/course', { params })
+    axiosInstance.get('/api/icpie/course',  {
+      params: params,  // 将 params 正确放入第二个参数中的 params 字段
+      headers: {
+        'Authorization': authHeader  // 传递 Bearer token
+      }
+    })
     .then(response => {
       console.log("Full response:", response.data); 
       if (response.data.message === "success") {

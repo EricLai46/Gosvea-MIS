@@ -1,7 +1,7 @@
 import React from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button } from '@mui/material';
 
-const InstructorTable = ({ currentItems, handleClickOpen }) => {
+const InstructorTable = ({ currentItems, handleClickOpen,userRole }) => {
   return (
     <TableContainer>
       <Table sx={{ minWidth: 650 }}>
@@ -15,13 +15,17 @@ const InstructorTable = ({ currentItems, handleClickOpen }) => {
             <TableCell sx={{ fontSize: '0.75rem', padding: '20px', whiteSpace: 'nowrap' }}>City</TableCell>
             <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>PhoneNumber</TableCell>
             <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>Email</TableCell>
-            <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>Wage Per Hour</TableCell>
-            <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>Salary Info</TableCell>
-            <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>Total Classes Times</TableCell>
-            <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>Deposit</TableCell>
-            <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>Rent Manikin Numbers</TableCell>
-            <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>Finance</TableCell>
-            <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>Rent Status</TableCell>
+            {userRole === 'ROLE_ICPIE'  && (
+  <>
+    <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>Wage Per Hour</TableCell>
+    <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>Salary Info</TableCell>
+    <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>Total Classes Times</TableCell>
+    <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>Deposit</TableCell>
+    <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>Rent Manikin Numbers</TableCell>
+    <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>Finance</TableCell>
+    <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>Rent Status</TableCell>
+  </>
+)}
             <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>Fob Key</TableCell>
             <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}></TableCell>
           </TableRow>
@@ -38,13 +42,18 @@ const InstructorTable = ({ currentItems, handleClickOpen }) => {
                 <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>{instructor.city}</TableCell>
                 <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>{instructor.phoneNumber}</TableCell>
                 <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>{instructor.email}</TableCell>
-                <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>{instructor.wageHour}</TableCell>
+                {userRole === 'ROLE_ICPIE' && (
+      <>
+                  <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>{instructor.wageHour}</TableCell>
                 <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>{instructor.salaryInfo}</TableCell>
                 <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>{instructor.totalClassTimes}</TableCell>
                 <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>{instructor.deposit}</TableCell>
                 <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>{instructor.rentManikinNumbers}</TableCell>
                 <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>{instructor.finance}</TableCell>
                 <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>{instructor.rentStatus}</TableCell>
+  </>
+        )}
+
                 <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>{instructor.fobKey}</TableCell>
                 <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>
                   <Button variant="outlined" onClick={() => handleClickOpen(instructor)}>Edit</Button>

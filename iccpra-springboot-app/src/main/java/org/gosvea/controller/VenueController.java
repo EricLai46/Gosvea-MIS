@@ -143,15 +143,25 @@ public class VenueController {
     public Result<PageResponse<Venue>> list(
             Integer pageNum,
             Integer pageSize,
+            String role,
+            String icpisname,
             @RequestParam(required = false) String state,
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String icpisManager,
-            @RequestParam(required = false) String paymentMethod,
             @RequestParam(required = false) String timeZone,
             @RequestParam(required = false) String venueId) {
 
         try {
-            PageResponse<Venue> ps = venueService.list(pageNum, pageSize, state, city, icpisManager, paymentMethod, timeZone,venueId);
+            PageResponse<Venue> ps = new PageResponse<>();
+            if(role.equals("ROLE_ICPIE"))
+            {
+                ps = venueService.list(pageNum, pageSize, state, city, icpisManager, timeZone,venueId);
+            }
+            else if (role.equals("ROLE_ICPIS"))
+            {
+                ps=venueService.icpislist(pageNum,pageSize,state,city,icpisname,timeZone,venueId);
+            }
+
             return Result.success(ps);
         } catch (Exception e) {
             e.printStackTrace();

@@ -3,7 +3,7 @@ import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, T
 import VenueScheduleCalendar from '../calendar/VenueScheduleCalendar';
 import axiosInstance from '../AxiosInstance';
 
-const VenueDialog = ({ open, handleClose, isEditMode, currentVenue, handleChange, handleSave, handleInsert, handleDelete, timeZones,instructors,setInstructors,icpisManager }) => {
+const VenueDialog = ({ open, handleClose, isEditMode, currentVenue, handleChange, handleSave, handleInsert, handleDelete, timeZones,instructors,setInstructors,icpisManager,userRole,icpisname }) => {
   const [isChecking, setIsChecking] = useState(false);
   const [error, setError] = useState('');
   const [idValid, setIdValid] = useState(true); // State for ID validation
@@ -118,20 +118,29 @@ const VenueDialog = ({ open, handleClose, isEditMode, currentVenue, handleChange
             />
           </Grid>
           <Grid item xs={6}>
-            <FormControl margin="dense" fullWidth>
-              <InputLabel>ICPIS Manager</InputLabel>
-              <Select
-                name="icpisManager"
-                value={currentVenue.icpisManager}
-                onChange={handleChange}
-              >
+          <FormControl margin="dense" fullWidth>
+      <InputLabel>ICPIS Manager</InputLabel>
+      <Select
+        name="icpisManager"
+        value={currentVenue.icpisManager}
+        onChange={handleChange}
+        disabled={userRole !== 'ROLE_ICPIE'}  // 如果不是 ROLE_ICPIE 则禁用 Select
+      >
+        {userRole === 'ROLE_ICPIE' ? (
+          // ROLE_ICPIE 用户的完整选项
+          <>
             <MenuItem value="Fisher">Fisher</MenuItem>
-          <MenuItem value="Jurin">Jurin</MenuItem>
-          <MenuItem value="Andy">Andy</MenuItem>
-          <MenuItem value="Kenny">Kenny</MenuItem>
-          <MenuItem value="Daniel">Daniel</MenuItem>
-              </Select>
-            </FormControl>
+            <MenuItem value="Jurin">Jurin</MenuItem>
+            <MenuItem value="Andy">Andy</MenuItem>
+            <MenuItem value="Kenny">Kenny</MenuItem>
+            <MenuItem value="Daniel">Daniel</MenuItem>
+          </>
+        ) : (
+          // 非 ROLE_ICPIE 用户，只能选择 icpisname
+          <MenuItem value={icpisname}>{icpisname}</MenuItem>
+        )}
+      </Select>
+    </FormControl>
           </Grid>
           <Grid item xs={6}>
             <TextField

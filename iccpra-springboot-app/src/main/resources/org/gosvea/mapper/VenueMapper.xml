@@ -30,7 +30,7 @@
             <result property="" column=""/>
         </collection>
     </resultMap>
-     <!--分类查询-->
+     <!--icpie分类查询-->
     <select id="list" resultMap="VenueResultMap">
         SELECT v.*,
         i.id AS instructor_id,
@@ -49,15 +49,44 @@
             <if test="timeZone != null">
                 AND v.time_zone = #{timeZone}
             </if>
-            <if test="paymentMethod != null">
-                AND v.payment_method = #{paymentMethod}
-            </if>
             <if test="icpisManager != null">
                 AND v.icpis_manager = #{icpisManager}
             </if>
             <if test="venueId != null">
                 AND v.id = #{venueId}
             </if>
+
+        </where>
+        ORDER BY v.city
+    </select>
+
+    <!--icpis分类查询-->
+    <select id="icpislist" resultMap="VenueResultMap">
+        SELECT v.*,
+        i.id AS instructor_id,
+        i.firstname,
+        i.lastname
+        FROM venue v
+        LEFT JOIN instructor_venue iv ON v.id = iv.venue_id
+        LEFT JOIN instructors i ON iv.instructor_id = i.id
+        <where>
+            <if test="state != null">
+                v.state = #{state}
+            </if>
+            <if test="city != null">
+                AND v.city = #{city}
+            </if>
+            <if test="timeZone != null">
+                AND v.time_zone = #{timeZone}
+            </if>
+
+            <if test="icpisname!=null">
+                AND v.icpis_manager=#{icpisname}
+            </if>
+            <if test="venueId != null">
+                AND v.id = #{venueId}
+            </if>
+
         </where>
         ORDER BY v.city
     </select>

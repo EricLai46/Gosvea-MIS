@@ -3,7 +3,7 @@ import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, T
 import axiosInstance from '../AxiosInstance';
 import InstructorScheduleCalendar from '../calendar/InstructorScheduleCalendar';
 
-const InstructorDialog = ({ open, handleClose, isEditMode, currentInstructor, handleChange, handleSave, handleInsert, handleDelete }) => {
+const InstructorDialog = ({ open, handleClose, isEditMode, currentInstructor, handleChange, handleSave, handleInsert, handleDelete,userRole }) => {
   const timeZones = ['PST', 'EST', 'CST', 'MST', 'GMT', 'UTC', 'BST', 'CEST'];
 
   return (
@@ -13,6 +13,15 @@ const InstructorDialog = ({ open, handleClose, isEditMode, currentInstructor, ha
         <DialogContentText>
           {isEditMode ? "Edit the information of the instructor." : "Add the information of the instructor."}
         </DialogContentText>
+        <TextField
+          margin="dense"
+          label="Id"
+          type="text"
+          fullWidth
+          name="id"
+          value={currentInstructor.id}
+          onChange={handleChange}
+        />
         <TextField
           margin="dense"
           label="FirstName"
@@ -67,66 +76,70 @@ const InstructorDialog = ({ open, handleClose, isEditMode, currentInstructor, ha
           value={currentInstructor.email}
           onChange={handleChange}
         />
-        <TextField
-          margin="dense"
-          label="Wage Per Hour"
-          type="text"
-          fullWidth
-          name="wageHour"
-          value={currentInstructor.wageHour}
-          onChange={handleChange}
-        />
-        <TextField
-          margin="dense"
-          label="TotalClassTimes"
-          type="text"
-          fullWidth
-          name="totalClassTimes"
-          value={currentInstructor.totalClassTimes}
-          onChange={handleChange}
-        />
-        <TextField
-          margin="dense"
-          label="Deposit"
-          type="text"
-          fullWidth
-          name="deposit"
-          value={currentInstructor.deposit}
-          onChange={handleChange}
-        />
-        <TextField
-          margin="dense"
-          label="Rent Manikin Numbers"
-          type="text"
-          fullWidth
-          name="rentManikinNumbers"
-          value={currentInstructor.rentManikinNumbers}
-          onChange={handleChange}
-        />
-        <TextField
-          margin="dense"
-          label="Finace"
-          type="text"
-          fullWidth
-          name="finance"
-          value={currentInstructor.finance}
-          onChange={handleChange}
-        />
-        <TextField
-          margin="dense"
-          label="Rent Status"
-          type="text"
-          fullWidth
-          name="rentStatus"
-          value={currentInstructor.rentStatus}
-          onChange={handleChange}
-        />
+       {userRole === 'ROLE_ICPIE' && (
+  <>
+    <TextField
+      margin="dense"
+      label="Wage Per Hour"
+      type="text"
+      fullWidth
+      name="wageHour"
+      value={currentInstructor.wageHour}
+      onChange={handleChange}
+    />
+    <TextField
+      margin="dense"
+      label="Total Class Times"
+      type="text"
+      fullWidth
+      name="totalClassTimes"
+      value={currentInstructor.totalClassTimes}
+      onChange={handleChange}
+    />
+    <TextField
+      margin="dense"
+      label="Deposit"
+      type="text"
+      fullWidth
+      name="deposit"
+      value={currentInstructor.deposit}
+      onChange={handleChange}
+    />
+    <TextField
+      margin="dense"
+      label="Rent Manikin Numbers"
+      type="text"
+      fullWidth
+      name="rentManikinNumbers"
+      value={currentInstructor.rentManikinNumbers}
+      onChange={handleChange}
+    />
+    <TextField
+      margin="dense"
+      label="Finance"
+      type="text"
+      fullWidth
+      name="finance"
+      value={currentInstructor.finance}
+      onChange={handleChange}
+    />
+    <TextField
+      margin="dense"
+      label="Rent Status"
+      type="text"
+      fullWidth
+      name="rentStatus"
+      value={currentInstructor.rentStatus}
+      onChange={handleChange}
+    />
+  </>
+)}
         <TextField
           margin="dense"
           label="Fob Key"
           type="text"
           fullWidth
-          name="fobkey"
+          name="fobKey"
           value={currentInstructor.fobKey}
           onChange={handleChange}
         />

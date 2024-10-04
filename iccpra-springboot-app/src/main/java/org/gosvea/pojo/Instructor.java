@@ -41,6 +41,8 @@ public class Instructor {
     private String rentStatus;
 
     private String fobKey;
+
+    private String icpisManager;
     private List<InstructorSchedule> scheduleList;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

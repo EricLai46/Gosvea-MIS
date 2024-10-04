@@ -21,4 +21,5 @@ public class Icpie {
     @Email
     private String email;
 
+    private String role;
 }

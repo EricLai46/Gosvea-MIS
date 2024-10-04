@@ -29,11 +29,11 @@ public class InstructorServiceImpl implements InstructorService {
     }
 
     @Override
-    public PageResponse<Instructor> getInstructor(Integer pageNum, Integer pageSize, String state, String city, String instructorId, String phoneNumber, String email, String wageHour,String venueId,String firstname, String lastname) {
+    public PageResponse<Instructor> getInstructor(Integer pageNum, Integer pageSize, String state, String city, String instructorId, String phoneNumber, String wageHour,String venueId,String firstname, String lastname) {
         PageResponse<Instructor> pi=new PageResponse<Instructor>();
 
         PageHelper.startPage(pageNum,pageSize);
-        List<Instructor> li=instructorMapper.getInstructor(state,city,instructorId,phoneNumber,email,wageHour,venueId,firstname,lastname);
+        List<Instructor> li=instructorMapper.getInstructor(state,city,instructorId,phoneNumber,wageHour,venueId,firstname,lastname);
         Page<Instructor> pgi=(Page<Instructor>)li;
 
         pi.setTotalElement(pgi.getTotal());
@@ -147,6 +147,19 @@ public class InstructorServiceImpl implements InstructorService {
     @Override
     public String getInstructorIdByInstructorName(String firstname, String lastname) {
         return instructorMapper.getInstructorIdByInstructorName(firstname,lastname);
+    }
+
+    @Override
+    public PageResponse<Instructor> getInstructorByIcpisName(Integer pageNum, Integer pageSize, String state, String city, String instructorId, String phoneNumber, String venueId, String firstname, String lastname, String icpisname) {
+        PageResponse<Instructor> pi=new PageResponse<Instructor>();
+
+        PageHelper.startPage(pageNum,pageSize);
+        List<Instructor> li=instructorMapper.getInstructorByIcpisName(state,city,instructorId,phoneNumber,venueId,firstname,lastname,icpisname);
+        Page<Instructor> pgi=(Page<Instructor>)li;
+
+        pi.setTotalElement(pgi.getTotal());
+        pi.setItems(pgi.getResult());
+        return pi;
     }
 
 

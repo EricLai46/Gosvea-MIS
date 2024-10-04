@@ -35,7 +35,9 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
 
-        registry.addInterceptor(loginInterceptors).excludePathPatterns("/icpie/login");
+//        registry.addInterceptor(loginInterceptors)
+//                .addPathPatterns("/api/icpie/**")  // 明确要拦截的路径
+//                .excludePathPatterns("/icpie/login");  // 排除不拦截的路径
 
     }
     @Override
@@ -43,7 +45,7 @@ public class WebConfig implements WebMvcConfigurer {
     {
         registry.addMapping("/**")
                 .allowedOrigins("http://54.175.129.180", "http://allcprmanage.com")
-                //.allowedOrigins("http://localhost:3000")
+                //allowedOrigins("http://localhost:3000")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("Content-Type","Authorization")
                 .allowCredentials(true);

@@ -15,7 +15,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import image from '../assets/images/background.png'
 import axiosInstance from './AxiosInstance';
-
+import {jwtDecode} from 'jwt-decode';
 
 function Copyright(props) {
   return (
@@ -41,7 +41,7 @@ export default function SignInSide() {
     const data = new FormData(event.currentTarget);
     const icpiename = data.get('icpiename');
     const password = data.get('password');
-    
+    console.log("Login details:",icpiename,password)
     try {
       const response = await axiosInstance.post('/icpie/login', new URLSearchParams({
         icpiename: icpiename,
@@ -53,12 +53,21 @@ export default function SignInSide() {
       });
 
       const result = response.data;
-      console.log(result);
+      console.log("result:",result);
 
       // 登录成功后的处理逻辑，例如保存JWT令牌
       if (result.code === 0) {
         localStorage.setItem("token", result.data);
-        alert("Login successfully");
+        console.log("Stored Token in localStorage:", result.data);
+           // 解析 JWT 获取角色信息
+        const decoded = jwtDecode(result.data); // 解析 JWT
+        console.log("Decoded token:", decoded);
+        const role = decoded.claims.role; // 获取角色信息
+   
+           // 将角色存储在 localStorage 中
+        localStorage.setItem("role", role);
+        console.log("Role from token:", role); // 打印角色信息
+        //alert("Login successfully");
         navigate('/dashboard');
       } else {
         alert("Login failed " + result.message);

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.Set;
 
 @Service
 public class IccpraServiceImpl implements IccpraService {
@@ -15,6 +16,8 @@ public class IccpraServiceImpl implements IccpraService {
     @Autowired
     private IccpraMapper iccpraMapper;
 
+
+    private static final Set<String> VALID_ROLES=Set.of("ICPIS","ICPIM","ICPIE");
 
     @Override
     public Icpie findByIcpieName(String icpiename) {
@@ -42,5 +45,12 @@ public class IccpraServiceImpl implements IccpraService {
     @Override
     public void deleteIcpie(Integer icpieId) {
         iccpraMapper.deleteIcpie(icpieId);
+    }
+
+    @Override
+    public void processIcpie(Icpie icpie) {
+        if (!VALID_ROLES.contains(icpie.getRole())) {
+            throw new IllegalArgumentException("Invalid role: " + icpie.getRole());
+        }
     }
 }

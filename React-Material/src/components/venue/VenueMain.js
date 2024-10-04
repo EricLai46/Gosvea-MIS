@@ -8,7 +8,7 @@ import VenueDialog from './VenueDialog';
 import { Container, Button } from '@mui/material';
 import { useNotification } from '../NotificationContext';
 import {saveAs} from 'file-saver';
-
+import {jwtDecode} from 'jwt-decode';
 
 const VenueMain = () => {
   const [timeZone, setTimeZone] = useState('');
@@ -30,6 +30,15 @@ const VenueMain = () => {
   const [selectedFile,setSelectedFile]=useState(null);
   const [venueId,setVenueId]=useState('');
   const [instructors, setInstructors] = useState([]); // 新增 instructors 状态
+  const [city,setCity]=useState([]);
+  const token = localStorage.getItem("token"); 
+      let userRole = null;
+      let icpisname=null;
+      if (token) {
+      const decodedToken = jwtDecode(token);
+      userRole = decodedToken.claims.role;
+      icpisname=decodedToken.claims.firstname;
+    }
   useEffect(() => {
     fetchInstructors();
     fetchVenues();
@@ -46,16 +55,17 @@ const VenueMain = () => {
 //获取venues信息
   const fetchVenues = async () => {
     try {
-   
+    
       const response = await axiosInstance.get('/venue', {
         params: {
           pageNum: currentPage,
           pageSize: itemsPerPage,
+          icpisname:icpisname,
+          role:userRole,
           state,
-          city: '',
+          city: city,
           instructor: instructor,
           icpisManager: icpisManager,
-          paymentMode: '',
           timeZone: timeZone,
           venueStatus: venueStatus,
         },
@@ -77,10 +87,11 @@ const VenueMain = () => {
     let params = {
       pageNum: currentPage,
       pageSize: itemsPerPage,
+      icpisname:icpisname,
+      role:userRole,
       state,
-      city: '',
+      city: city,
       icpisManager: icpisManager,
-      paymentMode: '',
       timeZone: timeZone,
       venueId:venueId
     };
@@ -140,7 +151,7 @@ const VenueMain = () => {
       refundableStatus: '',
       bookMethod: '',
       registrationLink: '',
-      icpisManager:'',
+      icpisManager: userRole==="ROLE_ICPIE"?'':icpisname,
       instructor: [],
       venueStatus: null,
     };
@@ -355,7 +366,10 @@ axiosInstance.put('/venue', venueDTO, {
           selectedFile={selectedFile}
           setIcpisManager={setIcpisManager}
           venueId={venueId}
+          userRole={userRole}
           setVenueId={setVenueId}
+          city={city}
+          setCity={setCity}
         />
         <VenueTable currentItems={venues} handleClickOpen={handleClickOpen} />
         <VenuePagination totalPages={totalPages} currentPage={currentPage} handlePageChange={handlePageChange}/>
@@ -364,6 +378,8 @@ axiosInstance.put('/venue', venueDTO, {
         </Button>
       </Container>
       <VenueDialog
+        userRole={userRole}
+        icpisname={icpisname}
         open={open}
         handleClose={handleClose}
         isEditMode={isEditMode}

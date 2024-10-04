@@ -11,7 +11,7 @@ import java.util.Map;
 public interface InstructorService {
     void addInstructor(Instructor instructor);
 
-    PageResponse<Instructor> getInstructor(Integer pageNum, Integer pageSize, String state, String city, String instructorId, String phoneNumber, String email, String wageHour,String venueId,String firstname,String lastname);
+    PageResponse<Instructor> getInstructor(Integer pageNum, Integer pageSize, String state, String city, String instructorId, String phoneNumber, String wageHour,String venueId,String firstname,String lastname);
 
     void deleteInstructor(String instructorId);
 
@@ -50,4 +50,6 @@ public interface InstructorService {
 
 
     String getInstructorIdByInstructorName(String firstname,String lastname);
+
+    PageResponse<Instructor> getInstructorByIcpisName(Integer pageNum, Integer pageSize, String state, String city, String instructorId, String phoneNumber, String venueId, String firstname, String lastname, String icpisname);
 }

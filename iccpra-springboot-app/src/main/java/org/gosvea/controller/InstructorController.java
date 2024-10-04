@@ -1,6 +1,7 @@
 package org.gosvea.controller;
 
 
+import ch.qos.logback.core.joran.spi.ElementSelector;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.gosvea.dto.InstructorDTO;
@@ -54,11 +55,12 @@ public class InstructorController {
     public Result<PageResponse<Instructor>> getInstructor(
             Integer pageNum,
             Integer pageSize,
+            String role,
+            String icpisname,
             @RequestParam(required = false) String state,
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String instructorId,
             @RequestParam(required = false) String phoneNumber,
-            @RequestParam(required = false) String email,
             @RequestParam(required = false) String wageHour,
             @RequestParam(required = false) String venueId,
             @RequestParam(required = false) String firstname,
@@ -66,7 +68,16 @@ public class InstructorController {
     )
     {
         try {
-            PageResponse<Instructor> ps=instructorService.getInstructor(pageNum,pageSize,state,city,instructorId,phoneNumber,email,wageHour,venueId,firstname,lastname);
+
+            PageResponse<Instructor> ps=new PageResponse<>();
+            if(role.equals("ROLE_ICPIE"))
+            {
+                ps=instructorService.getInstructor(pageNum,pageSize,state,city,instructorId,phoneNumber,wageHour,venueId,firstname,lastname);
+            }
+            else if(role.equals("ROLE_ICPIS"))
+            {
+                ps=instructorService.getInstructorByIcpisName(pageNum,pageSize,state,city,instructorId,phoneNumber,venueId,firstname,lastname,icpisname);
+            }
             return Result.success(ps);
         }
         catch (Exception e) {
@@ -149,13 +160,29 @@ public class InstructorController {
            Instructor instructor = instructorService.getInstructorById(instructorDTO.getId());
            System.out.println("venue "+instructor);
            List<String> instructorDTOvenueIds=instructorDTO.getVenueIds();
-
-           for(String venueDToInstructorId:instructorDTOvenueIds) {
-               Venue venue = venueService.getVenueById(venueDToInstructorId);
-               if (venue != null) {
-                   courseService.generateOrUpdateCourseSchedules(venue.getId(), instructor.getId());
-               }
-           }
+         if(instructorDTOvenueIds!=null&&!instructorDTOvenueIds.isEmpty())
+         {
+             for(String venueDToInstructorId:instructorDTOvenueIds) {
+                 Venue venue = venueService.getVenueById(venueDToInstructorId);
+                 if (venue != null) {
+                     courseService.generateOrUpdateCourseSchedules(venue.getId(), instructor.getId());
+                 }
+             }
+         }
+            instructor.setFirstname(instructorDTO.getFirstname());
+            instructor.setLastname(instructorDTO.getLastname());
+            instructor.setPhoneNumber(instructorDTO.getPhoneNumber());
+            instructor.setState(instructorDTO.getState());
+            instructor.setCity(instructorDTO.getCity());
+            instructor.setEmail(instructorDTO.getEmail());
+            instructor.setWageHour(instructorDTO.getWageHour());
+            instructor.setSalaryInfo(instructorDTO.getSalaryInfo());
+            instructor.setFobKey(instructorDTO.getFobKey());
+            instructor.setFinance(instructorDTO.getFinance());
+            instructor.setDeposit(instructorDTO.getDeposit());
+            instructor.setRentManikinNumbers(instructorDTO.getRentManikinNumbers());
+            instructor.setTotalClassTimes(instructorDTO.getTotalClassTimes());
+            instructor.setRentStatus(instructorDTO.getRentStatus());
            instructorService.updateInstructor(instructor); return Result.success();
        } catch (Exception e) {
            e.printStackTrace();

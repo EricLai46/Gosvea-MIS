@@ -11,11 +11,11 @@ import java.util.Map;
 
 @Mapper
 public interface InstructorMapper {
-    @Insert("insert into instructors (venue_id,firstname,lastname,state,city,phone_number,email,wage_hour,total_class_times,deposit,rent_manikin_numbers,finance,rent_status,fob_key)"+
-            "values(#{venueId},#{firstname},#{lastname},#{state},#{city},#{phoneNumber},#{email},#{wageHour},#{totalClassTimes},#{deposit},#{rentManikinNumbers},#{finance},#{rentStatus},#{fobKey})")
+    @Insert("insert into instructors (id,firstname,lastname,state,city,phone_number,email,wage_hour,total_class_times,deposit,rent_manikin_numbers,finance,rent_status,fob_key,icpis_manager)"+
+            "values(#{id},#{firstname},#{lastname},#{state},#{city},#{phoneNumber},#{email},#{wageHour},#{totalClassTimes},#{deposit},#{rentManikinNumbers},#{finance},#{rentStatus},#{fobKey},#{icpisManager})")
     void addInstructor(Instructor instructor);
 
-    List<Instructor> getInstructor(String state, String city, String instructorId, String phoneNumber, String email, String wageHour,String venueId,String firstname, String lastname);
+    List<Instructor> getInstructor(String state, String city, String instructorId, String phoneNumber, String wageHour,String venueId,String firstname, String lastname);
     @Delete("delete from instructors where id=#{instructorId}")
     void deleteInstructor(String instructorId);
     //@Update("update instructors set venue_id=#{venueId},firstname=#{firstname},lastname=#{lastname},state=#{state},city=#{city},phone_number=#{phoneNumber},email=#{email},wage_hour=#{wageHour},total_class_times=#{totalClassTimes},deposit=#{deposit},rent_manikin_numbers=#{rentManikinNumbers},finance=#{finance},rent_status=#{rentStatus},fob_key=#{fobKey} where id=#{id}")
@@ -51,4 +51,6 @@ public interface InstructorMapper {
     List<String> getInstructorIdsByVenueId(String venueId);
     @Select("select id from instructors where lastname=#{lastname} and firstname=#{firstname}")
     String getInstructorIdByInstructorName(String firstname, String lastname);
+
+    List<Instructor> getInstructorByIcpisName(String state, String city, String instructorId, String phoneNumber, String venueId, String firstname, String lastname, String icpisname);
 }

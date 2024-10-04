@@ -11,7 +11,7 @@ import java.util.List;
 public interface VenueService {
     void add(Venue venue);
 
-    PageResponse<Venue> list(Integer pageNum, Integer pageSize, String state, String city, String icpisManager, String paymentMethod, String timeZone,String venueId);
+    PageResponse<Venue> list(Integer pageNum, Integer pageSize, String state, String city, String icpisManager, String timeZone,String venueId);
 
     void updateVenue(Venue venue);
 
@@ -64,4 +64,6 @@ public interface VenueService {
     boolean isInstructrorListChanged(List<String> currentInstructorIds,List<String> previousInstructorIds);
 
     boolean verifyVenueId(String id);
+
+    PageResponse<Venue> icpislist(Integer pageNum, Integer pageSize, String state, String city, String icpisname, String timeZone, String venueId);
 }

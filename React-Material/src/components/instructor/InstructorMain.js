@@ -8,6 +8,7 @@ import InstructorDialog from "./InstructorDialog";
 import { useNotification } from '../NotificationContext';
 import { Container, Button } from '@mui/material';
 import { saveAs } from 'file-saver';
+import {jwtDecode} from 'jwt-decode';
 const InstructorMain = () => {
   const [timeZone, setTimeZone] = useState('');
   const [state, setState] = useState('');
@@ -23,12 +24,26 @@ const InstructorMain = () => {
   const { showNotification } = useNotification();
   const [firstname, setFirstname] = useState('');
   const [lastname, setLastname] = useState('');
-  const [email, setEmail] = useState('');
+  const [city, setCity] = useState('');
   const [phonenumber, setPhonenumber] = useState('');
   const [totalPages, setTotalPages] = useState(1);
   const [totalInstructors,setTotalInstructors]=useState(0);
   const [selectedFile,setSelectedFile]=useState(null);
   const [venueId,setVenueId]=useState('');
+  const token = localStorage.getItem("token"); 
+  const [email,setEmail]=useState('');
+
+  let userRole = null;
+  let icpisname=null;
+  if (token) {
+  const decodedToken = jwtDecode(token);
+  userRole = decodedToken.claims.role;
+  icpisname=decodedToken.claims.firstname;
+ 
+
+
+}
+
   useEffect(() => {
     fetchInstructors();
     handleSearch();
@@ -42,6 +57,9 @@ const InstructorMain = () => {
         params: {
           pageNum: currentPage,
           pageSize: itemsPerPage,
+          city: city,
+          role: userRole,
+          icpisname:icpisname,
           state,
           phoneNumber: '',
           lastname,
@@ -75,6 +93,9 @@ const InstructorMain = () => {
     let params = {
       pageNum: currentPage,
       pageSize: itemsPerPage,
+      role: userRole,
+      icpisname:icpisname,
+      city:city,
       state,
       phoneNumber: phonenumber,
       firstname: firstname,
@@ -112,7 +133,7 @@ const InstructorMain = () => {
 
   const handleAdd = () => {
     const newInstructor = {
-      id: null,
+      id: '',
       state: '',
       city: '',
       venueId: '',
@@ -125,7 +146,8 @@ const InstructorMain = () => {
       rentManikinNumbers: 0,
       finance: 0,
       rentStatus: '',
-      fobKey: ''
+      fobKey: '',
+      icpisManager:icpisname
     };
 
     setCurrentInstructor(newInstructor);
@@ -149,6 +171,44 @@ const InstructorMain = () => {
   };
 //保存instructor 信息
   const handleSave = () => {
+   // 从 currentVenue 中提取 instructor 对象，并生成 instructorIds 列表
+const venueIds = Array.isArray(currentInstructor.venueIds) 
+? currentInstructor.venueIds.map(venue => venue.id) 
+: []; // 提取 ID
+const firstname=currentInstructor.firstname;
+const lastname=currentInstructor.lastname;
+const phonenumber=currentInstructor.phoneNumber;
+const state=currentInstructor.state;
+const city=currentInstructor.city;
+const email=currentInstructor.email;
+const wageHour=currentInstructor.wageHour;
+const salaryInfo=currentInstructor.salaryInfo;
+const fobkey=currentInstructor.fobKey;
+const finance=currentInstructor.finance;
+const deposit=currentInstructor.deposit;
+const rentManikinNumbers=currentInstructor.rentManikinNumbers;
+const totalClassTimes=currentInstructor.totalClassTimes;
+const rentStatus=currentInstructor.rentStatus;
+// 构建符合 VenueDTO 格式的对象
+const venueDTO = {
+  ...currentInstructor,
+  venueIds: venueIds,  // 替换 instructor 对象为 ID 列表
+  firstname:firstname,
+  lastname:lastname,
+  phonenumber:phonenumber,
+  email:email,
+  state:state,
+  city:city,
+  wageHour:wageHour,
+  salaryInfo:salaryInfo,
+  finance:finance,
+  fobKey:fobkey,
+  deposit:deposit,
+  rentManikinNumbers:rentManikinNumbers,
+  totalClassTimes:totalClassTimes,
+  rentStatus:rentStatus,
+};
+
     axiosInstance.put('/instructor', currentInstructor, {
       headers: {
         'Content-Type': 'application/json'
@@ -170,11 +230,14 @@ const InstructorMain = () => {
   };
   //添加新的instructor
   const handleInsert = () => {
-    axiosInstance.post('/instructor', currentInstructor, {
-      headers: {
-        'Content-Type': 'application/json'
+    const authHeader = 'Bearer ' + token;
+    axiosInstance.post('/instructor', currentInstructor,  // 当前的 instructor 数据放在请求体中
+      {
+        headers: {
+          'Authorization': authHeader  // 传递 Bearer token
+        }
       }
-    })
+   )
       .then(response => {
         setOpen(false);
         handleSearch();
@@ -212,7 +275,7 @@ const InstructorMain = () => {
  //翻页
   const handlePageChange = (event, value) => {
     setCurrentPage(value);
-    handleSearch();
+    //handleSearch();
   };
 
   //导出文件
@@ -268,7 +331,8 @@ const handleUpload=()=>{
     <SidebarLayout>
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         <InstructorSearchForm
-
+          city={city}
+          setCity={setCity}
           state={state}
           setState={setState}
           email={email}
@@ -288,7 +352,7 @@ const handleUpload=()=>{
           venueId={venueId}
           setVenueId={setVenueId}
         />
-        <InstructorTable currentItems={instructors} handleClickOpen={handleClickOpen} />
+        <InstructorTable currentItems={instructors} handleClickOpen={handleClickOpen} userRole={userRole} />
         <InstructorPagination totalPages={totalPages} currentPage={currentPage} handlePageChange={handlePageChange} />
         <Button variant="contained" color="primary" onClick={handleAdd} sx={{ mt: 2 }}>
           Add Instructor
@@ -303,6 +367,7 @@ const handleUpload=()=>{
         handleSave={handleSave}
         handleInsert={handleInsert}
         handleDelete={handleDelete}
+        userRole={userRole}
       />
     </SidebarLayout>
   );

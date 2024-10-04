@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, FormControl, InputLabel, Select, MenuItem, Button,TextField } from '@mui/material';
 
-const VenueSearchForm = ({ venueId, state, icpisManager, setVenueId, setState, setInstructor, handleSearch, handleReset, handleExport,handleUpload, handleFileChange,selectedFile,setIcpisManager}) => (
+const VenueSearchForm = ({ venueId, state, icpisManager, setVenueId, setState, setInstructor, handleSearch, handleReset, handleExport,handleUpload, handleFileChange,selectedFile,setIcpisManager,userRole,city,setCity}) => (
   <Box display="flex" alignItems="center" mb={3}>
     {/* <FormControl variant="outlined" sx={{ minWidth: 200, mr: 2 }}>
       <InputLabel>Time Zone</InputLabel>
@@ -42,7 +42,14 @@ const VenueSearchForm = ({ venueId, state, icpisManager, setVenueId, setState, s
           <MenuItem value="Virginia">VA</MenuItem>
       </Select>
     </FormControl>
-    <FormControl variant="outlined" sx={{ minWidth: 200, mr: 2 }}>
+    <TextField
+        variant="outlined"
+        label="City"
+        value={city}
+        onChange={(e) => setCity(e.target.value)}
+        sx={{ minWidth: 50, mr: 2 }}
+      />
+    {userRole === 'ROLE_ICPIE' && (<FormControl variant="outlined" sx={{ minWidth: 200, mr: 2 }}>
       <InputLabel>ICPISManager</InputLabel>
       <Select
         value={icpisManager}
@@ -56,7 +63,7 @@ const VenueSearchForm = ({ venueId, state, icpisManager, setVenueId, setState, s
         <MenuItem value="Kenny">Kenny</MenuItem>
         <MenuItem value="Daniel">Daniel</MenuItem>
       </Select>
-    </FormControl>
+    </FormControl>)}
     <TextField
         variant="outlined"
         label="venueId"
@@ -79,7 +86,7 @@ const VenueSearchForm = ({ venueId, state, icpisManager, setVenueId, setState, s
       style={{ display: 'none' }}
       id="upload-file"
     />
-    <label htmlFor="upload-file">
+    {/* <label htmlFor="upload-file">
       <Button variant="outlined" component="span" sx={{ mr: 2 }}>
         Upload
       </Button>
@@ -87,7 +94,7 @@ const VenueSearchForm = ({ venueId, state, icpisManager, setVenueId, setState, s
 
     <Button variant="outlined" onClick={handleExport}>
       Export
-    </Button>
+    </Button> */}
   </Box>
 );
 

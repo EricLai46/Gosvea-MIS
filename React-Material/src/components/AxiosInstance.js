@@ -13,7 +13,7 @@ axiosInstance.interceptors.request.use(
     const token = localStorage.getItem('token');
     if (token) {
       // 在请求头中添加令牌
-      config.headers['Authorization'] = token;
+      config.headers['Authorization'] = `Bearer ${token}`;
       //console.log("nihao"+token);
     }
     return config;

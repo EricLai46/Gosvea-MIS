@@ -1,12 +1,15 @@
 package org.gosvea.controller;
 
 
+import org.springframework.security.core.Authentication;
 import org.gosvea.pojo.*;
 import org.gosvea.service.CourseService;
 import org.gosvea.service.InstructorService;
 import org.gosvea.service.VenueService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.PrintWriter;
@@ -16,7 +19,7 @@ import java.time.LocalTime;
 import java.util.*;
 
 @RestController
-@RequestMapping("/course")
+@RequestMapping("/api/icpie/course")
 @CrossOrigin(origins =  {"http://54.175.129.180:80", "http://allcprmanage.com"}, allowedHeaders = "*")
 //@CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
 public class CourseController {
@@ -30,6 +33,7 @@ public class CourseController {
     @Autowired
     private InstructorService instructorService;
 //获取课程广告表
+   // @PreAuthorize("hasRole('ICPIE')")
     @GetMapping
     public Result<PageResponse<CourseSchedule>> getCourseSchedule(
             Integer pageNum,
@@ -47,6 +51,11 @@ public class CourseController {
     {
         try {
            // Map<Integer,String> warnings=checkVenueInstructorInformation();
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+            // 打印用户信息，确保认证信息正确设置
+            System.out.println("Authenticated user: " + authentication.getName());
+            System.out.println("Authorities: " + authentication.getAuthorities());
             boolean activeStatus = (isActive != null) ? isActive : false;
             return  Result.success(courseService.getCourseSchedule(pageNum,pageSize,icpisManager,venueId,date,startTime,endTime,isActive,isProcessed,fromDate,toDate));
         } catch (Exception e) {

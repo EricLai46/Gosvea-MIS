@@ -14,7 +14,7 @@ const ADCalendarMain=()=>{
     const[Courses,setCourses]=useState([]);
     const[venues,setVenues]=useState([]);
     useEffect(() => {
-        axiosInstance.get('/course/coursevenueIdaddress')
+        axiosInstance.get('/api/icpie/course/coursevenueIdaddress')
           .then(response => {
             if (response.data) {
                 
@@ -43,7 +43,7 @@ const ADCalendarMain=()=>{
           return; // 终止搜索，直到选择了场地
         }
       
-        axiosInstance.get('/course/coursecalendar', { params: { venueId: currentvenue.id } })
+        axiosInstance.get('/api/icpie/course/coursecalendar', { params: { venueId: currentvenue.id } })
         .then(response => {
           if (response.data) {
             console.log(response.data);

@@ -21,7 +21,7 @@ public interface VenueMapper {
             "values(#{id},#{state}, #{city}, #{address}, #{timeZone}, #{cancellationPolicy}, #{paymentMode}, #{nonrefundableFee}, #{fobKey}, #{deposit}, #{membershipFee}, #{usageFee}, #{refundableStatus}, #{bookMethod}, #{registrationLink},#{venueStatus})")
     void add(Venue venue);
 
-    List<Venue> list(String state, String city, String icpisManager, String paymentMethod, String timeZone,String venueId);
+    List<Venue> list(String state, String city, String icpisManager, String timeZone,String venueId);
     //@Update("update venue set state=#{state},city=#{city},instructor=#{instructor},address=#{address},time_zone=#{timeZone},cancellation_policy=#{cancellationPolicy},payment_mode=#{paymentMode},nonrefundable_fee=#{nonrefundableFee},fob_key=#{fobKey},deposit=#{deposit},membership_fee=#{membershipFee},usage_fee=#{usageFee},refundable_status=#{refundableStatus},book_method=#{bookMethod},registration_link=#{registrationLink} where id=#{id}")
     void updateVenue(Venue venue);
     @Delete("delete from venue where id=#{venueId}")
@@ -79,7 +79,7 @@ public interface VenueMapper {
 
     @Insert({
             "<script>",
-            "insert into instructor_venue (instructor_id, venue_id) values ",
+            "INSERT INTO instructor_venue (instructor_id, venue_id) VALUES ",
             "<foreach collection='instructorId' item='id' separator=','>",
             "(#{id}, #{venueId})",
             "</foreach>",
@@ -92,4 +92,6 @@ public interface VenueMapper {
     void deleteInstructorVenueRealtionsByInstructorId(@Param("instructorId") String instructorId);
     @Select("select id from venue where id=#{id}")
     String verifyVenueId(String id);
+
+    List<Venue> icpislist(String state, String city, String icpisname, String timeZone, String venueId);
 }
