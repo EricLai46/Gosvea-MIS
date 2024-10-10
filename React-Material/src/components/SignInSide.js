@@ -36,6 +36,15 @@ const defaultTheme = createTheme();
 
 export default function SignInSide() {
   const navigate=useNavigate();
+  const [userRole,setUserRole]=React.useState('');
+
+  React.useEffect(() => {
+  const role = localStorage.getItem('role');
+  if (role) {
+    // 更新页面或组件的显示内容，基于角色
+    setUserRole(role);
+  }
+}, []);
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -43,6 +52,11 @@ export default function SignInSide() {
     const password = data.get('password');
     console.log("Login details:",icpiename,password)
     try {
+
+            // 清理旧的 token 和角色
+            localStorage.removeItem("token");
+            localStorage.removeItem("role");
+
       const response = await axiosInstance.post('/icpie/login', new URLSearchParams({
         icpiename: icpiename,
         password: password
@@ -63,11 +77,12 @@ export default function SignInSide() {
         const decoded = jwtDecode(result.data); // 解析 JWT
         console.log("Decoded token:", decoded);
         const role = decoded.claims.role; // 获取角色信息
-   
+        setUserRole(role);
            // 将角色存储在 localStorage 中
         localStorage.setItem("role", role);
         console.log("Role from token:", role); // 打印角色信息
         //alert("Login successfully");
+        
         navigate('/dashboard');
       } else {
         alert("Login failed " + result.message);

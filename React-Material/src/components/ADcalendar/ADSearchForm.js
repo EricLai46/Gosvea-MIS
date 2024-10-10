@@ -26,9 +26,10 @@ const ADSearchForm=({handleReset,handleSearch,venues,setCurrentvenue})=>{
             label="Select Venue"
             onChange={handleVenueChange}
           >
-            {venues.map((venue) => (
+            {venues.sort((a, b) => (a.city > b.city ? 1 : -1))
+            .map((venue) => (
               <MenuItem key={venue.id} value={venue.id}>
-                {venue.name || `${venue.address}`}
+                {venue.city || `${venue.address}`}
               </MenuItem>
             ))}
           </Select>

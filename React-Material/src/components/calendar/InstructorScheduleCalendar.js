@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button, Checkbox, FormControlLabel } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button, Checkbox, FormControlLabel,FormControl,InputLabel,Select,MenuItem } from '@mui/material';
 import axiosInstance from '../AxiosInstance';
 import { addWeeks } from 'date-fns';
 
@@ -113,16 +113,23 @@ const InstructorScheduleCalendar = ({ instructorId }) => {
             <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
                 <DialogTitle>Add New Event</DialogTitle>
                 <DialogContent>
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        name="title"
-                        label="Event Title"
-                        type="text"
-                        fullWidth
-                        value={newEvent.title}
-                        onChange={handleInputChange}
-                    />
+                <FormControl fullWidth margin="dense">
+                    <InputLabel id="course-title-label">Course Title</InputLabel>
+                    <Select
+                    labelId="course-title-label"
+                    name="courseTitle"
+                    label="Course Title"
+                    value={newEvent.courseTitle}
+                    onChange={handleInputChange}
+                    autoFocus
+                    >
+                    <MenuItem value="CPR">CPR</MenuItem>
+                    <MenuItem value="BLS">BLS</MenuItem>
+                    <MenuItem value="Skill">Skill</MenuItem>
+                    <MenuItem value="InstructorCourse">Instructor Course</MenuItem>
+                     <MenuItem value="CPR Adult">CPR Adult</MenuItem>
+                     </Select>
+                    </FormControl>
                     <TextField
                         margin="dense"
                         name="start"

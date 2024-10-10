@@ -9,6 +9,7 @@ import InstructorMain from './components/instructor/InstructorMain.js';
 import CourseMain from './components/course/CourseMain.js'
 import AdvertisementMain from './components/Advertisement/AdvertisementMain.js'
 import ADCalendarMain from'./components/ADcalendar/ADCalendarMain.js'
+import  ReportMain  from './components/reports/ReportMain.js';
 function App() {
   return (
     <Router>
@@ -22,6 +23,7 @@ function App() {
         <Route path="/coursemain" element={<CourseMain />} />
         <Route path="/advertisementmain" element={<AdvertisementMain/>}/>
         <Route path="/ADCalendarMain" element={<ADCalendarMain/>}/>
+        <Route path='/ReportMain' element={<ReportMain/>}/>
       </Routes>
     </Router>
   );

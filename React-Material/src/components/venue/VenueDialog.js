@@ -98,7 +98,11 @@ const VenueDialog = ({ open, handleClose, isEditMode, currentVenue, handleChange
         return instructor ? instructor.fullname : '';  // 如果找到对应的instructor，显示其fullname
       }).join(', ')}  // 使用逗号分隔多个instructor的fullname
     >
-      {instructors.map(instructor => (
+       {/* 对 instructors 按 fullname 从A到Z排序 */}
+    {instructors
+      .slice() // 复制数组，避免修改原始数据
+      .sort((a, b) => a.fullname.localeCompare(b.fullname)) // 按 fullname 排序
+      .map(instructor => (
         <MenuItem key={instructor.id} value={instructor.id}>
           {instructor.fullname}  
         </MenuItem>
@@ -122,19 +126,20 @@ const VenueDialog = ({ open, handleClose, isEditMode, currentVenue, handleChange
       <InputLabel>ICPIS Manager</InputLabel>
       <Select
         name="icpisManager"
-        value={currentVenue.icpisManager}
+        value={currentVenue.icpisManager||"Jurin"}
         onChange={handleChange}
         disabled={userRole !== 'ROLE_ICPIE'}  // 如果不是 ROLE_ICPIE 则禁用 Select
       >
         {userRole === 'ROLE_ICPIE' ? (
           // ROLE_ICPIE 用户的完整选项
-          <>
-            <MenuItem value="Fisher">Fisher</MenuItem>
-            <MenuItem value="Jurin">Jurin</MenuItem>
-            <MenuItem value="Andy">Andy</MenuItem>
-            <MenuItem value="Kenny">Kenny</MenuItem>
-            <MenuItem value="Daniel">Daniel</MenuItem>
-          </>
+          [
+            <MenuItem value="Fisher">Fisher</MenuItem>,
+            <MenuItem value="Jurin">Jurin</MenuItem>,
+            <MenuItem value="Andy">Andy</MenuItem>,
+            <MenuItem value="Kenny">Kenny</MenuItem>,
+            <MenuItem value="Daniel">Daniel</MenuItem>,
+            <MenuItem value="Mia">Mia</MenuItem>,
+          ]
         ) : (
           // 非 ROLE_ICPIE 用户，只能选择 icpisname
           <MenuItem value={icpisname}>{icpisname}</MenuItem>

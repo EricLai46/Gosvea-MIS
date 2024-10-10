@@ -17,7 +17,7 @@ const ADCalendarMain=()=>{
         axiosInstance.get('/api/icpie/course/coursevenueIdaddress')
           .then(response => {
             if (response.data) {
-                
+              console.log(response.data);
               setVenues(response.data); // 将返回的数据存储到 venues 状态中
             } else {
               showNotification('Failed to load venues!', 'error');

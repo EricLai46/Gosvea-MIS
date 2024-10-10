@@ -37,4 +37,6 @@ public interface CourseService {
     List<CourseSchedule> getCourseCalendar(String venueId);
 
     List<Venue> getAllVenueIdAndAddress();
+
+    List<CourseSchedule> getCourseScheduleSummary(LocalDate date);
 }

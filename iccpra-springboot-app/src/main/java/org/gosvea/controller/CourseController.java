@@ -1,6 +1,10 @@
 package org.gosvea.controller;
 
 
+import org.gosvea.utils.ExcelExporter;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.gosvea.pojo.*;
 import org.gosvea.service.CourseService;
@@ -12,15 +16,18 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @RestController
 @RequestMapping("/api/icpie/course")
-@CrossOrigin(origins =  {"http://54.175.129.180:80", "http://allcprmanage.com"}, allowedHeaders = "*")
+@CrossOrigin(origins =  {"http://54.175.129.180:80", "http://allcprmanage.com","http://localhost:3000"}, allowedHeaders = "*")
 //@CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
 public class CourseController {
 
@@ -32,6 +39,7 @@ public class CourseController {
 
     @Autowired
     private InstructorService instructorService;
+
 //获取课程广告表
    // @PreAuthorize("hasRole('ICPIE')")
     @GetMapping
@@ -214,6 +222,33 @@ public class CourseController {
     public List<Venue> getAllVenueIdAndAddress()
     {
         return courseService.getAllVenueIdAndAddress();
+    }
+    //导出广告Summary
+    @GetMapping("/coursesummary")
+    public ResponseEntity<byte[]> getCoursesSummary(LocalDate date)
+    {
+        //通过日期获取24天后的两个礼拜的课程
+       List<CourseSchedule> courseScheduleList=courseService.getCourseScheduleSummary(date);
+       //导出excel表格
+       ExcelExporter.exportCoursesToExcel(date,courseScheduleList);
+        // 导出excel表格
+        ByteArrayInputStream excelStream = ExcelExporter.exportCoursesToExcel(date, courseScheduleList);
+
+
+
+        // 设置响应头，文件名可以根据需要动态生成
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=AD_Summary.xlsx");
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+
+
+            // 将Excel文件流返回给客户端
+            byte[] excelBytes = excelStream.readAllBytes();
+            return ResponseEntity
+                    .ok()
+                    .headers(headers)
+                    .body(excelBytes);
+
     }
 
 

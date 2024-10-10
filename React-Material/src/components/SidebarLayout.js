@@ -15,7 +15,7 @@ import { ThemeProvider, createTheme, styled } from '@mui/material/styles';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import { mainListItems } from './listItems'; // 导入列表项
+import  ListItems  from './ListItems'; // 导入列表项
 import { useNotification } from './NotificationContext';
 
 const defaultTheme = createTheme();
@@ -108,7 +108,7 @@ const SidebarLayout = ({ children }) => {
           </Toolbar>
           <Divider />
           <List component="nav">
-            {mainListItems}
+            <ListItems/>
             <Divider sx={{ my: 1 }} />
             {/* {secondaryListItems} */}
           </List>

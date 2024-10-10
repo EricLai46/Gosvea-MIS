@@ -6,6 +6,7 @@ const VenueTable = ({ currentItems, handleClickOpen }) => (
     <Table sx={{ minWidth: 650 }}>
       <TableHead>
         <TableRow>
+          <TableCell>Actions</TableCell>
           <TableCell>Id</TableCell>
           <TableCell>ICPISManager</TableCell>
           <TableCell>Address</TableCell>
@@ -23,13 +24,16 @@ const VenueTable = ({ currentItems, handleClickOpen }) => (
           <TableCell>RefundableStatus</TableCell>
           <TableCell>BookMethod</TableCell>
           <TableCell>RegistrationLink</TableCell>
-          <TableCell>Actions</TableCell>
+          
         </TableRow>
       </TableHead>
       <TableBody>
       {Array.isArray(currentItems) && currentItems.length > 0 ? (
             currentItems.map((venue) => (
               <TableRow key={venue.id}>
+                <TableCell>
+                  <Button variant="outlined" onClick={() => handleClickOpen(venue)}>Edit</Button>
+                </TableCell>
                 <TableCell>{venue.id}</TableCell>
                 <TableCell>{venue.icpisManager}</TableCell>
                 <TableCell>{venue.address}</TableCell>
@@ -54,9 +58,7 @@ const VenueTable = ({ currentItems, handleClickOpen }) => (
                 <TableCell>{venue.refundableStatus}</TableCell>
                 <TableCell>{venue.bookMethod}</TableCell>
                 <TableCell>{venue.registrationLink}</TableCell>
-                <TableCell>
-                  <Button variant="outlined" onClick={() => handleClickOpen(venue)}>Edit</Button>
-                </TableCell>
+
               </TableRow>
             ))
           ) : (

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button, Checkbox, FormControlLabel } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button, Checkbox, FormControlLabel,FormControl,Select,MenuItem,InputLabel } from '@mui/material';
 import axiosInstance from '../AxiosInstance';
 import { addWeeks } from 'date-fns';
 
@@ -66,7 +66,7 @@ const VenueScheduleCalendar = ({ venueId }) => {
         const eventsToSave = [];
         let currentDate = new Date(selectedDate);
 
-        for (let i = 0; i < (newEvent.isWeekly ? 5 : 1); i++) {
+        for (let i = 0; i < (newEvent.isWeekly ? 4 : 1); i++) {
             eventsToSave.push({
                 courseTitle: newEvent.courseTitle,
                 date: currentDate.toISOString().split('T')[0],
@@ -122,16 +122,24 @@ const VenueScheduleCalendar = ({ venueId }) => {
             <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
                 <DialogTitle>Add New Event</DialogTitle>
                 <DialogContent>
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        name="courseTitle"
-                        label="Course Title"
-                        type="text"
-                        fullWidth
-                        value={newEvent.courseTitle}
-                        onChange={handleInputChange}
-                    />
+
+                <FormControl fullWidth margin="dense">
+                    <InputLabel id="course-title-label">Course Title</InputLabel>
+                    <Select
+                    labelId="course-title-label"
+                    name="courseTitle"
+                    label="Course Title"
+                    value={newEvent.courseTitle}
+                    onChange={handleInputChange}
+                    autoFocus
+                    >
+                    <MenuItem value="CPR">CPR</MenuItem>
+                    <MenuItem value="BLS">BLS</MenuItem>
+                    <MenuItem value="Skill">Skill</MenuItem>
+                    <MenuItem value="InstructorCourse">Instructor Course</MenuItem>
+                     <MenuItem value="CPR Adult">CPR Adult</MenuItem>
+                     </Select>
+                    </FormControl>
                     <TextField
                         margin="dense"
                         name="start"

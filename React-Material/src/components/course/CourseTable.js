@@ -6,6 +6,7 @@ const CourseTable = ({ currentItems, handleClickOpen }) => (
     <Table sx={{ minWidth: 650 }}>
       <TableHead>
         <TableRow>
+        <TableCell>Actions</TableCell>
           <TableCell>AD ID</TableCell>
           <TableCell>ICPIS Manager</TableCell>
           <TableCell>AD Address</TableCell>
@@ -20,13 +21,16 @@ const CourseTable = ({ currentItems, handleClickOpen }) => (
           <TableCell>AD Published</TableCell>
           <TableCell>Course Processed</TableCell>
           <TableCell>Added on Enrollware</TableCell>
-          <TableCell>Actions</TableCell>
+         
         </TableRow>
       </TableHead>
       <TableBody>
         {Array.isArray(currentItems) && currentItems.length > 0 ? (
           currentItems.map((course) => (
             <TableRow key={course.id}>
+                <TableCell>
+                <Button variant="outlined" onClick={() => handleClickOpen(course)}>Edit</Button>
+              </TableCell>
               <TableCell>{course.id}</TableCell>
               <TableCell>{course.icpisManager}</TableCell>
               <TableCell>{course.address}</TableCell>
@@ -41,9 +45,7 @@ const CourseTable = ({ currentItems, handleClickOpen }) => (
               <TableCell>{String(course.active)}</TableCell>
               <TableCell>{String(course.processed)}</TableCell>
               <TableCell>{String(course.enrollwareAdded)}</TableCell>
-              <TableCell>
-                <Button variant="outlined" onClick={() => handleClickOpen(course)}>Edit</Button>
-              </TableCell>
+            
             </TableRow>
           ))
         ) : (

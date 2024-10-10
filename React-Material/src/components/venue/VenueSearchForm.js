@@ -62,6 +62,7 @@ const VenueSearchForm = ({ venueId, state, icpisManager, setVenueId, setState, s
         <MenuItem value="Jurin">Jurin</MenuItem>
         <MenuItem value="Kenny">Kenny</MenuItem>
         <MenuItem value="Daniel">Daniel</MenuItem>
+        <MenuItem value="Mia">Mia</MenuItem>
       </Select>
     </FormControl>)}
     <TextField

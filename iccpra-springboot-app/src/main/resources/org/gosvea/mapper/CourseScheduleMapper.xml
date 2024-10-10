@@ -134,4 +134,9 @@
         </if>
 
     </select>
+
+    <select id="getCourseScheduleSummary" resultType="org.gosvea.pojo.CourseSchedule">
+    SELECT * FROM coursesschedule
+    WHERE date BETWEEN #{fromDate} AND #{toDate}
+    </select>
 </mapper>

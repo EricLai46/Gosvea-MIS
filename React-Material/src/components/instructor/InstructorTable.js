@@ -7,6 +7,7 @@ const InstructorTable = ({ currentItems, handleClickOpen,userRole }) => {
       <Table sx={{ minWidth: 650 }}>
         <TableHead>
           <TableRow>
+          <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>Action</TableCell>
             <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>Id</TableCell>
             <TableCell sx={{ fontSize: '0.75rem', padding: '25px', whiteSpace: 'nowrap' }}>VenueId</TableCell>
             <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>FirstName</TableCell>
@@ -27,13 +28,16 @@ const InstructorTable = ({ currentItems, handleClickOpen,userRole }) => {
   </>
 )}
             <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>Fob Key</TableCell>
-            <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}></TableCell>
+            
           </TableRow>
         </TableHead>
         <TableBody>
         {Array.isArray(currentItems) && currentItems.length > 0 ? (
             currentItems.map((instructor) => (
               <TableRow key={instructor.id}>
+                 <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>
+                  <Button variant="outlined" onClick={() => handleClickOpen(instructor)}>Edit</Button>
+                </TableCell>
                 <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>{instructor.id}</TableCell>
                 <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>{instructor.venueId}</TableCell>
                 <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>{instructor.firstname}</TableCell>
@@ -55,9 +59,7 @@ const InstructorTable = ({ currentItems, handleClickOpen,userRole }) => {
         )}
 
                 <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>{instructor.fobKey}</TableCell>
-                <TableCell sx={{ fontSize: '0.75rem', padding: '4px', whiteSpace: 'nowrap' }}>
-                  <Button variant="outlined" onClick={() => handleClickOpen(instructor)}>Edit</Button>
-                </TableCell>
+               
               </TableRow>
             ))
           ) : (

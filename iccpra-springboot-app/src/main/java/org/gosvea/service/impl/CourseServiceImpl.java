@@ -308,6 +308,13 @@ public Map<String, String> generateOrUpdateCourseSchedules(String venueId, Strin
         return courseScheduleMapper.getAllVenueIdAndAddress();
     }
 
+    @Override
+    public List<CourseSchedule> getCourseScheduleSummary(LocalDate date) {
+        LocalDate fromDate=date.plusDays(24);
+        LocalDate toDate=fromDate.plusDays(13);
+        return courseScheduleMapper.getCourseScheduleSummary(fromDate,toDate);
+    }
+
     public void deleteCourseSchedules(List<CourseSchedule> schedulesToDelete) {
         courseScheduleMapper.deleteCourseSchedules(schedulesToDelete);
     }

@@ -50,6 +50,8 @@ public interface CourseScheduleMapper {
     void updateCourseScheduleProcessed(CourseSchedule courseSchedule, Boolean isProcessed);
     @Select("select date,start_time,end_time,course_title,price,is_active from coursesschedule where venue_id=#{venueId}")
     List<CourseSchedule> getCourseCalendar(String venueId);
-    @Select("select id,address from venue")
+    @Select("select id,address,city from venue")
     List<Venue> getAllVenueIdAndAddress();
+
+    List<CourseSchedule> getCourseScheduleSummary(LocalDate fromDate, LocalDate toDate);
 }
