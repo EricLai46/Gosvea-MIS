@@ -21,6 +21,9 @@ const InstructorDialog = ({ open, handleClose, isEditMode, currentInstructor, ha
           name="id"
           value={currentInstructor.id}
           onChange={handleChange}
+          InputProps={{
+            readOnly: isEditMode, 
+          }}
         />
         <TextField
           margin="dense"

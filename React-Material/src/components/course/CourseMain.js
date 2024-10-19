@@ -20,9 +20,9 @@ const CourseMain = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [open, setOpen] = useState(false);
-  const [isProcessed,setIsProcessed]=useState();
+  const [processed,setProcessed]=useState(false);
   const [isPublished,setIsPublished]=useState();
-  const [isActive,setIsActive]=useState();
+  const [active,setActive]=useState(false);
   const timeZones = ['PST', 'EST', 'CST', 'MST', 'GMT', 'UTC', 'BST', 'CEST'];
   const { showNotification } = useNotification();
   const [icpisManager,setIcpisManager]=useState('');
@@ -31,6 +31,8 @@ const CourseMain = () => {
   const [toDate, setToDate] = useState(null);
   const [totalPages, setTotalPages] = useState(1); // 添加 totalPages 状态
   const [totalCourses,setTotalCourses]=useState(0);
+  const [isChecked, setIsChecked] = useState(false);
+  const [isEnrollwareChecked, setIsEnrollwareChecked] = useState(false);
   const token = localStorage.getItem("token"); 
   useEffect(() => {
     //fetchVenues();
@@ -79,8 +81,8 @@ const CourseMain = () => {
       pageSize: itemsPerPage,
       icpisManager: icpisManager,
       date: '',
-      isActive: isActive,
-      isProcessed: isProcessed,
+      isActive: active,
+      isProcessed: processed,
       fromDate:fromDate,
       toDate:toDate,
       venueId:venueId,
@@ -93,10 +95,10 @@ const CourseMain = () => {
       }
     });
     const token = localStorage.getItem('token');
-    console.log("Stored JWT in localStorage:", token);
+    //("Stored JWT in localStorage:", token);
     
     const authHeader = 'Bearer ' + token;
-    console.log("Authorization header to be sent:", authHeader); 
+    //console.log("Authorization header to be sent:", authHeader); 
 
     axiosInstance.get('/api/icpie/course',  {
       params: params,  // 将 params 正确放入第二个参数中的 params 字段
@@ -105,14 +107,14 @@ const CourseMain = () => {
       }
     })
     .then(response => {
-      console.log("Full response:", response.data); 
+      //console.log("Full response:", response.data); 
       if (response.data.message === "success") {
         
         
         setCourses(response.data.data ? response.data.data.items : []);
         setTotalPages(Math.ceil(response.data.data.totalElement / itemsPerPage));
         setTotalCourses(response.data.data.totalElement);
-        console.log(totalCourses);
+        //console.log(totalCourses);
         if (response.data.warnings && Object.keys(response.data.warnings).length > 0) {
           Object.entries(response.data.warnings).forEach(([key, value]) => {
             showNotification(value, 'warning');
@@ -124,7 +126,7 @@ const CourseMain = () => {
         showNotification('Course search failed!', 'error');
   
         if (response.data.warnings && Object.keys(response.data.warnings).length > 0) {
-          console.log("Warnings (error):", response.data.warnings); // 打印 warnings
+          //console.log("Warnings (error):", response.data.warnings); // 打印 warnings
           Object.entries(response.data.warnings).forEach(([key, value]) => {
             showNotification(value, 'warning');
           });
@@ -166,7 +168,7 @@ const CourseMain = () => {
   };
 
   const handleSave = () => {
-    axiosInstance.put('/course', currentCourse, {
+    axiosInstance.put('/api/icpie/course', currentCourse, {
       headers: {
         'Content-Type': 'application/json'
       }
@@ -175,7 +177,7 @@ const CourseMain = () => {
         setCourses(prev => {
           const updatedCourses = prev.map(c => {
             if (c.id === currentCourse.id) {
-              console.log(`Updating course with id: ${currentCourse.id}`);
+              //console.log(`Updating course with id: ${currentCourse.id}`);
               return currentCourse;
             }
             return c;
@@ -282,10 +284,10 @@ const handleClose = () => {
           setInstructor={setInstructor}
           handleSearch={handleSearch}
           handleReset={handleReset}
-          isActive={isActive}
-          isProcessed={isProcessed}
-          setIsActive={setIsActive}
-          setIsProcessed={setIsProcessed}
+          active={active}
+          processed={processed}
+          setActive={setActive}
+          setProcessed={setProcessed}
           setIcpisManager={setIcpisManager}
           icpisManager={icpisManager}
           venueId={venueId}
@@ -319,7 +321,10 @@ const handleClose = () => {
         handleInsert={handleInsert}
         handleDelete={handleDelete}
         timeZones={timeZones}
-        
+        isChecked={isChecked}
+        setIsChecked={setIsChecked}
+        isEnrollwareChecked={isEnrollwareChecked}
+        setIsEnrollwareChecked={setIsEnrollwareChecked}
       />
     </SidebarLayout>
   );

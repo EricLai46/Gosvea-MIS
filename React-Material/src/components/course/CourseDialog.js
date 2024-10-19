@@ -2,17 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Grid, Checkbox, FormControlLabel, Button } from '@mui/material';
 import axiosInstance from '../AxiosInstance';
 
-const CourseDialog = ({ open, handleClose, isEditMode, currentCourse, handleChange, handleSave, handleInsert, handleDelete }) => {
+const CourseDialog = ({ open, handleClose, isEditMode, currentCourse, handleChange, handleSave, handleInsert, handleDelete,isChecked,setIsChecked,isEnrollwareChecked,setIsEnrollwareChecked }) => {
 
   const [instructors, setInstructors] = useState([]);
-  const [isChecked, setIsChecked] = useState(currentCourse.active);
-  const [isEnrollwareChecked, setIsEnrollwareChecked] = useState(currentCourse.isEnrollwareAdded);
+  // const [isChecked, setIsChecked] = useState(currentCourse?.active || false);
+  // const [isEnrollwareChecked, setIsEnrollwareChecked] = useState(!!currentCourse.isEnrollwareAdded);
   const [comments, setComments] = useState(currentCourse.comments || ''); 
   useEffect(() => {
     // 当 open 或 currentCourse 发生变化时更新 isChecked
     if (open && currentCourse) {
       setIsChecked(currentCourse.active ); 
-      setIsEnrollwareChecked(currentCourse.isEnrollwareAdded); 
+      setIsEnrollwareChecked(currentCourse.enrollwareAdded); 
       setComments(currentCourse.comments || ''); // 1 表示 true
     }
     
@@ -51,17 +51,26 @@ const CourseDialog = ({ open, handleClose, isEditMode, currentCourse, handleChan
   };
   useEffect(() => {
     if (open && currentCourse) {
-      axiosInstance.get('/instructor/instructorid', {
-        params: { instructor: currentCourse.instructorId }
-      })
-      .then(response => {
-        setInstructors(response.data);
-      })
-      .catch(error => {
-        console.error('Error fetching instructors:', error);
-      });
+      // 将 currentCourse 中的 0 和 1 转换为布尔值
+      const processedCourse = {
+        ...currentCourse,
+        active: currentCourse.active === 1, // 1 转换为 true，0 转换为 false
+        enrollwareAdded: currentCourse.enrollwareAdded === 1, // 同理
+      };
+  
+      // 请求 instructor 数据
+      axiosInstance
+        .get('/instructor/instructorid', {
+          params: { instructor: processedCourse.instructorId },
+        })
+        .then((response) => {
+          setInstructors(response.data);
+        })
+        .catch((error) => {
+          console.error('Error fetching instructors:', error);
+        });
     }
-  }, [open, currentCourse.instructorId]);
+  }, [open, currentCourse]);
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
@@ -174,7 +183,7 @@ const CourseDialog = ({ open, handleClose, isEditMode, currentCourse, handleChan
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={isChecked}
+                  checked={currentCourse?.active??false}
                   onChange={handleCheckboxChange}
                   name="active"
                   color="primary"
@@ -187,7 +196,7 @@ const CourseDialog = ({ open, handleClose, isEditMode, currentCourse, handleChan
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={isEnrollwareChecked} 
+                  checked={currentCourse?.enrollwareAdded??false} 
                   onChange={handleCheckboxChange}
                   name="enrollwareAdded" 
                   color="primary"

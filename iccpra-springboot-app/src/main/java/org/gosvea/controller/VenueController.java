@@ -40,7 +40,7 @@ import java.io.ByteArrayOutputStream;
 
 @RestController
 @RequestMapping("/venue")
-@CrossOrigin(origins =  {"http://54.175.129.180:80", "http://allcprmanage.com","http://localhost:3000"}, allowedHeaders = "*")
+@CrossOrigin(origins =  {"http://54.175.129.180:80", "http://allcprmanage.com"}, allowedHeaders = "*")
 //@CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
 public class VenueController {
 
@@ -90,9 +90,28 @@ public class VenueController {
 
     //添加新场地
     @PostMapping
-    public Result add(@RequestBody Venue venue) {
+    public Result add(@RequestBody VenueDTO venueDTO) {
         try {
             // 生成新场地
+            Venue venue=new Venue();
+
+            venue.setId(venueDTO.getId());
+            venue.setVenueStatus(venueDTO.getVenueStatus());
+            venue.setIcpisManager(venueDTO.getIcpisManager());
+            venue.setAddress(venueDTO.getAddress());
+            venue.setCancellationPolicy(venueDTO.getCancellationPolicy());
+            venue.setPaymentMode(venueDTO.getPaymentMode());
+            venue.setNonrefundableFee(venueDTO.getNonrefundableFee());
+            venue.setFobKey(venueDTO.getFobKey());
+            venue.setDeposit(venueDTO.getDeposit());
+            venue.setMembershipFee(venueDTO.getMembershipFee());
+            venue.setUsageFee(venueDTO.getUsageFee());
+            venue.setRefundableStatus(venueDTO.getRefundableStatus());
+            venue.setBookMethod(venueDTO.getBookMethod());
+            venue.setRegistrationLink(venueDTO.getRegistrationLink());
+            venue.setCity(venueDTO.getCity());
+            venue.setTimeZone(venueDTO.getTimeZone());
+            venue.setState(venueDTO.getState());
             venueService.add(venue);
             System.out.println("venue"+venue.getInstructors());
             // 获取关联的讲师列表
@@ -110,24 +129,28 @@ public class VenueController {
 //                    venueService.addInstructorVenueRelation(venue.getId(), instructor.getId());
 //                }
 //            }
-            List<String> instructorIds=new ArrayList<>();
-            List<Instructor> instructorList=venue.getInstructors();
 
-            if(instructorList!=null)
-            {
-                for(Instructor instructor:instructorList)
-                {
-                    String instructorid=instructorService.getInstructorIdByInstructorName(instructor.getFirstname(),instructor.getLastname());
-                    if(instructorid!=null)
-                    {
-                        instructorIds.add(instructorid);
-                    }
-                }
-            }
+//            List<Instructor> instructorList=venue.getInstructors();
+//
+//            if(instructorList!=null)
+//            {
+//                for(Instructor instructor:instructorList)
+//                {
+//                    String instructorid=instructorService.getInstructorIdByInstructorName(instructor.getFirstname(),instructor.getLastname());
+//                    if(instructorid!=null)
+//                    {
+//                        instructorIds.add(instructorid);
+//                    }
+//                }
+//                venueService.addInstructorVenueRelation(instructorIds, venue.getId());
+//            }
+
+        if(venueDTO.getInstructorIds()!=null)
+        {
+            venueService.addInstructorVenueRelation(venueDTO.getInstructorIds(), venue.getId());
+        }
 
 
-
-            venueService.addInstructorVenueRelation(instructorIds, venue.getId());
             // 如果需要生成新场地的默认日程，可以在这里调用
             // venueService.addVenueSchedule(venue.getId());
 
@@ -149,17 +172,18 @@ public class VenueController {
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String icpisManager,
             @RequestParam(required = false) String timeZone,
-            @RequestParam(required = false) String venueId) {
+            @RequestParam(required = false) String venueId,
+            @RequestParam(required = false) String venueStatus) {
 
         try {
             PageResponse<Venue> ps = new PageResponse<>();
             if(role.equals("ROLE_ICPIE"))
             {
-                ps = venueService.list(pageNum, pageSize, state, city, icpisManager, timeZone,venueId);
+                ps = venueService.list(pageNum, pageSize, state, city, icpisManager, timeZone,venueId,venueStatus);
             }
             else if (role.equals("ROLE_ICPIS"))
             {
-                ps=venueService.icpislist(pageNum,pageSize,state,city,icpisname,timeZone,venueId);
+                ps=venueService.icpislist(pageNum,pageSize,state,city,icpisname,timeZone,venueId,venueStatus);
             }
 
             return Result.success(ps);
@@ -351,7 +375,9 @@ public class VenueController {
     //删除场地schedule
     @DeleteMapping("/schedule")
     public Result<VenueSchedule> deleteVenueScheduleSingle(String id) {
+
         venueService.deleteVenueScheduleSingle(id);
+
         //checkVenueInstructorInformation();
         return Result.success();
     }

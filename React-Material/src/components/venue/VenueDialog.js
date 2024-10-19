@@ -38,6 +38,9 @@ const VenueDialog = ({ open, handleClose, isEditMode, currentVenue, handleChange
               name="id"
               value={currentVenue.id}
               onChange={handleChange}
+              InputProps={{
+                readOnly: isEditMode, // 如果 editMode 为 true，则设置为只读
+              }}
             />
        </Grid>
         <Grid container spacing={2}>
@@ -91,9 +94,9 @@ const VenueDialog = ({ open, handleClose, isEditMode, currentVenue, handleChange
       onChange={handleChange}
       renderValue={(selected) => selected.map(id => {
         const instructor = instructors.find(i => i.id === id);
-        console.log("current venues instructors", currentVenue.instructors);
-        console.log('Selected ID:', id);
-        console.log('Found instructor:', instructor);
+        //console.log("current venues instructors", currentVenue.instructors);
+        //console.log('Selected ID:', id);
+        //console.log('Found instructor:', instructor);
 
         return instructor ? instructor.fullname : '';  // 如果找到对应的instructor，显示其fullname
       }).join(', ')}  // 使用逗号分隔多个instructor的fullname
@@ -126,7 +129,7 @@ const VenueDialog = ({ open, handleClose, isEditMode, currentVenue, handleChange
       <InputLabel>ICPIS Manager</InputLabel>
       <Select
         name="icpisManager"
-        value={currentVenue.icpisManager||"Jurin"}
+        value={currentVenue.icpisManager}
         onChange={handleChange}
         disabled={userRole !== 'ROLE_ICPIE'}  // 如果不是 ROLE_ICPIE 则禁用 Select
       >
@@ -272,7 +275,7 @@ const VenueDialog = ({ open, handleClose, isEditMode, currentVenue, handleChange
               <InputLabel>Status</InputLabel>
               <Select
                 labelId="select-label"
-                value={currentVenue.venueStatus || ''}
+                value={currentVenue.venueStatus}
                 onChange={handleChange}
                 label="Select Option"
                 name="venueStatus"

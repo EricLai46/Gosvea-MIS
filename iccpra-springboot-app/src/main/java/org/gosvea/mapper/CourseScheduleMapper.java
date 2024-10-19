@@ -7,8 +7,6 @@ import java.util.List;
 import org.apache.ibatis.annotations.*;
 import org.gosvea.pojo.CourseSchedule;
 import org.gosvea.pojo.Venue;
-import org.gosvea.pojo.VenueSchedule;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @Mapper
 public interface CourseScheduleMapper {
@@ -42,7 +40,7 @@ public interface CourseScheduleMapper {
 
     void updateCourseSchedules(List<CourseSchedule> schedulesToUpdate);
 
-    List<CourseSchedule> findCourseSchedulesByVenueAndDateRange(String venueId, List<VenueSchedule> venueSchedules);
+    List<CourseSchedule> findCourseSchedulesByVenueAndDateRange(String venueId);
 
     @Select("select * from coursesschedule")
     List<CourseSchedule> getAllCourseSchedule();
@@ -54,4 +52,6 @@ public interface CourseScheduleMapper {
     List<Venue> getAllVenueIdAndAddress();
 
     List<CourseSchedule> getCourseScheduleSummary(LocalDate fromDate, LocalDate toDate);
+
+    List<CourseSchedule> getCourseScheduleSummaryByVenueId(LocalDate fromDate, LocalDate toDate);
 }

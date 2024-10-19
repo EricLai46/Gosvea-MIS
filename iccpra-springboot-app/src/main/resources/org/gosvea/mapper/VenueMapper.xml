@@ -22,6 +22,7 @@
         <result property="refundableStatus" column="refundable_status"/>
         <result property="bookMethod" column="book_method"/>
         <result property="registrationLink" column="registration_link"/>
+        <result property="venueStatus" column="venue_status" />
         <collection property="instructors" ofType="org.gosvea.pojo.Instructor">
             <id property="id" column="instructor_id"/>
             <result property="firstname" column="firstname"/>
@@ -55,6 +56,9 @@
             <if test="venueId != null">
                 AND v.id = #{venueId}
             </if>
+            <if test="venueStatus!=null">
+                AND v.venue_status=#{venueStatus}
+            </if>
 
         </where>
         ORDER BY v.city
@@ -85,6 +89,9 @@
             </if>
             <if test="venueId != null">
                 AND v.id = #{venueId}
+            </if>
+            <if test="venueStatus!=null">
+                AND v.venue_status=#{venueStatus}
             </if>
 
         </where>

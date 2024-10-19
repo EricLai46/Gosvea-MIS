@@ -25,12 +25,12 @@ const VenueMain = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const timeZones = ['PST', 'EST', 'CST', 'MST', 'GMT', 'UTC', 'BST', 'CEST'];
   const { showNotification } = useNotification();
-  const [venueStatus]=useState('');
   const [totalPages, setTotalPages] = useState(1); // 添加 totalPages 状态
   const [selectedFile,setSelectedFile]=useState(null);
   const [venueId,setVenueId]=useState('');
   const [instructors, setInstructors] = useState([]); // 新增 instructors 状态
   const [city,setCity]=useState([]);
+  const [venueStatus,setVenueStatus]=useState('');
   const token = localStorage.getItem("token"); 
       let userRole = null;
       let icpisname=null;
@@ -93,7 +93,8 @@ const VenueMain = () => {
       city: city,
       icpisManager: icpisManager,
       timeZone: timeZone,
-      venueId:venueId
+      venueId:venueId,
+      venueStatus:venueStatus
     };
 
     Object.keys(params).forEach((key) => {
@@ -131,7 +132,7 @@ const VenueMain = () => {
     })
     .finally(() => {
       setIsLoading(false);
-      console.log(`totalpages,${totalPages}`);
+      //console.log(`totalpages,${totalPages}`);
     });
   }
   const handleAdd = () => {
@@ -250,22 +251,51 @@ axiosInstance.put('/venue', venueDTO, {
   // 处理错误
 });
 };
-//添加新场地
-  const handleInsert = () => {
-    axiosInstance
-      .post('/venue', currentVenue, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-      .then((response) => {
-        setOpen(false);
-        showNotification('Add a new venue successfully', 'success');
-      })
-      .catch((error) => {
-        console.error('Bad Request:', error);
-      });
+const handleInsert = () => {
+  // 从 currentVenue 获取讲师的 id 列表，如果讲师为空则返回空数组
+  const instructorIds = Array.isArray(currentVenue.instructors) 
+    ? currentVenue.instructors.map(instructor => instructor.id) 
+    : []; 
+
+  // 创建要发送的请求数据
+  const data = {
+    id: currentVenue.id,
+    venueStatus: currentVenue.venueStatus,
+    icpisManager: currentVenue.icpisManager,
+    address: currentVenue.address,
+    cancellationPolicy: currentVenue.cancellationPolicy,
+    paymentMode: currentVenue.paymentMode,
+    nonrefundableFee: currentVenue.nonrefundableFee,
+    fobKey: currentVenue.fobKey,
+    deposit: currentVenue.deposit,
+    membershipFee: currentVenue.membershipFee,
+    usageFee: currentVenue.usageFee,
+    refundableStatus: currentVenue.refundableStatus,
+    bookMethod: currentVenue.bookMethod,
+    registrationLink: currentVenue.registrationLink,
+    city: currentVenue.city,
+    timeZone: currentVenue.timeZone,
+    state: currentVenue.state,
+    instructorIds: instructorIds // 添加讲师 ID 列表
   };
+
+  //console.log("新场地信息是：", data);
+
+  // 发送请求
+  axiosInstance
+    .post('/venue', data, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .then((response) => {
+      setOpen(false);
+      showNotification('Add a new venue successfully', 'success');
+    })
+    .catch((error) => {
+      console.error('Bad Request:', error);
+    });
+};
 //删除场地
   const handleDelete = () => {
     axiosInstance
@@ -293,7 +323,7 @@ axiosInstance.put('/venue', venueDTO, {
   const handlePageChange = (event, value) => {
 
     setCurrentPage(value);
-    console.log(`Page change triggered: ${value}`);
+    //console.log(`Page change triggered: ${value}`);
   };
 
   //导出文件
@@ -307,7 +337,7 @@ axiosInstance.put('/venue', venueDTO, {
       const filename=contentDisposition
                 ?contentDisposition.split('filename')[1].split(';')[0].replace(/"/g,''):'venues.xlsx';
       
-      console.log('Content-Disposition:', contentDisposition);          
+      //console.log('Content-Disposition:', contentDisposition);          
 
     //文件下载
     saveAs(new Blob([response.data]),filename);
@@ -339,11 +369,11 @@ axiosInstance.put('/venue', venueDTO, {
           }
         })
         .then(response=>{
-          console.log(response.data);
+          //console.log(response.data);
 
         })
         .catch(error=>{
-          console.log(error);
+          //console.log(error);
         });
    };
 
@@ -368,6 +398,8 @@ axiosInstance.put('/venue', venueDTO, {
           venueId={venueId}
           userRole={userRole}
           setVenueId={setVenueId}
+          venueStatus={venueStatus}
+          setVenueStatus={setVenueStatus}
           city={city}
           setCity={setCity}
         />

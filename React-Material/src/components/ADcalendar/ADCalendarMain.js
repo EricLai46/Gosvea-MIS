@@ -17,14 +17,14 @@ const ADCalendarMain=()=>{
         axiosInstance.get('/api/icpie/course/coursevenueIdaddress')
           .then(response => {
             if (response.data) {
-              console.log(response.data);
+              //console.log(response.data);
               setVenues(response.data); // 将返回的数据存储到 venues 状态中
             } else {
               showNotification('Failed to load venues!', 'error');
             }
           })
           .catch(error => {
-            console.error('Error fetching venues:', error);
+            //console.error('Error fetching venues:', error);
             showNotification('Error fetching venues!', 'error');
           });
       }, []); 
@@ -46,7 +46,7 @@ const ADCalendarMain=()=>{
         axiosInstance.get('/api/icpie/course/coursecalendar', { params: { venueId: currentvenue.id } })
         .then(response => {
           if (response.data) {
-            console.log(response.data);
+            //console.log(response.data);
             setCourses(response.data);
              // 保存获取到的课程数据
           } else {

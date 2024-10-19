@@ -45,6 +45,7 @@ public class Venue {
     private Double longitude;
     private  String instructorNames;
     // VenueStatus 枚举类型的属性
+    @Enumerated(EnumType.STRING)
     private VenueStatus venueStatus;
 
 

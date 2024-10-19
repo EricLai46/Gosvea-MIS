@@ -17,16 +17,16 @@ export default function ListItems() {
   const [userRole, setUserRole] = useState('');
 
   useEffect(() => {
-    console.log("useEffect has been triggered");
+    //console.log("useEffect has been triggered");
     const token = localStorage.getItem('token');
     if (token) {
       try {
         const decodedToken = jwtDecode(token);
-        console.log("Decoded Token:", decodedToken);
+        //console.log("Decoded Token:", decodedToken);
         setUserRole(decodedToken.claims.role);
-        console.log("User Role:", decodedToken.claims.role);
+        //console.log("User Role:", decodedToken.claims.role);
       } catch (error) {
-        console.error('Invalid token:', error);
+       // console.error('Invalid token:', error);
       }
     } else {
       // 如果 localStorage 中没有 token，可以将用户角色设置为空或默认角色

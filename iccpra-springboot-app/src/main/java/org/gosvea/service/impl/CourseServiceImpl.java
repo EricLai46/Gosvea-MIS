@@ -190,8 +190,8 @@ public Map<String, String> generateOrUpdateCourseSchedules(String venueId, Strin
 
     Venue venue = venueService.getVenueById(venueId);
     Instructor instructor = instructorService.getInstructorById(instructorId);
-    System.out.println("venue: "+venue);
-    System.out.println("Instructor: "+instructor);
+    //System.out.println("venue: "+venue);
+    //System.out.println("Instructor: "+instructor);
     if (venue == null) {
         warnings.put(venueId, "Venue ID " + venueId + " does not exist.");
         return warnings;
@@ -201,9 +201,11 @@ public Map<String, String> generateOrUpdateCourseSchedules(String venueId, Strin
         warnings.put(instructorId, "Instructor ID " + instructorId + " does not exist.");
         return warnings;
     }
-
+    //获取所有venuescheudles
     List<VenueSchedule> venueSchedules = venueService.getVenueSchedule(venueId);
-    System.out.println("venueschedule:"+venueSchedules);
+
+
+    //获取所有instructorschedules
     List<InstructorSchedule> instructorSchedules = instructorService.getInstructorSchedule(instructorId);
 
     if (venueSchedules.isEmpty()) {
@@ -214,13 +216,30 @@ public Map<String, String> generateOrUpdateCourseSchedules(String venueId, Strin
         warnings.put(instructorId, "Instructor ID " + instructorId + " has no schedules defined.");
     }
 
-    // 批量查询所有可能的课程安排
-    List<CourseSchedule> existingSchedules = findCourseSchedulesByVenueAndDateRange(venueId, venueSchedules);
-    System.out.println("existingschedules:"+existingSchedules);
+// 获取所有与 venueId 相关的课程安排（不再依赖 venueSchedules 过滤）
+    List<CourseSchedule> existingSchedules = findCourseSchedulesByVenueAndDateRange(venueId);
+
+
     List<CourseSchedule> schedulesToUpdate = new ArrayList<>();
     List<CourseSchedule> schedulesToInsert = new ArrayList<>();
     List<CourseSchedule> schedulesToDelete = new ArrayList<>();
 
+// 遍历现有的 CourseSchedule，检查是否有对应的 VenueSchedule，如果没有则删除
+    for (CourseSchedule courseSchedule : existingSchedules) {
+        boolean isMatched = venueSchedules.stream()
+                .anyMatch(venueSchedule ->
+                        venueSchedule.getDate().equals(courseSchedule.getDate()) &&
+                                venueSchedule.getStartTime().equals(courseSchedule.getStartTime()) &&
+                                venueSchedule.getEndTime().equals(courseSchedule.getEndTime())
+                );
+
+        // 如果没有匹配的 VenueSchedule，标记为删除
+        if (!isMatched) {
+            schedulesToDelete.add(courseSchedule);
+        }
+    }
+
+// 遍历 venueSchedules，匹配 CourseSchedule
     for (VenueSchedule venueSchedule : venueSchedules) {
         CourseSchedule existingSchedule = existingSchedules.stream()
                 .filter(cs -> cs.getStartTime().equals(venueSchedule.getStartTime()) &&
@@ -233,15 +252,19 @@ public Map<String, String> generateOrUpdateCourseSchedules(String venueId, Strin
         for (Schedule instructorSchedule : instructorSchedules) {
             if (instructorSchedule.getDate().equals(venueSchedule.getDate()) &&
                     !instructorSchedule.getEndTime().isBefore(venueSchedule.getStartTime()) &&
-                    !instructorSchedule.getStartTime().isAfter(venueSchedule.getEndTime()))  {
+                    !instructorSchedule.getStartTime().isAfter(venueSchedule.getEndTime())) {
 
                 isMatchFound = true;
+
                 if (existingSchedule != null) {
                     if (!existingSchedule.getInstructorId().equals(instructorId) ||
                             !existingSchedule.getStartTime().equals(venueSchedule.getStartTime()) ||
                             !existingSchedule.getEndTime().equals(venueSchedule.getEndTime()) ||
-                            !existingSchedule.getCourseTitle().equals(venueSchedule.getCourseTitle())||(existingSchedule.getRegistrationLink()==null||!existingSchedule.getRegistrationLink().equals(venue.getRegistrationLink()))||!existingSchedule.getTimeZone().equals(venue.getTimeZone())||
-                            !existingSchedule.getIcpisManager().equals(venue.getIcpisManager())) { // 添加对 courseTitle 的比较
+                            !existingSchedule.getCourseTitle().equals(venueSchedule.getCourseTitle()) ||
+                            (existingSchedule.getRegistrationLink() == null ||
+                                    !existingSchedule.getRegistrationLink().equals(venue.getRegistrationLink())) ||
+                            !existingSchedule.getTimeZone().equals(venue.getTimeZone()) ||
+                            !existingSchedule.getIcpisManager().equals(venue.getIcpisManager())) {
 
                         existingSchedule.setInstructorId(instructorId);
                         existingSchedule.setStartTime(venueSchedule.getStartTime());
@@ -249,13 +272,14 @@ public Map<String, String> generateOrUpdateCourseSchedules(String venueId, Strin
                         existingSchedule.setCourseTitle(venueSchedule.getCourseTitle());
                         existingSchedule.setRegistrationLink(venue.getRegistrationLink());
                         existingSchedule.setIcpisManager(venue.getIcpisManager());
-                        existingSchedule.setTimeZone(venue.getTimeZone());// 更新 courseTitle
+                        existingSchedule.setTimeZone(venue.getTimeZone());
                         schedulesToUpdate.add(existingSchedule);
                     }
                 } else {
                     CourseSchedule newSchedule = new CourseSchedule(instructorId, venueId,
                             venueSchedule.getDate(), venueSchedule.getStartTime(), venueSchedule.getEndTime(),
-                            venue.getAddress(), venueSchedule.getCourseTitle(),venueSchedule.getPrice(),venue.getRegistrationLink(),venue.getTimeZone(),"",venue.getIcpisManager(),false);
+                            venue.getAddress(), venueSchedule.getCourseTitle(), venueSchedule.getPrice(),
+                            venue.getRegistrationLink(), venue.getTimeZone(), "", venue.getIcpisManager(), false);
                     schedulesToInsert.add(newSchedule);
                 }
                 break;
@@ -267,25 +291,23 @@ public Map<String, String> generateOrUpdateCourseSchedules(String venueId, Strin
         }
     }
 
-    // 批量更新、插入和删除课程表
+// 处理批量更新、插入和删除课程表的操作
     if (!schedulesToUpdate.isEmpty()) {
         updateCourseSchedules(schedulesToUpdate);
-        System.out.println("updated schedules:"+schedulesToUpdate);
     }
     if (!schedulesToInsert.isEmpty()) {
         insertCourseSchedules(schedulesToInsert);
-        System.out.println("Insert schedule:"+instructorSchedules);
     }
     if (!schedulesToDelete.isEmpty()) {
         deleteCourseSchedules(schedulesToDelete);
-        System.out.println("Delete schedule:"+schedulesToDelete);
+        System.out.println("需要删除的课程安排：" + schedulesToDelete);
     }
 
     return warnings.isEmpty() ? null : warnings;
 }
 
-    public List<CourseSchedule> findCourseSchedulesByVenueAndDateRange(String venueId, List<VenueSchedule> venueSchedules) {
-        return courseScheduleMapper.findCourseSchedulesByVenueAndDateRange(venueId,venueSchedules);
+    public List<CourseSchedule> findCourseSchedulesByVenueAndDateRange(String venueId) {
+        return courseScheduleMapper.findCourseSchedulesByVenueAndDateRange(venueId);
     }
 
     @Override
@@ -313,6 +335,13 @@ public Map<String, String> generateOrUpdateCourseSchedules(String venueId, Strin
         LocalDate fromDate=date.plusDays(24);
         LocalDate toDate=fromDate.plusDays(13);
         return courseScheduleMapper.getCourseScheduleSummary(fromDate,toDate);
+    }
+
+    @Override
+    public List<CourseSchedule> getCourseScheduleSummaryByVenueId(LocalDate date) {
+        LocalDate fromDate=date.plusDays(24);
+        LocalDate toDate=fromDate.plusDays(13);
+        return courseScheduleMapper.getCourseScheduleSummaryByVenueId(fromDate,toDate);
     }
 
     public void deleteCourseSchedules(List<CourseSchedule> schedulesToDelete) {

@@ -7,7 +7,7 @@
     <select id="getInstructor" resultType="org.gosvea.pojo.Instructor">
         select DISTINCT i.*
         from instructors i
-        join instructor_venue iv on i.id=iv.instructor_id
+        Left join instructor_venue iv on i.id=iv.instructor_id
         <where >
             <if test="state!=null">
                 i.state=#{state}

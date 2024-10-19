@@ -27,7 +27,7 @@ public interface CourseService {
     void insertCourseSchedules(List<CourseSchedule> schedulesToInsert);
     void updateCourseSchedules(List<CourseSchedule> schedulesToUpdate);
 
-    List<CourseSchedule> findCourseSchedulesByVenueAndDateRange(String venueId, List<VenueSchedule> venueSchedules);
+    List<CourseSchedule> findCourseSchedulesByVenueAndDateRange(String venueId);
 
     List<CourseSchedule> getAllCourseSchedule();
 
@@ -39,4 +39,6 @@ public interface CourseService {
     List<Venue> getAllVenueIdAndAddress();
 
     List<CourseSchedule> getCourseScheduleSummary(LocalDate date);
+
+    List<CourseSchedule> getCourseScheduleSummaryByVenueId(LocalDate date);
 }

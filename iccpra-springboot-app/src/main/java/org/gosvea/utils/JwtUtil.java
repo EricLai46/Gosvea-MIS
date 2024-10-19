@@ -28,18 +28,18 @@ public class JwtUtil {
                 .build()
                 .verify(token);
         // 输出 JWT 中的所有信息，帮助调试
-        System.out.println("Header: " + decodedJWT.getHeader());
-        System.out.println("Payload: " + decodedJWT.getPayload());
-        System.out.println("Claims: " + decodedJWT.getClaims());
+        //System.out.println("Header: " + decodedJWT.getHeader());
+       // System.out.println("Payload: " + decodedJWT.getPayload());
+       // System.out.println("Claims: " + decodedJWT.getClaims());
 
 
         // 获取 "claims" 字段
         Map<String, Object> claims = decodedJWT.getClaim("claims").asMap();
-        System.out.println("Parsed claims: " + claims);
+        //System.out.println("Parsed claims: " + claims);
 
         // 获取 claims 中的具体字段
         String role = claims.get("role").toString();  // 确保你想要的是 role 字段
-        System.out.println("Role from token: " + role);
+       // System.out.println("Role from token: " + role);
 
         // 将 claims 中的信息保存到 Map 中返回
         Map<String, Object> claimsMap = new HashMap<>();

@@ -27,7 +27,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/icpie/course")
-@CrossOrigin(origins =  {"http://54.175.129.180:80", "http://allcprmanage.com","http://localhost:3000"}, allowedHeaders = "*")
+@CrossOrigin(origins =  {"http://54.175.129.180:80", "http://allcprmanage.com"}, allowedHeaders = "*")
 //@CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
 public class CourseController {
 
@@ -62,8 +62,8 @@ public class CourseController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
             // 打印用户信息，确保认证信息正确设置
-            System.out.println("Authenticated user: " + authentication.getName());
-            System.out.println("Authorities: " + authentication.getAuthorities());
+            //System.out.println("Authenticated user: " + authentication.getName());
+           // System.out.println("Authorities: " + authentication.getAuthorities());
             boolean activeStatus = (isActive != null) ? isActive : false;
             return  Result.success(courseService.getCourseSchedule(pageNum,pageSize,icpisManager,venueId,date,startTime,endTime,isActive,isProcessed,fromDate,toDate));
         } catch (Exception e) {
@@ -230,9 +230,29 @@ public class CourseController {
         //通过日期获取24天后的两个礼拜的课程
        List<CourseSchedule> courseScheduleList=courseService.getCourseScheduleSummary(date);
        //导出excel表格
-       ExcelExporter.exportCoursesToExcel(date,courseScheduleList);
+       //ExcelExporter.exportCoursesToExcel(date,courseScheduleList);
+
+        //通过日期获取24天后的两个李白的课程，按照venueid顺序排列，
+
+        List<CourseSchedule> courseScheduleListByVenueId=courseService.getCourseScheduleSummaryByVenueId(date);
+
+        System.out.println("origial: "+courseScheduleListByVenueId);
+
+        //获取所有场地
+
+       Map<String, String> venueList=getAllVenueIdandAddress();
+
+
+        Map<String,Venue> venueListMap=venueService.getVenueListMap();
+
+        //获取场地，场地状态的hashmap
+
+        Map<String, String> venueStatusmap=getAllVenueStatus();
+
+
+
         // 导出excel表格
-        ByteArrayInputStream excelStream = ExcelExporter.exportCoursesToExcel(date, courseScheduleList);
+        ByteArrayInputStream excelStream = ExcelExporter.exportCoursesToExcel( venueListMap, courseScheduleListByVenueId,venueList,venueStatusmap);
 
 
 
@@ -250,6 +270,35 @@ public class CourseController {
                     .body(excelBytes);
 
     }
+    public Map<String, String> getAllVenueStatus() {
+        List<Map<String, String>> resultList = venueService.getAllVenueStatus();
+        Map<String, String> resultMap = new HashMap<>();
+        for (Map<String, String> row : resultList) {
+            String id = row.get("id");
+            String status = row.get("venue_status");
+
+            // 调用 VenueStatus.fromValue() 方法，将数据库中的字符串转换为 VenueStatus 枚举
+            Venue.VenueStatus venueStatusEnum = Venue.VenueStatus.fromValue(status);
+
+            // 使用 getValue() 方法获取枚举的字符串表示形式
+            resultMap.put(id, venueStatusEnum.getValue());
+        }
+        return resultMap;
+    }
 
 
+    public Map<String, String> getAllVenueIdandAddress(){
+        List<Map<String, String>> resultList = venueService.getAllVenueAddress();
+        Map<String, String> resultMap = new HashMap<>();
+        for (Map<String, String> row : resultList) {
+            String id = row.get("id");
+            String address = row.get("address");
+
+
+
+            // 使用 getValue() 方法获取枚举的字符串表示形式
+            resultMap.put(id, address);
+        }
+        return resultMap;
+    }
 }

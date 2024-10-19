@@ -35,12 +35,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         // 获取 Authorization 头
         String token = request.getHeader("Authorization");
-        System.out.println("Authorization header: " + token);
+       // System.out.println("Authorization header: " + token);
      // 确认 token 是否不为空且符合 Bearer 前缀
         if (token != null) {
-            System.out.println("Token exists: " + token);
+            //System.out.println("Token exists: " + token);
             if (token.startsWith("Bearer ")) {
-                System.out.println("Token starts with 'Bearer '");
+                //System.out.println("Token starts with 'Bearer '");
                 token = token.substring(7); // 去掉 "Bearer " 前缀
                 try {
                     // 解析 Token，获取 claims
@@ -50,8 +50,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     String role = (String) claims.get("role");
                     String username = (String) claims.get("icpiename");
 
-                    System.out.println("Parsed claims: " + claims);
-                    System.out.println("Role: " + role);
+                    //System.out.println("Parsed claims: " + claims);
+                   // System.out.println("Role: " + role);
 
                     // 创建权限列表
                     List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role));
@@ -61,10 +61,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authentication);
 
                     // 打印调试信息
-                    System.out.println("Authenticated user: " + username);
-                    System.out.println("Authorities: " + authorities);
+                    //System.out.println("Authenticated user: " + username);
+                    //System.out.println("Authorities: " + authorities);
                 } catch (Exception e) {
-                    System.out.println("Error parsing token: " + e.getMessage());
+                    //System.out.println("Error parsing token: " + e.getMessage());
                     e.printStackTrace(); // 打印异常
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 解析失败，返回 401
                     return;

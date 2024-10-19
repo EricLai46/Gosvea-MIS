@@ -3,7 +3,7 @@ import { Box, FormControl, InputLabel, Select, MenuItem, Button,TextField } from
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
-const CourseSearchForm = ({ setVenueId, fromDate, venueId, setFromDate, toDate,setToDate, handleSearch, handleReset,isActive,isProcessed,setIsActive,setIsProcessed,setIcpisManager,icpisManager }) => {
+const CourseSearchForm = ({ setVenueId, fromDate, venueId, setFromDate, toDate,setToDate, handleSearch, handleReset,active,processed,setActive,setProcessed,setIcpisManager,icpisManager }) => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -36,8 +36,8 @@ const CourseSearchForm = ({ setVenueId, fromDate, venueId, setFromDate, toDate,s
         <FormControl variant="outlined" sx={{ minWidth: 100, mr: 2 }}>
           <InputLabel>IsPublished</InputLabel>
           <Select
-            value={isActive}
-            onChange={(e) => setIsActive(e.target.value)}
+            value={active}
+            onChange={(e) => setActive(e.target.value)}
             label="IsPublished"
           >
             <MenuItem value=""><em>Please Select</em></MenuItem>
@@ -49,8 +49,8 @@ const CourseSearchForm = ({ setVenueId, fromDate, venueId, setFromDate, toDate,s
         <FormControl variant="outlined" sx={{ minWidth: 100, mr: 2 }}>
           <InputLabel>IsProcessed</InputLabel>
           <Select
-            value={isProcessed}
-            onChange={(e) => setIsProcessed(e.target.value)}
+            value={processed}
+            onChange={(e) => setProcessed(e.target.value)}
             label="IsProcessed"
           >
             <MenuItem value=""><em>Please Select</em></MenuItem>

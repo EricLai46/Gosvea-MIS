@@ -122,21 +122,20 @@
     <select id="findCourseSchedulesByVenueAndDateRange" parameterType="map" resultType="org.gosvea.pojo.CourseSchedule">
         select *
         from coursesschedule
-        where venue_id=#{venueId}
-        <if test="venueSchedules!=null and venueSchedules.size()>0">
-            And(
-            <foreach item="schedule" collection="venueSchedules" separator="or">
-                (date=#{schedule.date}
-                and start_time &lt;=#{schedule.endTime}
-                and end_time &gt;=#{schedule.startTime})
-            </foreach>
-            )
-        </if>
-
+        where venue_id = #{venueId}
     </select>
 
     <select id="getCourseScheduleSummary" resultType="org.gosvea.pojo.CourseSchedule">
     SELECT * FROM coursesschedule
     WHERE date BETWEEN #{fromDate} AND #{toDate}
+    </select>
+
+    <select id="getCourseScheduleSummaryByVenueId" resultType="org.gosvea.pojo.CourseSchedule">
+        SELECT v.id AS venue_id, cs.*
+        FROM venue v
+        LEFT JOIN coursesschedule cs
+        ON v.id = cs.venue_id
+        AND (cs.date BETWEEN #{fromDate} AND #{toDate})
+
     </select>
 </mapper>

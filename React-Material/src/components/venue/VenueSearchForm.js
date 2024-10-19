@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, FormControl, InputLabel, Select, MenuItem, Button,TextField } from '@mui/material';
 
-const VenueSearchForm = ({ venueId, state, icpisManager, setVenueId, setState, setInstructor, handleSearch, handleReset, handleExport,handleUpload, handleFileChange,selectedFile,setIcpisManager,userRole,city,setCity}) => (
+const VenueSearchForm = ({ venueId, state, icpisManager, setVenueId, setState, setInstructor, handleSearch, handleReset, handleExport,handleUpload, handleFileChange,selectedFile,setIcpisManager,userRole,city,setCity,venueStatus,setVenueStatus}) => (
   <Box display="flex" alignItems="center" mb={3}>
     {/* <FormControl variant="outlined" sx={{ minWidth: 200, mr: 2 }}>
       <InputLabel>Time Zone</InputLabel>
@@ -63,6 +63,7 @@ const VenueSearchForm = ({ venueId, state, icpisManager, setVenueId, setState, s
         <MenuItem value="Kenny">Kenny</MenuItem>
         <MenuItem value="Daniel">Daniel</MenuItem>
         <MenuItem value="Mia">Mia</MenuItem>
+        <MenuItem value="Eric">Eric</MenuItem>
       </Select>
     </FormControl>)}
     <TextField
@@ -72,6 +73,21 @@ const VenueSearchForm = ({ venueId, state, icpisManager, setVenueId, setState, s
         onChange={(e) => setVenueId(e.target.value)}
         sx={{ minWidth: 50, mr: 2 }}
       />
+      <FormControl variant="outlined" sx={{ minWidth: 200, mr: 2 }}>
+      <InputLabel>VenueStatus</InputLabel>
+      <Select
+        value={venueStatus}
+        onChange={(e) => setVenueStatus(e.target.value)}
+        label="VenueStatus"
+      >
+        <MenuItem value=""><em>Please Select</em></MenuItem>
+        <MenuItem value="NORMAL">Normal</MenuItem>
+          <MenuItem value="INSTRUCTORISSUE">Instructor Issue</MenuItem>
+          <MenuItem value="VENUEISSUE">Venue Issue</MenuItem>
+          <MenuItem value="CLOSED">Closed</MenuItem>
+          <MenuItem value="INVESTIGATION">Investigation</MenuItem>
+      </Select>
+    </FormControl>
     <Button variant="contained" color="primary" onClick={handleSearch} sx={{ mr: 2 }}>
       Search
     </Button>

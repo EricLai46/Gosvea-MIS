@@ -9,6 +9,7 @@ import org.gosvea.pojo.VenueSchedule;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface VenueMapper {
@@ -17,11 +18,11 @@ public interface VenueMapper {
 //            "values(#{state}, #{city}, #{instructor}, #{address}, #{timeZone}, #{cancellationPolicy}, #{paymentMode}, #{nonrefundableFee}, #{fobKey}, #{deposit}, #{membershipFee}, #{usageFee}, #{refundableStatus}, #{bookMethod}, #{registrationLink})")
 //    void add(Venue venue);
     //修改后的
-    @Insert("insert into venue(id,state, city, address, time_zone, cancellation_policy, payment_mode, nonrefundable_fee, fob_key, deposit, membership_fee, usage_fee, refundable_status, book_method, registration_link,venue_status) " +
-            "values(#{id},#{state}, #{city}, #{address}, #{timeZone}, #{cancellationPolicy}, #{paymentMode}, #{nonrefundableFee}, #{fobKey}, #{deposit}, #{membershipFee}, #{usageFee}, #{refundableStatus}, #{bookMethod}, #{registrationLink},#{venueStatus})")
+    @Insert("insert into venue(id,state, city, address, time_zone, cancellation_policy, payment_mode, nonrefundable_fee, fob_key, deposit, membership_fee, usage_fee, refundable_status, book_method, registration_link,venue_status,icpis_manager) " +
+            "values(#{id},#{state}, #{city}, #{address}, #{timeZone}, #{cancellationPolicy}, #{paymentMode}, #{nonrefundableFee}, #{fobKey}, #{deposit}, #{membershipFee}, #{usageFee}, #{refundableStatus}, #{bookMethod}, #{registrationLink},#{venueStatus},#{icpisManager})")
     void add(Venue venue);
 
-    List<Venue> list(String state, String city, String icpisManager, String timeZone,String venueId);
+    List<Venue> list(String state, String city, String icpisManager, String timeZone,String venueId,String venueStatus);
     //@Update("update venue set state=#{state},city=#{city},instructor=#{instructor},address=#{address},time_zone=#{timeZone},cancellation_policy=#{cancellationPolicy},payment_mode=#{paymentMode},nonrefundable_fee=#{nonrefundableFee},fob_key=#{fobKey},deposit=#{deposit},membership_fee=#{membershipFee},usage_fee=#{usageFee},refundable_status=#{refundableStatus},book_method=#{bookMethod},registration_link=#{registrationLink} where id=#{id}")
     void updateVenue(Venue venue);
     @Delete("delete from venue where id=#{venueId}")
@@ -93,5 +94,15 @@ public interface VenueMapper {
     @Select("select id from venue where id=#{id}")
     String verifyVenueId(String id);
 
-    List<Venue> icpislist(String state, String city, String icpisname, String timeZone, String venueId);
+    List<Venue> icpislist(String state, String city, String icpisname, String timeZone, String venueId,String venueStatus);
+    @Select("select * from venueschedule where id={id} ")
+    VenueSchedule getSingleVenueSchedule(String id);
+    @Select("select id,address from venue ")
+    List<Map<String, String>> getAllVenueAddress();
+
+    @Select("select id,venue_status from venue")
+    List<Map<String,String>> getAllVenueStatus();
+    @MapKey("id")
+    @Select("select * from venue")
+    Map<String, Venue> getVenueListMap();
 }

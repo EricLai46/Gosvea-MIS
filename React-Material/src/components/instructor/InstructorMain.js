@@ -112,7 +112,7 @@ const InstructorMain = () => {
 
     axiosInstance.get('/instructor', { params })
       .then(response => {
-        console.log('Response received:', response); // 添加日志
+        //console.log('Response received:', response); // 添加日志
         if (response.data.message === "success") {
           setInstructors(response.data.data.items);
           setTotalInstructors(response.data.totalElements);
@@ -289,7 +289,7 @@ const venueDTO = {
       const filename=contentDisposition
                 ?contentDisposition.split('filename')[1].split(';')[0].replace(/"/g,''):'instructors.xlsx';
       
-      console.log('Content-Disposition:', contentDisposition);     
+      //console.log('Content-Disposition:', contentDisposition);     
          //文件下载
     saveAs(new Blob([response.data]),filename);
   } catch(error){
@@ -319,7 +319,7 @@ const handleUpload=()=>{
       }
     })
     .then(response=>{
-      console.log(response.data);
+      //console.log(response.data);
 
     })
     .catch(error=>{

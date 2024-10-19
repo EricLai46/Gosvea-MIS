@@ -21,7 +21,7 @@ const VenueMap = () => {
       const firstVenue = venues[0];
       setMapCenter([Number(firstVenue.latitude), Number(firstVenue.longitude)]);
     }
-    console.log("Venues array after setVenues:", venues); // 打印 venues 数组，调试用
+    //console.log("Venues array after setVenues:", venues); // 打印 venues 数组，调试用
   }, [venues]);
 
 
@@ -30,7 +30,7 @@ const VenueMap = () => {
       const response = await axiosInstance.get('/venue/venuemap');
       if (response.data.message === "success") {
         setVenues(response.data.data); // 直接设置 venues
-        console.log("Venue data:",venues);
+        //console.log("Venue data:",venues);
         showNotification('Venue Information loaded successfully!', 'success');
       } else {
         showNotification('Get Venue Information failed!', 'error');

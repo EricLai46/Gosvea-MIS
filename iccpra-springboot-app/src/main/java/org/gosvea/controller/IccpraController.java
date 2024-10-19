@@ -67,10 +67,10 @@ public class IccpraController {
 
 
             if (JwtUtil.hasRole(token, "ROLE_ICPIE")) {
-                System.out.println("ss");
+                //System.out.println("ss");
                 return Result.success( token);
             } else {
-                System.out.println("ff");
+                //System.out.println("ff");
                 return Result.success( token);
             }
             //return Result.success(token);

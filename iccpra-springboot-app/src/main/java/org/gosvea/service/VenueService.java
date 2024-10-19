@@ -7,11 +7,12 @@ import org.springframework.scheduling.annotation.Async;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 
 public interface VenueService {
     void add(Venue venue);
 
-    PageResponse<Venue> list(Integer pageNum, Integer pageSize, String state, String city, String icpisManager, String timeZone,String venueId);
+    PageResponse<Venue> list(Integer pageNum, Integer pageSize, String state, String city, String icpisManager, String timeZone,String venueId,String venueStatus);
 
     void updateVenue(Venue venue);
 
@@ -65,5 +66,13 @@ public interface VenueService {
 
     boolean verifyVenueId(String id);
 
-    PageResponse<Venue> icpislist(Integer pageNum, Integer pageSize, String state, String city, String icpisname, String timeZone, String venueId);
+    PageResponse<Venue> icpislist(Integer pageNum, Integer pageSize, String state, String city, String icpisname, String timeZone, String venueId,String venueStatus);
+
+    VenueSchedule getSingleVenueSchedule(String id);
+
+    List<Map<String, String>> getAllVenueAddress();
+
+    List<Map<String,String>> getAllVenueStatus();
+
+    Map<String, Venue> getVenueListMap();
 }

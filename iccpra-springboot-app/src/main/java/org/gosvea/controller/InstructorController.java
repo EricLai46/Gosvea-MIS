@@ -27,7 +27,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/instructor")
-@CrossOrigin(origins =  {"http://54.175.129.180:80", "http://allcprmanage.com","http://localhost:3000"}, allowedHeaders = "*")
+@CrossOrigin(origins =  {"http://54.175.129.180:80", "http://allcprmanage.com"}, allowedHeaders = "*")
 //@CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
 public class InstructorController {
 
@@ -156,9 +156,9 @@ public class InstructorController {
 //       }
        try {
            // 获取现有的 Venue 实体
-           System.out.println(instructorDTO);
+           //System.out.println(instructorDTO);
            Instructor instructor = instructorService.getInstructorById(instructorDTO.getId());
-           System.out.println("venue "+instructor);
+           //System.out.println("venue "+instructor);
            List<String> instructorDTOvenueIds=instructorDTO.getVenueIds();
          if(instructorDTOvenueIds!=null&&!instructorDTOvenueIds.isEmpty())
          {
