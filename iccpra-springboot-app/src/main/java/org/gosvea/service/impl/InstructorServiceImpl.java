@@ -162,5 +162,10 @@ public class InstructorServiceImpl implements InstructorService {
         return pi;
     }
 
+    @Override
+    public List<Map<String, Object>> getInstructorNameListByIcpis(String icpisName) {
+        return instructorMapper.getInstructorNameListByIcpis(icpisName);
+    }
+
 
 }

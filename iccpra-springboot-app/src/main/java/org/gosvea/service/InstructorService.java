@@ -52,4 +52,6 @@ public interface InstructorService {
     String getInstructorIdByInstructorName(String firstname,String lastname);
 
     PageResponse<Instructor> getInstructorByIcpisName(Integer pageNum, Integer pageSize, String state, String city, String instructorId, String phoneNumber, String venueId, String firstname, String lastname, String icpisname);
+
+    List<Map<String, Object>> getInstructorNameListByIcpis(String icpisName);
 }

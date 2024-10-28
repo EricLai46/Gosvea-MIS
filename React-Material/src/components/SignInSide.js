@@ -50,7 +50,7 @@ export default function SignInSide() {
     const data = new FormData(event.currentTarget);
     const icpiename = data.get('icpiename');
     const password = data.get('password');
-    console.log("Login details:",icpiename,password)
+    //console.log("Login details:",icpiename,password)
     try {
 
             // 清理旧的 token 和角色
@@ -67,20 +67,20 @@ export default function SignInSide() {
       });
 
       const result = response.data;
-      console.log("result:",result);
+      //console.log("result:",result);
 
       // 登录成功后的处理逻辑，例如保存JWT令牌
       if (result.code === 0) {
         localStorage.setItem("token", result.data);
-        console.log("Stored Token in localStorage:", result.data);
+       // console.log("Stored Token in localStorage:", result.data);
            // 解析 JWT 获取角色信息
         const decoded = jwtDecode(result.data); // 解析 JWT
-        console.log("Decoded token:", decoded);
+        //console.log("Decoded token:", decoded);
         const role = decoded.claims.role; // 获取角色信息
         setUserRole(role);
            // 将角色存储在 localStorage 中
         localStorage.setItem("role", role);
-        console.log("Role from token:", role); // 打印角色信息
+        //console.log("Role from token:", role); // 打印角色信息
         //alert("Login successfully");
         
         navigate('/dashboard');

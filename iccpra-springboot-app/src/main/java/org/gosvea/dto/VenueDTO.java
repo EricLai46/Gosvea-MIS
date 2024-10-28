@@ -29,5 +29,7 @@ public class VenueDTO {
     private String state;
 
 
-
+    //课程价格
+    private Double cprPrice;
+    private Double blsPrice;
 }

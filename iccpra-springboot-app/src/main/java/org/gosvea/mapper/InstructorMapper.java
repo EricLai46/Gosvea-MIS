@@ -53,4 +53,6 @@ public interface InstructorMapper {
     String getInstructorIdByInstructorName(String firstname, String lastname);
 
     List<Instructor> getInstructorByIcpisName(String state, String city, String instructorId, String phoneNumber, String venueId, String firstname, String lastname, String icpisname);
+    @Select("select id,concat(firstname,' ',lastname) as fullname from instructors where icpis_manager=#{icpisName}")
+    List<Map<String, Object>> getInstructorNameListByIcpis(String icpisName);
 }

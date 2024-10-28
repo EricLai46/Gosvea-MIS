@@ -255,7 +255,7 @@ public class ExcelExporter {
                             row.createCell(5).setCellValue(course.getPrice() != null ? Double.parseDouble(course.getPrice().toString()) : 0.0); // ALLCPR售价
                             row.createCell(6).setCellValue(
                                     coursedateMap.get(course.getVenueId() + "|" + (course.getCourseTitle() != null ? course.getCourseTitle().toUpperCase() : "")) != null
-                                            ? coursedateMap.get(course.getVenueId() + "|" + (course.getCourseTitle() != null ? course.getCourseTitle().toUpperCase() : ""))
+                                            ? coursedateMap.get(course.getVenueId() + "|" + (course.getCourseTitle() != null ? course.getCourseTitle().toUpperCase() : ""))+" "+course.getStartTime()+'-'+course.getEndTime()
                                             : ""
                             );
                             //row.createCell(6).setCellValue(coursedateMap.get(course.getVenueId() + "|" + course.getCourseTitle().toUpperCase()) != null ? coursedateMap.get(course.getVenueId() + "|" + course.getCourseTitle().toUpperCase()) : "");   // 开班日期计划

@@ -40,7 +40,7 @@ import java.io.ByteArrayOutputStream;
 
 @RestController
 @RequestMapping("/venue")
-@CrossOrigin(origins =  {"http://54.175.129.180:80", "http://allcprmanage.com"}, allowedHeaders = "*")
+@CrossOrigin(origins =  { "https://allcprmanage.com"}, allowedHeaders = "*")
 //@CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
 public class VenueController {
 
@@ -112,6 +112,8 @@ public class VenueController {
             venue.setCity(venueDTO.getCity());
             venue.setTimeZone(venueDTO.getTimeZone());
             venue.setState(venueDTO.getState());
+            venue.setCprPrice(venue.getCprPrice());
+            venue.setBlsPrice(venue.getBlsPrice());
             venueService.add(venue);
             System.out.println("venue"+venue.getInstructors());
             // 获取关联的讲师列表
@@ -274,9 +276,25 @@ public class VenueController {
 
 
             // 更新 Venue
+            venue.setCity(venueDTO.getCity());
+            venue.setState(venueDTO.getState());
+            venue.setRegistrationLink(venueDTO.getRegistrationLink());
             venue.setIcpisManager(venueDTO.getIcpisManager());
             venue.setAddress(venueDTO.getAddress());
             venue.setVenueStatus(venueDTO.getVenueStatus());
+            venue.setBlsPrice(venueDTO.getBlsPrice());
+            venue.setCprPrice(venueDTO.getCprPrice());
+            venue.setCancellationPolicy(venueDTO.getCancellationPolicy());
+            venue.setPaymentMode(venueDTO.getPaymentMode());
+            venue.setNonrefundableFee(venueDTO.getNonrefundableFee());
+            venue.setFobKey(venueDTO.getFobKey());
+            venue.setDeposit(venueDTO.getDeposit());
+            venue.setMembershipFee(venueDTO.getMembershipFee());
+            venue.setUsageFee(venueDTO.getUsageFee());
+            venue.setRefundableStatus(venueDTO.getRefundableStatus());
+            venue.setBookMethod(venueDTO.getBookMethod());
+            venue.setTimeZone(venueDTO.getTimeZone());
+
             venueService.updtaeLatLonInformationForOneVenue(venue);
             venueService.updateVenue(venue);
 

@@ -64,7 +64,7 @@ const InstructorScheduleCalendar = ({ instructorId }) => {
         const eventsToSave = [];
         let currentDate = new Date(selectedDate);
 
-        for (let i = 0; i < (newEvent.isWeekly ? 5 : 1); i++) {
+        for (let i = 0; i < (newEvent.isWeekly ? 4 : 1); i++) {
             eventsToSave.push({
                 title: newEvent.title,
                 date: currentDate.toISOString().split('T')[0],

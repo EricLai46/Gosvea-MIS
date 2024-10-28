@@ -276,9 +276,10 @@ public Map<String, String> generateOrUpdateCourseSchedules(String venueId, Strin
                         schedulesToUpdate.add(existingSchedule);
                     }
                 } else {
+                    //Double price= venueSchedule.getCourseTitle().substring(0,2).toLowerCase().equals("cpr")?venue.getCprPrice():venue.getBlsPrice();
                     CourseSchedule newSchedule = new CourseSchedule(instructorId, venueId,
                             venueSchedule.getDate(), venueSchedule.getStartTime(), venueSchedule.getEndTime(),
-                            venue.getAddress(), venueSchedule.getCourseTitle(), venueSchedule.getPrice(),
+                            venue.getAddress(), venueSchedule.getCourseTitle(),venueSchedule.getPrice() ,
                             venue.getRegistrationLink(), venue.getTimeZone(), "", venue.getIcpisManager(), false);
                     schedulesToInsert.add(newSchedule);
                 }

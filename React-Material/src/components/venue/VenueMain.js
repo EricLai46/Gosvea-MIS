@@ -46,7 +46,27 @@ const VenueMain = () => {
   }, [currentPage]);
   const fetchInstructors = async () => {
     try {
-      const response = await axiosInstance.get('/instructor/instructorname');
+      const token = localStorage.getItem('token');
+      //("Stored JWT in localStorage:", token);
+      
+      const authHeader = 'Bearer ' + token;
+       // 判断 userRole 是否是 'ROLE_ICPIE'
+    let queryParams = {};
+    if (userRole !== 'ROLE_ICPIE') {
+      queryParams = {
+          role: userRole,
+          icpisName: icpisname
+      };
+  } else {
+      queryParams = { role: userRole }; // ROLE_ICPIE 也应该有 role 参数
+  }
+    const response = await axiosInstance.get('/instructor/instructorname', {
+      params: queryParams
+      ,headers: {
+        'Authorization': authHeader
+      }
+       // 传递参数
+    });
       setInstructors(response.data); // 设置 instructors 数据
     } catch (error) {
       console.error('Error fetching instructors:', error);
@@ -55,7 +75,10 @@ const VenueMain = () => {
 //获取venues信息
   const fetchVenues = async () => {
     try {
-    
+      const token = localStorage.getItem('token');
+      //("Stored JWT in localStorage:", token);
+      
+      const authHeader = 'Bearer ' + token;
       const response = await axiosInstance.get('/venue', {
         params: {
           pageNum: currentPage,
@@ -69,6 +92,9 @@ const VenueMain = () => {
           timeZone: timeZone,
           venueStatus: venueStatus,
         },
+        headers: {
+          'Authorization': authHeader  // 传递 Bearer token
+        }
       });
       if (response.data.message === 'success') {
         setVenues(response.data.data.items);
@@ -102,9 +128,17 @@ const VenueMain = () => {
         delete params[key];
       }
     });
-
+    const token = localStorage.getItem('token');
+    //("Stored JWT in localStorage:", token);
+    
+    const authHeader = 'Bearer ' + token;
     axiosInstance
-    .get('/venue', { params })
+    .get('/venue', {
+      params: params,  // 将 params 正确放入第二个参数中的 params 字段
+      headers: {
+        'Authorization': authHeader  // 传递 Bearer token
+      }
+    })
     .then((response) => {
       if (response.data.message === 'success') {
         console.log('Full Response:', response.data);
@@ -211,6 +245,8 @@ const usageFee=currentVenue.usageFee;
 const refundablestatus=currentVenue.refundableStatus;
 const bookmethod=currentVenue.bookMethod;
 const registrationlink=currentVenue.registrationLink;
+const cprPrice=currentVenue.cprPrice;
+const blsPrice=currentVenue.blsPrice;
 // 构建符合 VenueDTO 格式的对象
 const venueDTO = {
   ...currentVenue,
@@ -230,7 +266,9 @@ const venueDTO = {
   usageFee:usageFee,
   refundableStatus:refundablestatus,
   bookMethod:bookmethod,
-  registrationLink:registrationlink
+  registrationLink:registrationlink,
+  cprPrice:cprPrice,
+  blsPrice:blsPrice
 };
 //console.log(JSON.stringify(venueDTO, null, 2));
 //console.log('Venue DTO:', venueDTO);  // 调试时查看传递的 DTO 数据

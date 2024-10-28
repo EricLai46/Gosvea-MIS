@@ -22,6 +22,9 @@ const CourseSearchForm = ({ setVenueId, fromDate, venueId, setFromDate, toDate,s
             <MenuItem value="Jurin">Jurin</MenuItem>
             <MenuItem value="Kenny">Kenny</MenuItem>
             <MenuItem value="Daniel">Daniel</MenuItem>
+            <MenuItem value="Daya">Daya</MenuItem>
+            <MenuItem value="Jianan">Jianan</MenuItem>
+            <MenuItem value="Matilda">Matilda</MenuItem>
           </Select>
         </FormControl>
 

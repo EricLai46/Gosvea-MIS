@@ -25,9 +25,12 @@ public class SecurityConfig  {
                 .csrf(csrf -> csrf.disable())  // 这里使用 lambda 替代被弃用的 csrf() 方法
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/icpie/login").permitAll()
+                        .requestMatchers("/health").permitAll()
                         .requestMatchers("/api/icpie/**").hasRole("ICPIE")
                         .requestMatchers("/api/icpim/**").hasAnyRole("ICPIM", "ICPIE")
                         .requestMatchers("/api/icpis/**").hasAnyRole("ICPIS", "ICPIM", "ICPIE")
+                        .requestMatchers("/venue/**").authenticated()  // 确保 /venue 路径需要认证
+                        .requestMatchers("/instructor/**").authenticated()  // 确保 /instructor 路径需要认证
                         .anyRequest().authenticated()
 
                 )

@@ -6,7 +6,7 @@ import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button, C
 import axiosInstance from '../AxiosInstance';
 import { addWeeks } from 'date-fns';
 
-const VenueScheduleCalendar = ({ venueId }) => {
+const VenueScheduleCalendar = ({ venueId, currentVenue }) => {
     const [events, setEvents] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
     const [newEvent, setNewEvent] = useState({
@@ -19,8 +19,11 @@ const VenueScheduleCalendar = ({ venueId }) => {
     const [selectedDate, setSelectedDate] = useState('');
 
     useEffect(() => {
-        fetchEvents();
-    }, [venueId]);
+        if (venueId && currentVenue) {
+            console.log('Current Venue:', currentVenue);
+            fetchEvents();
+        }
+    }, [venueId, currentVenue]);
 
     const fetchEvents = async () => {
         try {
@@ -100,7 +103,35 @@ const VenueScheduleCalendar = ({ venueId }) => {
     const handleInputChange = (e) => {
         const { name, value, checked, type } = e.target;
         setNewEvent(prevState => ({ ...prevState, [name]: type === 'checkbox' ? checked : value }));
+
+        // 根据 courseTitle 更新价格
+        if (name === 'courseTitle' && currentVenue) {
+            console.log('Selected Course Title:', value);
+            let price = 0;
+            switch (value) {
+                case 'cpr':
+                    price = currentVenue.cprPrice;
+                    break;
+                case 'bls':
+                    price = currentVenue.blsPrice;
+                    break;
+             
+                default:
+                    price = 0;
+                    break;
+            }
+            setNewEvent(prevState => ({ ...prevState, price }));
+        }
+         // 当 start 时间变化时，自动设置 end 时间为 start 时间 + 2 小时
+    if (name === 'start') {
+        const [hours, minutes] = value.split(':'); // 分割出小时和分钟
+        let newEndHour = parseInt(hours) + 2; // 加两个小时
+        if (newEndHour >= 24) newEndHour = newEndHour - 24; // 确保时间在 24 小时内
+        const endTime = `${String(newEndHour).padStart(2, '0')}:${minutes}`; // 格式化时间
+        setNewEvent(prevState => ({ ...prevState, end: endTime })); // 更新 end 时间
+    }
     };
+
     const renderEventContent = (eventInfo) => (
         <div>
             <b>{eventInfo.timeText}</b>
@@ -133,11 +164,8 @@ const VenueScheduleCalendar = ({ venueId }) => {
                     onChange={handleInputChange}
                     autoFocus
                     >
-                    <MenuItem value="CPR">CPR</MenuItem>
-                    <MenuItem value="BLS">BLS</MenuItem>
-                    <MenuItem value="Skill">Skill</MenuItem>
-                    <MenuItem value="InstructorCourse">Instructor Course</MenuItem>
-                     <MenuItem value="CPR Adult">CPR Adult</MenuItem>
+                    <MenuItem value="cpr">CPR</MenuItem>
+                    <MenuItem value="bls">BLS</MenuItem>
                      </Select>
                     </FormControl>
                     <TextField

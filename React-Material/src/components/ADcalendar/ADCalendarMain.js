@@ -14,7 +14,13 @@ const ADCalendarMain=()=>{
     const[Courses,setCourses]=useState([]);
     const[venues,setVenues]=useState([]);
     useEffect(() => {
-        axiosInstance.get('/api/icpie/course/coursevenueIdaddress')
+      const token = localStorage.getItem('token');
+      //("Stored JWT in localStorage:", token);
+      
+      const authHeader = 'Bearer ' + token;
+        axiosInstance.get('/course/coursevenueIdaddress', {headers: {
+          'Authorization': authHeader}  // 传递 Bearer token
+        })
           .then(response => {
             if (response.data) {
               //console.log(response.data);
@@ -42,8 +48,13 @@ const ADCalendarMain=()=>{
           showNotification('Please select a venue before searching!', 'warning');
           return; // 终止搜索，直到选择了场地
         }
-      
-        axiosInstance.get('/api/icpie/course/coursecalendar', { params: { venueId: currentvenue.id } })
+        const token = localStorage.getItem('token');
+        //("Stored JWT in localStorage:", token);
+        
+        const authHeader = 'Bearer ' + token;
+        axiosInstance.get('/course/coursecalendar', { params: { venueId: currentvenue.id },headers: {
+          'Authorization': authHeader}  // 传递 Bearer token
+        })
         .then(response => {
           if (response.data) {
             //console.log(response.data);

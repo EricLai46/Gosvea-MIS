@@ -27,7 +27,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/icpie/course")
-@CrossOrigin(origins =  {"http://54.175.129.180:80", "http://allcprmanage.com"}, allowedHeaders = "*")
+@CrossOrigin(origins =  { "https://allcprmanage.com","http://localhost:3000"}, allowedHeaders = "*")
 //@CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*")
 public class CourseController {
 

@@ -27,7 +27,14 @@ const VenueMap = () => {
 
   const fetchVenues = async () => {
     try {
-      const response = await axiosInstance.get('/venue/venuemap');
+      const token = localStorage.getItem('token');
+    //("Stored JWT in localStorage:", token);
+    
+    const authHeader = 'Bearer ' + token;
+      const response = await axiosInstance.get('/venue/venuemap', {headers: {
+        'Authorization': authHeader }
+         // 传递 Bearer token
+      });
       if (response.data.message === "success") {
         setVenues(response.data.data); // 直接设置 venues
         //console.log("Venue data:",venues);

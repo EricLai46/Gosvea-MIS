@@ -109,8 +109,16 @@ const InstructorMain = () => {
         delete params[key];
       }
     });
-
-    axiosInstance.get('/instructor', { params })
+    const token = localStorage.getItem('token');
+    //("Stored JWT in localStorage:", token);
+    
+    const authHeader = 'Bearer ' + token;
+    axiosInstance.get('/instructor', {
+      params: params,  // 将 params 正确放入第二个参数中的 params 字段
+      headers: {
+        'Authorization': authHeader  // 传递 Bearer token
+      }
+    })
       .then(response => {
         //console.log('Response received:', response); // 添加日志
         if (response.data.message === "success") {

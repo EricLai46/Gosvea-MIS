@@ -18,8 +18,8 @@ public interface VenueMapper {
 //            "values(#{state}, #{city}, #{instructor}, #{address}, #{timeZone}, #{cancellationPolicy}, #{paymentMode}, #{nonrefundableFee}, #{fobKey}, #{deposit}, #{membershipFee}, #{usageFee}, #{refundableStatus}, #{bookMethod}, #{registrationLink})")
 //    void add(Venue venue);
     //修改后的
-    @Insert("insert into venue(id,state, city, address, time_zone, cancellation_policy, payment_mode, nonrefundable_fee, fob_key, deposit, membership_fee, usage_fee, refundable_status, book_method, registration_link,venue_status,icpis_manager) " +
-            "values(#{id},#{state}, #{city}, #{address}, #{timeZone}, #{cancellationPolicy}, #{paymentMode}, #{nonrefundableFee}, #{fobKey}, #{deposit}, #{membershipFee}, #{usageFee}, #{refundableStatus}, #{bookMethod}, #{registrationLink},#{venueStatus},#{icpisManager})")
+    @Insert("insert into venue(id,state, city, address, time_zone, cancellation_policy, payment_mode, nonrefundable_fee, fob_key, deposit, membership_fee, usage_fee, refundable_status, book_method, registration_link,venue_status,icpis_manager,cpr_price,bls_price) " +
+            "values(#{id},#{state}, #{city}, #{address}, #{timeZone}, #{cancellationPolicy}, #{paymentMode}, #{nonrefundableFee}, #{fobKey}, #{deposit}, #{membershipFee}, #{usageFee}, #{refundableStatus}, #{bookMethod}, #{registrationLink},#{venueStatus},#{icpisManager},#{cprPrice},#{blsPrice})")
     void add(Venue venue);
 
     List<Venue> list(String state, String city, String icpisManager, String timeZone,String venueId,String venueStatus);

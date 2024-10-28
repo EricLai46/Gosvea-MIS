@@ -44,6 +44,11 @@ public class Venue {
     private Double latitude;
     private Double longitude;
     private  String instructorNames;
+
+    //课程价格
+    private Double cprPrice;
+    private Double blsPrice;
+
     // VenueStatus 枚举类型的属性
     @Enumerated(EnumType.STRING)
     private VenueStatus venueStatus;

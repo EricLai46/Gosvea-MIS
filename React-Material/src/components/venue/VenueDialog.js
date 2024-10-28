@@ -142,6 +142,9 @@ const VenueDialog = ({ open, handleClose, isEditMode, currentVenue, handleChange
             <MenuItem value="Kenny">Kenny</MenuItem>,
             <MenuItem value="Daniel">Daniel</MenuItem>,
             <MenuItem value="Mia">Mia</MenuItem>,
+            <MenuItem value="Daya">Daya</MenuItem>,
+            <MenuItem value="Jianan">Jianan</MenuItem>,
+            <MenuItem value="Matilda">Matilda</MenuItem>
           ]
         ) : (
           // 非 ROLE_ICPIE 用户，只能选择 icpisname
@@ -269,6 +272,28 @@ const VenueDialog = ({ open, handleClose, isEditMode, currentVenue, handleChange
               onChange={handleChange}
             />
           </Grid>
+          <Grid item xs={6}>
+            <TextField
+              margin="dense"
+              label="CPR Price"
+              type="text"
+              fullWidth
+              name="cprPrice"
+              value={currentVenue.cprPrice}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField
+              margin="dense"
+              label="BLS Price"
+              type="text"
+              fullWidth
+              name="blsPrice"
+              value={currentVenue.blsPrice}
+              onChange={handleChange}
+            />
+          </Grid>
 
           <Grid item xs={6}>
             <FormControl margin="dense" fullWidth>
@@ -291,7 +316,8 @@ const VenueDialog = ({ open, handleClose, isEditMode, currentVenue, handleChange
         </Grid>
 
         {isEditMode && (
-          <VenueScheduleCalendar venueId={currentVenue.id} />
+          <VenueScheduleCalendar venueId={currentVenue.id}
+          currentVenue={currentVenue} />
         )}
       </DialogContent>
       <DialogActions>

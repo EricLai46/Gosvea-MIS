@@ -100,7 +100,7 @@ const CourseMain = () => {
     const authHeader = 'Bearer ' + token;
     //console.log("Authorization header to be sent:", authHeader); 
 
-    axiosInstance.get('/api/icpie/course',  {
+    axiosInstance.get('/course',  {
       params: params,  // 将 params 正确放入第二个参数中的 params 字段
       headers: {
         'Authorization': authHeader  // 传递 Bearer token
@@ -168,7 +168,7 @@ const CourseMain = () => {
   };
 
   const handleSave = () => {
-    axiosInstance.put('/api/icpie/course', currentCourse, {
+    axiosInstance.put('/course', currentCourse, {
       headers: {
         'Content-Type': 'application/json'
       }
