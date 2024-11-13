@@ -167,6 +167,7 @@ public class InstructorController {
            Instructor instructor = instructorService.getInstructorById(instructorDTO.getId());
            //System.out.println("venue "+instructor);
            List<String> instructorDTOvenueIds=instructorDTO.getVenueIds();
+           System.out.println("venueIDs"+instructorDTOvenueIds);
          if(instructorDTOvenueIds!=null&&!instructorDTOvenueIds.isEmpty())
          {
              for(String venueDToInstructorId:instructorDTOvenueIds) {
@@ -176,6 +177,7 @@ public class InstructorController {
                  }
              }
          }
+
             instructor.setFirstname(instructorDTO.getFirstname());
             instructor.setLastname(instructorDTO.getLastname());
             instructor.setPhoneNumber(instructorDTO.getPhoneNumber());
@@ -241,6 +243,24 @@ public class InstructorController {
     public Result<InstructorSchedule> addInstructorSchedule(@RequestBody InstructorSchedule instructorSchedule)
     {
         instructorService.addInstructorSchedule(instructorSchedule);
+//        String instructorId=instructorSchedule.getInstructorId();
+//        if(instructorId!=null) {
+//            List<Venue> venueList = venueService.getVenueByInstructorId(instructorId);
+//            for(Venue venue:venueList)
+//            {
+//                List<String> afterInstructorIds = instructorService.getInstructorIdsByVenueId(venue.getId());
+//                //重新生成新的course schedule
+//                for (String afterInstructorId : afterInstructorIds) {
+//                    Instructor instructor = getInstructorById(afterInstructorId);
+//                    if (instructor != null) {
+//                        //生成course schedule
+//                        courseService.generateOrUpdateCourseSchedules(venue.getId(), instructor.getId());
+//
+//                    }
+//                }
+//            }
+//
+//        }
         //checkVenueInstructorInformation();
         return Result.success();
     }

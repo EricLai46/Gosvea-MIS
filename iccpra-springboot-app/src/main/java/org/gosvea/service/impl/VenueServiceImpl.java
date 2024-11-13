@@ -5,6 +5,7 @@ import org.gosvea.pojo.Instructor;
 import org.gosvea.pojo.PageResponse;
 import org.gosvea.pojo.Venue;
 import org.gosvea.pojo.VenueSchedule;
+import org.gosvea.service.CourseService;
 import org.gosvea.service.InstructorService;
 import org.gosvea.service.VenueService;
 import org.json.JSONObject;
@@ -32,8 +33,7 @@ public class VenueServiceImpl implements VenueService {
 
     private RestTemplate restTemplate;
 
-    @Autowired
-    private InstructorService instructorService;
+
     @Override
     public void add(Venue venue) {
 
@@ -113,6 +113,7 @@ public class VenueServiceImpl implements VenueService {
     @Override
     public void addVenueSchedule(VenueSchedule venueSchedule) {
         venueMapper.addVenueSchedule(venueSchedule);
+
     }
 
     @Override

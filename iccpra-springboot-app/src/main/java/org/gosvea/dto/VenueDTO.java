@@ -32,4 +32,6 @@ public class VenueDTO {
     //课程价格
     private Double cprPrice;
     private Double blsPrice;
+    private Double cpradultPrice;
+    private Double cprinstructorPrice;
 }

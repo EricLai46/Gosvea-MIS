@@ -178,7 +178,18 @@ const CourseDialog = ({ open, handleClose, isEditMode, currentCourse, handleChan
               }}
             />
           </Grid>
-
+          <Grid item xs={6}>
+            <TextField
+              margin="dense"
+              label="Price"
+              type="text"
+              fullWidth
+              name="price"
+              value={currentCourse.price}
+              onChange={handleChange}
+              
+            />
+          </Grid>
           <Grid item xs={6}>
             <FormControlLabel
               control={

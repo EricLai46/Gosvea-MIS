@@ -15,7 +15,7 @@ const ReportMain=()=>{
     console.log("Stored JWT in localStorage:", token);
     
     const authHeader = 'Bearer ' + token;
-    axiosInstance.get('/course/coursesummary', {
+    axiosInstance.get('/api/icpie/course/coursesummary', {
       params: {
         date: date  // 传递需要查询的日期作为参数
       },

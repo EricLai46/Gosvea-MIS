@@ -188,7 +188,7 @@ const VenueMap = () => {
                   <span>
                     <strong>{venue.name}</strong><br />
                     Status: {venue.venueStatus}<br />
-                    Address: {venue.address}<br />
+                    Address:  {`${venue.id.substring(0, 2)} ${venue.address}`}<br />
                     ICPISManager:{venue.icpisManager}
                   </span>
                 </Tooltip>

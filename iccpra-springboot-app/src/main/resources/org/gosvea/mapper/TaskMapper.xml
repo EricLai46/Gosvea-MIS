@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.gosvea.mapper.TaskMapper">
+
+    <!--批量插入Venues到数据库-->
+    <insert id="insertListTasks" parameterType="list">
+        insert into task (description, is_completed, icpis_manager)
+        values
+        <foreach collection="list" item="task" separator=",">
+            (#{task.description},#{task.isCompleted},#{task.icpisManager})
+        </foreach>
+    </insert>
+</mapper>

@@ -48,7 +48,8 @@ public class Venue {
     //课程价格
     private Double cprPrice;
     private Double blsPrice;
-
+    private Double cpradultPrice;
+    private Double cprinstructorPrice;
     // VenueStatus 枚举类型的属性
     @Enumerated(EnumType.STRING)
     private VenueStatus venueStatus;

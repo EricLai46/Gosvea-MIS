@@ -23,7 +23,7 @@ const VenueMain = () => {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  const timeZones = ['PST', 'EST', 'CST', 'MST', 'GMT', 'UTC', 'BST', 'CEST'];
+  const timeZones = ['PST', 'EST', 'CST', 'MST', 'GMT', 'UTC','AKST'];
   const { showNotification } = useNotification();
   const [totalPages, setTotalPages] = useState(1); // 添加 totalPages 状态
   const [selectedFile,setSelectedFile]=useState(null);
@@ -187,8 +187,12 @@ const VenueMain = () => {
       bookMethod: '',
       registrationLink: '',
       icpisManager: userRole==="ROLE_ICPIE"?'':icpisname,
+      cprPrice: 0,
+      blsPrice: 0,
+      cpradultPrice: 0,
+      cprinstructorPrice: 0,
       instructor: [],
-      venueStatus: null,
+      venueStatus: 'NORMAL',
     };
 
     setCurrentVenue(newVenue);
@@ -247,6 +251,8 @@ const bookmethod=currentVenue.bookMethod;
 const registrationlink=currentVenue.registrationLink;
 const cprPrice=currentVenue.cprPrice;
 const blsPrice=currentVenue.blsPrice;
+const cpradultPrice=currentVenue.cpradultPrice;
+const cprinstructorPrice=currentVenue.cprinstructorPrice;
 // 构建符合 VenueDTO 格式的对象
 const venueDTO = {
   ...currentVenue,
@@ -268,7 +274,9 @@ const venueDTO = {
   bookMethod:bookmethod,
   registrationLink:registrationlink,
   cprPrice:cprPrice,
-  blsPrice:blsPrice
+  blsPrice:blsPrice,
+  cpradultPrice:cpradultPrice,
+  cprinstructorPrice:cprinstructorPrice
 };
 //console.log(JSON.stringify(venueDTO, null, 2));
 //console.log('Venue DTO:', venueDTO);  // 调试时查看传递的 DTO 数据
@@ -312,12 +320,16 @@ const handleInsert = () => {
     bookMethod: currentVenue.bookMethod,
     registrationLink: currentVenue.registrationLink,
     city: currentVenue.city,
-    timeZone: currentVenue.timeZone,
+    timeZone: currentVenue.timeZone || 'PST',
     state: currentVenue.state,
-    instructorIds: instructorIds // 添加讲师 ID 列表
+    instructorIds: instructorIds, // 添加讲师 ID 列表
+    cprPrice:currentVenue.cprPrice,
+    blsPrice:currentVenue.blsPrice,
+    cpradultPrice:currentVenue.cpradultPrice,
+    cprinstructorPrice:currentVenue.cprinstructorPrice
   };
 
-  //console.log("新场地信息是：", data);
+  console.log("新场地信息是：", data);
 
   // 发送请求
   axiosInstance

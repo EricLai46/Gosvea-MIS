@@ -29,7 +29,7 @@ public interface CourseScheduleMapper {
     @Delete("delete from coursesschedule where instructor_id=#{instructorId} and venue_id=#{venueId}")
     void deleteCourse(Integer instructorId, Integer venueId);
 
-     @Update("update coursesschedule set instructor_id=#{instructorId},venue_id=#{venueId},start_time=#{startTime},end_time=#{endTime},date=#{date},is_active=#{isActive},is_enrollwareAdded=#{isEnrollwareAdded},comments=#{comments} where id=#{id}")
+     @Update("update coursesschedule set instructor_id=#{instructorId},venue_id=#{venueId},start_time=#{startTime},end_time=#{endTime},date=#{date},is_active=#{isActive},is_enrollwareAdded=#{isEnrollwareAdded},comments=#{comments},price=#{price} where id=#{id}")
     void updateCourseInformation(CourseSchedule courseSchedule);
     @Delete("delete from coursesschedule")
     void deleteAllSchedule();
@@ -54,4 +54,8 @@ public interface CourseScheduleMapper {
     List<CourseSchedule> getCourseScheduleSummary(LocalDate fromDate, LocalDate toDate);
 
     List<CourseSchedule> getCourseScheduleSummaryByVenueId(LocalDate fromDate, LocalDate toDate);
+
+    List<Venue> getNoCourseSchedleVenueFromTo(LocalDate fromData,LocalDate toDate);
+
+    List<CourseSchedule> getActivedCourseScheduleSummaryByVenyeId(LocalDate fromDate,LocalDate toDate);
 }

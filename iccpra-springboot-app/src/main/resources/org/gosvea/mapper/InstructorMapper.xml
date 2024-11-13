@@ -74,10 +74,10 @@
 
 
             <if test="lastname!=null">
-                and i.lastname=#{lastname}
+                AND i.lastname LIKE CONCAT('%', #{lastname}, '%')
             </if>
             <if test="firstname!=null">
-                and i.firstname=#{firstname}
+                AND i.firstname LIKE CONCAT('%', #{firstname}, '%')
             </if>
             <if test="venueId!=null">
                and iv.venue_id = #{venueId}

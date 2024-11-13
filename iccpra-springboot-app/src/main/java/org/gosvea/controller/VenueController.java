@@ -7,9 +7,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.poi.ss.usermodel.*;
 import org.gosvea.dto.VenueDTO;
 import org.gosvea.pojo.*;
-import org.gosvea.service.CourseService;
-import org.gosvea.service.InstructorService;
-import org.gosvea.service.VenueService;
+import org.gosvea.service.*;
 import org.gosvea.utils.JwtUtil;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +47,12 @@ public class VenueController {
 
     @Autowired
     private CourseService courseService;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    private IccpraService iccpraService;
 
     @Autowired
     private SqlSessionTemplate sqlSessionTemplate;
@@ -112,10 +116,12 @@ public class VenueController {
             venue.setCity(venueDTO.getCity());
             venue.setTimeZone(venueDTO.getTimeZone());
             venue.setState(venueDTO.getState());
-            venue.setCprPrice(venue.getCprPrice());
-            venue.setBlsPrice(venue.getBlsPrice());
+            venue.setCprPrice(venueDTO.getCprPrice());
+            venue.setBlsPrice(venueDTO.getBlsPrice());
+            venue.setCpradultPrice(venueDTO.getCpradultPrice());
+            venue.setCprinstructorPrice(venueDTO.getCprinstructorPrice());
             venueService.add(venue);
-            System.out.println("venue"+venue.getInstructors());
+            //System.out.println("venue"+venue.getInstructors());
             // 获取关联的讲师列表
 //            List<Instructor> instructors = venue.getInstructors();
 //            if (instructors != null && !instructors.isEmpty()) {
@@ -162,7 +168,24 @@ public class VenueController {
             return Result.error(e.getMessage() + "\n" + getStackTrace(e));
         }
     }
+    //获取单个场地信息
+    @GetMapping("/singlevenue")
+    public Result<Venue> getVenueById(String venueId)
+    {
+        if(venueId!=null)
+        {
+            try{
+                Venue venue=venueService.getVenueById(venueId);
+                return Result.success(venue);
+            }
+                catch(Exception e){
+                e.printStackTrace();
+                return Result.error(e.getMessage()+"\n"+getStackTrace(e));
+        }
+        }
+        return Result.error("venueId is null");
 
+    }
     //获取场地信息
     @GetMapping
     public Result<PageResponse<Venue>> list(
@@ -187,7 +210,18 @@ public class VenueController {
             {
                 ps=venueService.icpislist(pageNum,pageSize,state,city,icpisname,timeZone,venueId,venueStatus);
             }
-
+//            List<Venue> investigationVenueList=venueService.getAllSpecStatusVenues(Venue.VenueStatus.INVESTIGATION);
+//            for(Venue venue:investigationVenueList)
+//            {
+//                Icpie icpie =iccpraService.findByIcpieName(venue.getIcpisManager());
+//                System.out.println(icpie);
+//                if(icpie!=null)
+//                {
+//                    String email=icpie.getEmail();
+//                    emailService.noticeIcpisManagerAddAD(email,venue);
+//                }
+//
+//            }
             return Result.success(ps);
         } catch (Exception e) {
             e.printStackTrace();
@@ -209,14 +243,14 @@ public class VenueController {
     public Result updateVenue(@RequestBody VenueDTO venueDTO) {
         try {
             // 获取现有的 Venue 实体
-            System.out.println("venueDTO"+venueDTO);
+            //System.out.println("venueDTO"+venueDTO);
             Venue venue = venueService.getVenueById(venueDTO.getId());
-            System.out.println("venue "+venue);
+           //System.out.println("venue "+venue);
             List<String> venueDTOInstructorIds=venueDTO.getInstructorIds();
             venueService.updtaeLatLonInformationForOneVenue(venue);
 
             List<String> previousInstructorIds=instructorService.getInstructorIdsByVenueId(venue.getId());
-            System.out.println("previous instructor Id"+previousInstructorIds);
+            //System.out.println("previous instructor Id"+previousInstructorIds);
             //检查是否改变了instructor和venue的关系
             if(venueService.isInstructrorListChanged(venueDTOInstructorIds,previousInstructorIds))
             {
@@ -284,6 +318,8 @@ public class VenueController {
             venue.setVenueStatus(venueDTO.getVenueStatus());
             venue.setBlsPrice(venueDTO.getBlsPrice());
             venue.setCprPrice(venueDTO.getCprPrice());
+            venue.setCpradultPrice(venueDTO.getCpradultPrice());
+            venue.setCprinstructorPrice(venueDTO.getCprinstructorPrice());
             venue.setCancellationPolicy(venueDTO.getCancellationPolicy());
             venue.setPaymentMode(venueDTO.getPaymentMode());
             venue.setNonrefundableFee(venueDTO.getNonrefundableFee());
@@ -378,7 +414,7 @@ public class VenueController {
                 venueHasLaLon.add(venue);
             }
         }
-        System.out.println("The Venue hasLalon"+venueHasLaLon);
+        //System.out.println("The Venue hasLalon"+venueHasLaLon);
         return Result.success(venueHasLaLon);
     }
 
@@ -386,6 +422,26 @@ public class VenueController {
     @PostMapping("/schedule")
     public Result<VenueSchedule> addVenueSchedule(@RequestBody VenueSchedule venueSchedule) {
         venueService.addVenueSchedule(venueSchedule);
+//        String venueId=venueSchedule.getVenueId();
+//        if(venueId!=null)
+//        {
+//            Venue venue=venueService.getVenueById(venueId);
+//            if(venue!=null)
+//            {
+//                List<String>  afterInstructorIds=instructorService.getInstructorIdsByVenueId(venue.getId());
+//                //重新生成新的course schedule
+//                for(String afterInstructorId:afterInstructorIds)
+//                {
+//                    Instructor instructor=instructorService.getInstructorById(afterInstructorId);
+//                    if(instructor!=null)
+//                    {
+//                        //生成course schedule
+//                        courseService.generateOrUpdateCourseSchedules(venue.getId(), instructor.getId());
+//
+//                    }
+//                }
+//            }
+//        }
        // checkVenueInstructorInformation();
         return Result.success();
     }
@@ -430,12 +486,12 @@ public class VenueController {
                         id = idCell.getStringCellValue().trim();
                     } else {
                         id = "UNKNOWN";
-                        System.out.println("Row " + row.getRowNum() + " ID has an unexpected cell type: " + idCell.getCellType());
+                        //System.out.println("Row " + row.getRowNum() + " ID has an unexpected cell type: " + idCell.getCellType());
                     }
-                    System.out.println("Row " + row.getRowNum() + " ID: " + id);
+                    //System.out.println("Row " + row.getRowNum() + " ID: " + id);
                     venue.setId(id);
                 } else {
-                    System.out.println("Row " + row.getRowNum() + " ID cell is null or empty");
+                    //System.out.println("Row " + row.getRowNum() + " ID cell is null or empty");
                     continue; // 如果ID为空或null，跳过该行
                 }
 
@@ -502,10 +558,10 @@ public class VenueController {
                 Cell timeZoneCell = row.getCell(6);
                 if (timeZoneCell != null && timeZoneCell.getCellType() != CellType.BLANK) {
                     String timeZone = timeZoneCell.getStringCellValue().trim();
-                    System.out.println("Time zone at row " + row.getRowNum() + ": " + timeZone);
+                    //System.out.println("Time zone at row " + row.getRowNum() + ": " + timeZone);
                     venue.setTimeZone(timeZone);
                 } else {
-                    System.out.println("Time zone cell is null or empty at row " + row.getRowNum());
+                    //System.out.println("Time zone cell is null or empty at row " + row.getRowNum());
                     venue.setTimeZone(""); // 或者设置为默认的时区
                 }
 
@@ -565,7 +621,7 @@ public class VenueController {
                         Venue.VenueStatus status = Venue.VenueStatus.valueOf(statusString);
                         venue.setVenueStatus(status);
                     } catch (IllegalArgumentException e) {
-                        System.out.println("Unknown venue status: " + statusString);
+                       // System.out.println("Unknown venue status: " + statusString);
                         venue.setVenueStatus(Venue.VenueStatus.NORMAL);
                     }
                 } else {
@@ -583,7 +639,7 @@ public class VenueController {
 
             // 循环结束后分别添加和更新venue列表
             if (!insertVenuesList.isEmpty()) {
-                System.out.println(insertVenuesList);
+               // System.out.println(insertVenuesList);
                 venueService.insertListVenues(insertVenuesList);
                 venueService.addLatLonInformationForListVenues(insertVenuesList);
             }

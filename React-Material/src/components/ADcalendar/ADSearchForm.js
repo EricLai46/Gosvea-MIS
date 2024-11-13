@@ -2,6 +2,7 @@ import React,{useState} from 'react';
 import { Box, FormControl, InputLabel, Select, MenuItem, Button,TextField } from '@mui/material';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import ADCalendarPriceComponent from './ADCalendarPriceComponent';
 import dayjs from 'dayjs';
 
 const ADSearchForm=({handleReset,handleSearch,venues,setCurrentvenue})=>{
@@ -49,7 +50,15 @@ const ADSearchForm=({handleReset,handleSearch,venues,setCurrentvenue})=>{
               Reset
             </Button>
           </Box>
+          <ADCalendarPriceComponent
+            selectedVenue={selectedVenue}         
+          
+          />
+
+        
         </LocalizationProvider>
+
+       
       );
 };
 

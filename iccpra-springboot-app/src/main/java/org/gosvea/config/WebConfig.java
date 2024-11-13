@@ -30,20 +30,20 @@ public class WebConfig implements WebMvcConfigurer {
 
 
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-
-//        registry.addInterceptor(loginInterceptors)
-//                .addPathPatterns("/api/icpie/**")  // 明确要拦截的路径
-//                .excludePathPatterns("/icpie/login");  // 排除不拦截的路径
-
+   @Override
+  public void addInterceptors(InterceptorRegistry registry) {
+//
+////        registry.addInterceptor(loginInterceptors)
+////                .addPathPatterns("/api/icpie/**")  // 明确要拦截的路径
+////                .excludePathPatterns("/icpie/login");  // 排除不拦截的路径
+//
     }
     @Override
     public void addCorsMappings(CorsRegistry registry)
     {
         registry.addMapping("/**")
                 //.allowedOrigins("http://54.175.129.180", "https://allcprmanage.com")
-                .allowedOrigins( "https://allcprmanage.com","http://localhost:3000")
+                .allowedOrigins( "https://allcprmanage.com","http://localhost:3000", "http://localhost:8080")
                 //.allowedOrigins("http://localhost:3000")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("Content-Type","Authorization")

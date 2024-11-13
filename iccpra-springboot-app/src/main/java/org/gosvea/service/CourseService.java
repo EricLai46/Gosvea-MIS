@@ -41,4 +41,8 @@ public interface CourseService {
     List<CourseSchedule> getCourseScheduleSummary(LocalDate date);
 
     List<CourseSchedule> getCourseScheduleSummaryByVenueId(LocalDate date);
+
+    List<Venue> getNoCourseSchedleVenueFromTo(LocalDate fromData,LocalDate toDate);
+
+    List<CourseSchedule> getActivedCourseScheduleSummaryByVenyeId(LocalDate date);
 }

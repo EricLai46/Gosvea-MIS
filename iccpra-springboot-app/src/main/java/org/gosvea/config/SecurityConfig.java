@@ -24,17 +24,19 @@ public class SecurityConfig  {
         http
                 .csrf(csrf -> csrf.disable())  // 这里使用 lambda 替代被弃用的 csrf() 方法
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/icpie/login").permitAll()
-                        .requestMatchers("/health").permitAll()
-                        .requestMatchers("/api/icpie/**").hasRole("ICPIE")
-                        .requestMatchers("/api/icpim/**").hasAnyRole("ICPIM", "ICPIE")
-                        .requestMatchers("/api/icpis/**").hasAnyRole("ICPIS", "ICPIM", "ICPIE")
-                        .requestMatchers("/venue/**").authenticated()  // 确保 /venue 路径需要认证
-                        .requestMatchers("/instructor/**").authenticated()  // 确保 /instructor 路径需要认证
-                        .anyRequest().authenticated()
+                                .anyRequest().permitAll()
+//                        .requestMatchers("/icpie/login").permitAll()
+//                        .requestMatchers("/health").permitAll()
+//                        .requestMatchers("/testredis").permitAll()
+//                        .requestMatchers("/api/icpie/**").hasRole("ICPIE")
+//                        .requestMatchers("/api/icpim/**").hasAnyRole("ICPIM", "ICPIE")
+//                        .requestMatchers("/api/icpis/**").hasAnyRole("ICPIS", "ICPIM", "ICPIE")
+//                        .requestMatchers("/venue/**").authenticated()  // 确保 /venue 路径需要认证
+//                        .requestMatchers("/instructor/**").authenticated()  // 确保 /instructor 路径需要认证
+//                        .anyRequest().authenticated()
 
                 )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)  // 在用户名密码验证之前添加 JWT 验证
+                //.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)  // 在用户名密码验证之前添加 JWT 验证
                 .httpBasic(httpBasic -> httpBasic.disable());  // 禁用 HTTP Basic 认证
 
         return http.build();

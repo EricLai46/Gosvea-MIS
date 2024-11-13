@@ -1,15 +1,14 @@
 package org.gosvea.task;
 
 import org.gosvea.pojo.CourseSchedule;
+import org.gosvea.pojo.Icpie;
 import org.gosvea.pojo.Instructor;
 import org.gosvea.pojo.Venue;
-import org.gosvea.service.CourseService;
-import org.gosvea.service.InstructorService;
-import org.gosvea.service.VenueService;
+import org.gosvea.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
+import java.time.temporal.ChronoUnit;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.chrono.ChronoLocalDate;
@@ -23,7 +22,11 @@ import java.util.stream.Collectors;
 @Component
 public class CourseCompletionTask {
 
+    @Autowired
+    private EmailService emailService;
 
+    @Autowired
+    private IccpraService iccpraService;
     @Autowired
     private InstructorService instructorService;
 
@@ -32,6 +35,9 @@ public class CourseCompletionTask {
 
     @Autowired
     private VenueService venueService;
+
+    // 起始日期：11/09/2024
+    private static final LocalDate START_DATE = LocalDate.of(2024, 11, 9);
 
     @Scheduled(cron = "0 0 0 * * ?") // 每天午夜执行一次
     public void checkCourseCompletion() {
@@ -109,6 +115,47 @@ public class CourseCompletionTask {
                         venueService.updateVenue(venue);
                         break; // 找到一个满足条件的讲师后，跳出循环
                     }
+                }
+            }
+        }
+    }
+
+    //检查新点准备补打广告
+    @Scheduled(cron = "0 0 2 * * ?")
+    public void CheckIfNeedAddedAD(){
+        List<Venue> investigationVenueList=venueService.getAllSpecStatusVenues(Venue.VenueStatus.INVESTIGATION);
+        for(Venue venue:investigationVenueList)
+        {
+            Icpie icpie =iccpraService.findByIcpieName(venue.getIcpisManager());
+            if(icpie!=null)
+            {
+                String email=icpie.getEmail();
+                emailService.noticeIcpisManagerAddAD(email,venue);
+            }
+
+        }
+    }
+    //广告异常通知
+    @Scheduled(cron = "0 20 2 * * ?")
+    public void CheckADWired(){
+        LocalDate today = LocalDate.now();
+
+        // 计算从起始日期到今天的天数差
+        long daysBetween = ChronoUnit.DAYS.between(START_DATE, today);
+
+
+        // 检查是否为两周的倍数
+        if (daysBetween % 14 == 0) {
+            System.out.println("Executing task on: " + today);
+            // 执行任务的代码逻辑
+            LocalDate fromDate=today.plusDays(22);
+            LocalDate toDate=fromDate.plusDays(13);
+            List<Venue> venueList=courseService.getNoCourseSchedleVenueFromTo(fromDate,toDate);
+            if(venueList!=null&&!venueList.isEmpty())
+            {
+                for(Venue venue:venueList)
+                {
+                    emailService.noticeIcpisManagerAdWired(venue);
                 }
             }
         }

@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.gosvea.service.RedisService;
 import org.gosvea.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,13 +24,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private JwtUtil jwtUtil; //
 
+    @Autowired
+    private RedisService redisService;
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         // 跳过登录路径，不执行 JWT 验证
         String requestPath = request.getServletPath();
-        if ("/icpie/login".equals(requestPath)) {
+        if ("/icpie/login".equals(requestPath)|| "/testredis".equals(requestPath)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -49,6 +52,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     // 获取用户名和角色
                     String role = (String) claims.get("role");
                     String username = (String) claims.get("icpiename");
+                    String email=(String)claims.get("email");
+                    //储存数据到redis缓存
+                    redisService.saveData("name",username);
+                    redisService.saveData("email",email);
 
                     //System.out.println("Parsed claims: " + claims);
                    // System.out.println("Role: " + role);

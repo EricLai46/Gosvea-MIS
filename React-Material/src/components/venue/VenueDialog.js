@@ -294,7 +294,28 @@ const VenueDialog = ({ open, handleClose, isEditMode, currentVenue, handleChange
               onChange={handleChange}
             />
           </Grid>
-
+          <Grid item xs={6}>
+            <TextField
+              margin="dense"
+              label="CPR Adult Price"
+              type="text"
+              fullWidth
+              name="cpradultPrice"
+              value={currentVenue.cpradultPrice}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField
+              margin="dense"
+              label="CPR Instructor Price"
+              type="text"
+              fullWidth
+              name="cprinstructorPrice"
+              value={currentVenue.cprinstructorPrice}
+              onChange={handleChange}
+            />
+          </Grid>
           <Grid item xs={6}>
             <FormControl margin="dense" fullWidth>
               <InputLabel>Status</InputLabel>

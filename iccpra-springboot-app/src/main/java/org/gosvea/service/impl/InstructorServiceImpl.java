@@ -7,7 +7,9 @@ import org.gosvea.pojo.Instructor;
 import org.gosvea.pojo.InstructorSchedule;
 import org.gosvea.pojo.PageResponse;
 import org.gosvea.pojo.Venue;
+import org.gosvea.service.CourseService;
 import org.gosvea.service.InstructorService;
+import org.gosvea.service.VenueService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +25,9 @@ public class InstructorServiceImpl implements InstructorService {
 
     @Autowired
     private InstructorMapper instructorMapper;
+
+
+
     @Override
     public void addInstructor(Instructor instructor) {
         instructorMapper.addInstructor(instructor);
@@ -81,6 +86,7 @@ public class InstructorServiceImpl implements InstructorService {
     @Override
     public void addInstructorSchedule(InstructorSchedule instructorSchedule) {
         instructorMapper.addInstructorSchedule(instructorSchedule);
+
     }
 
     @Override

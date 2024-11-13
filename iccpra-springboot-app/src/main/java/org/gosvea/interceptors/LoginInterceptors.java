@@ -24,7 +24,9 @@ public class LoginInterceptors implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
-
+        if ("/test-redis".equals(request.getRequestURI())) {
+            return true;
+        }
         // 处理CORS预检请求
         if (HttpMethod.OPTIONS.toString().equals(request.getMethod())) {
             response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));

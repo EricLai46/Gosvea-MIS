@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Delete;
 import org.gosvea.pojo.Icpie;
 import org.gosvea.pojo.Result;
 
+import org.gosvea.service.EmailService;
 import org.gosvea.service.IccpraService;
 import org.gosvea.utils.JwtUtil;
 import org.gosvea.utils.ThreadLocalUtil;
@@ -24,7 +25,8 @@ import java.util.Map;
 @RequestMapping("/icpie")
 @Validated
 public class IccpraController {
-
+    @Autowired
+    private EmailService emailService;
     @Autowired
     private IccpraService iccpraService;
     //register
@@ -63,11 +65,13 @@ public class IccpraController {
             claims.put("firstname",loginicpie.getFirstname());
             claims.put("icpiename",loginicpie.getIcpiename());
             claims.put("role",loginicpie.getRole());
+            claims.put("email",loginicpie.getEmail());
             String token=JwtUtil.genToken(claims);
 
 
             if (JwtUtil.hasRole(token, "ROLE_ICPIE")) {
                 //System.out.println("ss");
+                //emailService.sendEmailNotification(JwtUtil.getUserEmailFromToken(token),"Login successfully","Hello World");
                 return Result.success( token);
             } else {
                 //System.out.println("ff");

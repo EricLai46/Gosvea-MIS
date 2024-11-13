@@ -345,6 +345,18 @@ public Map<String, String> generateOrUpdateCourseSchedules(String venueId, Strin
         return courseScheduleMapper.getCourseScheduleSummaryByVenueId(fromDate,toDate);
     }
 
+    @Override
+    public List<Venue> getNoCourseSchedleVenueFromTo(LocalDate fromData, LocalDate toDate) {
+        return courseScheduleMapper.getNoCourseSchedleVenueFromTo(fromData,toDate);
+    }
+
+    @Override
+    public List<CourseSchedule> getActivedCourseScheduleSummaryByVenyeId(LocalDate date) {
+        LocalDate fromDate=date.plusDays(24);
+        LocalDate toDate=fromDate.plusDays(13);
+        return courseScheduleMapper.getActivedCourseScheduleSummaryByVenyeId(fromDate,toDate);
+    }
+
     public void deleteCourseSchedules(List<CourseSchedule> schedulesToDelete) {
         courseScheduleMapper.deleteCourseSchedules(schedulesToDelete);
     }

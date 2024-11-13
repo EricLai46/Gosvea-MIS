@@ -17,8 +17,10 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import ListItems from './ListItems.js';
-
+import CourseSummaryTable from './CourseTable/CourseSummaryTable.js';
+import {jwtDecode} from 'jwt-decode';
 function Copyright(props) {
+
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
@@ -85,7 +87,13 @@ export default function Dashboard() {
   const toggleDrawer = () => {
     setOpen(!open);
   };
- 
+  const token = localStorage.getItem("token");
+  let userRole = null;
+
+  if (token) {
+    const decodedToken = jwtDecode(token);
+    userRole = decodedToken.claims.role;
+  }
   return (
     <ThemeProvider theme={defaultTheme}>
       <Box sx={{ display: 'flex' }}>
@@ -158,6 +166,7 @@ export default function Dashboard() {
         >
           <Toolbar />
           <VenueMap></VenueMap>
+          {userRole === 'ROLE_ICPIE' && <CourseSummaryTable />}
           <Copyright sx={{ pt: 4 }} />
           
         </Box>

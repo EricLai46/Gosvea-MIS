@@ -1,6 +1,7 @@
 package org.gosvea.controller;
 
 
+import org.gosvea.service.RedisService;
 import org.gosvea.utils.ExcelExporter;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -32,6 +33,9 @@ import java.util.*;
 public class CourseController {
 
     @Autowired
+    private RedisService redisService;
+
+    @Autowired
     private CourseService courseService;
 
     @Autowired
@@ -60,7 +64,8 @@ public class CourseController {
         try {
            // Map<Integer,String> warnings=checkVenueInstructorInformation();
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
+            System.out.println("email address XXXXXXXXX" + redisService.getData("email"));
+            System.out.println("name   OOOOOOOOOOOOO" + redisService.getData("name"));
             // 打印用户信息，确保认证信息正确设置
             //System.out.println("Authenticated user: " + authentication.getName());
            // System.out.println("Authorities: " + authentication.getAuthorities());
@@ -236,7 +241,7 @@ public class CourseController {
 
         List<CourseSchedule> courseScheduleListByVenueId=courseService.getCourseScheduleSummaryByVenueId(date);
 
-        System.out.println("origial: "+courseScheduleListByVenueId);
+        //System.out.println("origial: "+courseScheduleListByVenueId);
 
         //获取所有场地
 
@@ -248,7 +253,6 @@ public class CourseController {
         //获取场地，场地状态的hashmap
 
         Map<String, String> venueStatusmap=getAllVenueStatus();
-
 
 
         // 导出excel表格
@@ -269,6 +273,104 @@ public class CourseController {
                     .headers(headers)
                     .body(excelBytes);
 
+
+    }
+    //导出广告Summarytable
+    @GetMapping("/coursesummaytable")
+    public ResponseEntity<List<Map<String, Object>>> getCoursesSummaryTable(LocalDate date) {
+        // 获取24天后两周内的课程数据并按 venueId 排序
+        List<CourseSchedule> courseScheduleListByVenueId = courseService.getCourseScheduleSummaryByVenueId(date);
+        List<CourseSchedule> activedCourseScheduleListByVenueId = courseService.getActivedCourseScheduleSummaryByVenyeId(date);
+        System.out.println("Actived Course Schedule List: " + activedCourseScheduleListByVenueId);
+        // 获取所有场地
+        Map<String, String> venueList = getAllVenueIdandAddress();
+        Map<String, Venue> venueListMap = venueService.getVenueListMap();
+        Map<String, String> venueStatusMap = getAllVenueStatus();
+
+        // 准备 JSON 格式的列表数据
+        List<Map<String, Object>> tableData = new ArrayList<>();
+        Map<String, Map<String, Object>> uniqueEntryMap = new HashMap<>();  // 用于存储合并数据
+        Map<String, Map<String, Object>> activedEntryMap = new HashMap<>(); // 用于存储活动课程数据
+
+        // 先处理 activedCourseScheduleListByVenueId 生成 activedEntryMap
+        for (CourseSchedule activeCourse : activedCourseScheduleListByVenueId) {
+            String venueId = activeCourse.getVenueId();
+            String courseTitle = (activeCourse.getCourseTitle() != null) ? activeCourse.getCourseTitle().toUpperCase() : "";
+            String uniqueKey = venueId + "|" + courseTitle;
+
+            // 检查 activedEntryMap 中是否已存在该记录
+            if (activedEntryMap.containsKey(uniqueKey)) {
+                Map<String, Object> existingActiveRow = activedEntryMap.get(uniqueKey);
+                String existingActiveDates = (String) existingActiveRow.get("实际开课日期");
+                existingActiveRow.put("实际开课日期", existingActiveDates + ", " + activeCourse.getDate().toString());
+
+                int updatedActiveAdCount = (int) existingActiveRow.get("实际广告次数") + 1;
+                existingActiveRow.put("实际广告次数", updatedActiveAdCount);
+            } else {
+                Map<String, Object> activeRow = new HashMap<>();
+                activeRow.put("实际开课日期", activeCourse.getDate() != null ? activeCourse.getDate().toString() : "No Date");
+                activeRow.put("实际广告次数", 1);  // 初始化实际广告次数为1
+                activedEntryMap.put(uniqueKey, activeRow);
+            }
+        }
+
+        // 处理 courseScheduleListByVenueId 并合并 activedEntryMap 的数据
+        for (CourseSchedule course : courseScheduleListByVenueId) {
+            String venueId = course.getVenueId();
+            String courseTitle = (course.getCourseTitle() != null) ? course.getCourseTitle().toUpperCase() : "";
+            String uniqueKey = venueId + "|" + courseTitle;
+
+            // 获取地址
+            String address = course.getAddress() != null ? course.getAddress() : venueList.getOrDefault(venueId, "地址未知");
+
+            // 检查是否已存在相同的记录
+            if (uniqueEntryMap.containsKey(uniqueKey)) {
+                // 如果存在相同的记录，合并数据
+                Map<String, Object> existingRow = uniqueEntryMap.get(uniqueKey);
+                String existingDates = (String) existingRow.get("开课日期计划");
+                existingRow.put("开课日期计划", existingDates + ", " + course.getDate().toString());
+
+                int updatedPlanCount = (int) existingRow.get("计划次数") + 1;
+                existingRow.put("计划次数", updatedPlanCount);
+
+            } else {
+                // 如果不存在相同的记录，创建新条目
+                Map<String, Object> row = new HashMap<>();
+                row.put("课程编号", course.getId());
+                row.put("培训点编码", venueId);
+                row.put("地址", address);
+                row.put("课程名称", courseTitle);
+                row.put("时区", course.getTimeZone());
+                row.put("AllCPR售价", course.getPrice());
+                row.put("开课日期计划", course.getDate() != null ? course.getDate().toString() : "No Date");
+                row.put("计划次数", 1);  // 初始化计划次数为1
+                row.put("备注", course.isEnrollwareAdded() ? "TRUE" : "FALSE");
+                row.put("负责人", venueListMap.getOrDefault(venueId, new Venue()).getIcpisManager());
+                row.put("补打广告次数", course.isEnrollwareAdded() ? "TRUE" : "FALSE");
+                row.put("发布人", venueListMap.getOrDefault(venueId, new Venue()).getIcpisManager());
+                row.put("场地状态", venueStatusMap.getOrDefault(venueId, "N/A"));
+
+                // 从 activedEntryMap 获取 "实际开课日期" 和 "实际广告次数"
+                if (activedEntryMap.containsKey(uniqueKey)) {
+                    Map<String, Object> activeData = activedEntryMap.get(uniqueKey);
+                    row.put("实际开课日期", activeData.get("实际开课日期"));
+                    row.put("实际广告次数", activeData.get("实际广告次数"));
+                } else {
+                    // 如果没有活动数据，则初始化为 "No Date" 和 0
+                    row.put("实际开课日期", "No Date");
+                    row.put("实际广告次数", 0);
+                }
+
+                // 添加到 uniqueEntryMap 和 tableData
+                uniqueEntryMap.put(uniqueKey, row);
+                tableData.add(row);
+            }
+        }
+
+        // 对 tableData 按 "培训点编码" 排序
+        tableData.sort(Comparator.comparing(row -> (String) row.get("培训点编码")));
+
+        return ResponseEntity.ok().body(tableData);
     }
     public Map<String, String> getAllVenueStatus() {
         List<Map<String, String>> resultList = venueService.getAllVenueStatus();

@@ -11,6 +11,26 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: gosvea@usjus.org
+    password: jzbh dfpb wtdh rusw
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+  data:
+    redis:
+      host: 54.175.129.180
+      port: 6379
+      password: Gosvea2024@
+      timeout: 6000
 
 mybatis:
   configuration:

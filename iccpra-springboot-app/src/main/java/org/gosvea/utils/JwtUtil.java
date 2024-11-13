@@ -47,7 +47,7 @@ public class JwtUtil {
         claimsMap.put("firstname", claims.get("firstname"));
         claimsMap.put("icpiename", claims.get("icpiename"));
         claimsMap.put("id", claims.get("id"));
-
+        claimsMap.put("email",claims.get("email"));
         return claimsMap;
     }
 
@@ -62,5 +62,10 @@ public class JwtUtil {
     public static boolean hasRole(String token, String requiredRole) {
         String role = getUserRoleFromToken(token); // 从 token 中获取用户角色
         return requiredRole.equals(role); // 比较是否拥有该角色
+    }
+
+    public static String getUserEmailFromToken(String token){
+        Map<String, Object> claims = parseToken(token);
+        return (String) claims.get("email");
     }
 }

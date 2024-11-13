@@ -13,7 +13,7 @@ const InstructorScheduleCalendar = ({ instructorId }) => {
         title: '',
         start: '',
         end: '',
-        isWeekly: false,
+        repeatTimes: 0,
     });
     const [selectedDate, setSelectedDate] = useState('');
 
@@ -64,7 +64,7 @@ const InstructorScheduleCalendar = ({ instructorId }) => {
         const eventsToSave = [];
         let currentDate = new Date(selectedDate);
 
-        for (let i = 0; i < (newEvent.isWeekly ? 4 : 1); i++) {
+        for (let i = 0; i < (newEvent.repeatTimes>0 ? newEvent.repeatTimes : 1); i++) {
             eventsToSave.push({
                 title: newEvent.title,
                 date: currentDate.toISOString().split('T')[0],
@@ -90,6 +90,14 @@ const InstructorScheduleCalendar = ({ instructorId }) => {
     const handleInputChange = (e) => {
         const { name, value, checked, type } = e.target;
         setNewEvent(prevState => ({ ...prevState, [name]: type === 'checkbox' ? checked : value }));
+        
+        if (name === 'start') {
+            const [hours, minutes] = value.split(':'); // 分割出小时和分钟
+            let newEndHour = parseInt(hours) + 2; // 加两个小时
+            if (newEndHour >= 24) newEndHour = newEndHour - 24; // 确保时间在 24 小时内
+            const endTime = `${String(newEndHour).padStart(2, '0')}:${minutes}`; // 格式化时间
+            setNewEvent(prevState => ({ ...prevState, end: endTime })); // 更新 end 时间
+        }
     };
 
     const renderEventContent = (eventInfo) => (
@@ -125,9 +133,8 @@ const InstructorScheduleCalendar = ({ instructorId }) => {
                     >
                     <MenuItem value="CPR">CPR</MenuItem>
                     <MenuItem value="BLS">BLS</MenuItem>
-                    <MenuItem value="Skill">Skill</MenuItem>
-                    <MenuItem value="InstructorCourse">Instructor Course</MenuItem>
-                     <MenuItem value="CPR Adult">CPR Adult</MenuItem>
+                    <MenuItem value="cpradult">CPR Adult</MenuItem>
+                    <MenuItem value="cprinstructor">CPR Instructor</MenuItem>
                      </Select>
                     </FormControl>
                     <TextField
@@ -148,7 +155,7 @@ const InstructorScheduleCalendar = ({ instructorId }) => {
                         value={newEvent.end}
                         onChange={handleInputChange}
                     />
-                    <FormControlLabel
+                    {/* <FormControlLabel
                         control={
                             <Checkbox
                                 checked={newEvent.isWeekly}
@@ -158,6 +165,16 @@ const InstructorScheduleCalendar = ({ instructorId }) => {
                             />
                         }
                         label="Repeat weekly for 4 weeks"
+                    /> */}
+                         <TextField
+                        margin="dense"
+                        name="repeatTimes"
+                        label="Repeat Times"
+                        type="number"
+                        fullWidth
+                        value={newEvent.repeatTimes}
+                        onChange={handleInputChange}
+                        inputProps={{ min: 0 }} 
                     />
                 </DialogContent>
                 <DialogActions>

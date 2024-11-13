@@ -13,7 +13,7 @@ const VenueScheduleCalendar = ({ venueId, currentVenue }) => {
         courseTitle: '',
         start: '',
         end: '',
-        isWeekly: false,
+        repeatTimes: 0,
         price: 0
     });
     const [selectedDate, setSelectedDate] = useState('');
@@ -69,7 +69,7 @@ const VenueScheduleCalendar = ({ venueId, currentVenue }) => {
         const eventsToSave = [];
         let currentDate = new Date(selectedDate);
 
-        for (let i = 0; i < (newEvent.isWeekly ? 4 : 1); i++) {
+        for (let i = 0; i < (newEvent.repeatTimes>0 ? newEvent.repeatTimes : 1); i++) {
             eventsToSave.push({
                 courseTitle: newEvent.courseTitle,
                 date: currentDate.toISOString().split('T')[0],
@@ -115,7 +115,12 @@ const VenueScheduleCalendar = ({ venueId, currentVenue }) => {
                 case 'bls':
                     price = currentVenue.blsPrice;
                     break;
-             
+                case 'cpradult':
+                    price=currentVenue.cpradultPrice;
+                    break;
+                case 'cprinstructor':
+                    price=currentVenue.cprinstructorPrice;
+                    break;
                 default:
                     price = 0;
                     break;
@@ -166,6 +171,8 @@ const VenueScheduleCalendar = ({ venueId, currentVenue }) => {
                     >
                     <MenuItem value="cpr">CPR</MenuItem>
                     <MenuItem value="bls">BLS</MenuItem>
+                    <MenuItem value="cpradult">CPR Adult</MenuItem>
+                    <MenuItem value="cprinstructor">CPR Instructor</MenuItem>
                      </Select>
                     </FormControl>
                     <TextField
@@ -195,7 +202,7 @@ const VenueScheduleCalendar = ({ venueId, currentVenue }) => {
                         onChange={handleInputChange}
                         inputProps={{ min: 0 }} 
                       />
-                    <FormControlLabel
+                    {/* <FormControlLabel
                         control={
                             <Checkbox
                                 checked={newEvent.isWeekly}
@@ -205,7 +212,17 @@ const VenueScheduleCalendar = ({ venueId, currentVenue }) => {
                             />
                         }
                         label="Repeat weekly for 4 weeks"
-                    />
+                    /> */}
+                 <TextField
+                        margin='dense'
+                        name="repeatTimes"
+                        label="Repeat times"
+                        type="number"
+                        value={newEvent.repeatTimes}
+                        onChange={handleInputChange}
+                        inputProps={{ min: 0 }} 
+                      />
+
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpenDialog(false)} color="primary">

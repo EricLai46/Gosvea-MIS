@@ -138,4 +138,23 @@
         AND (cs.date BETWEEN #{fromDate} AND #{toDate})
 
     </select>
+    <select id="getActivedCourseScheduleSummaryByVenyeId" resultType="org.gosvea.pojo.CourseSchedule">
+        SELECT v.id AS venue_id, cs.*
+        FROM venue v
+        LEFT JOIN coursesschedule cs
+        ON v.id = cs.venue_id
+        WHERE cs.is_active = 1
+        AND cs.date BETWEEN #{fromDate} AND #{toDate}
+
+    </select>
+    <select id="getNoCourseSchedleVenueFromTo" resultType="org.gosvea.pojo.CourseSchedule">
+        SELECT v.*
+        FROM venue v
+        INNER JOIN coursesschedule cs
+        ON v.id = cs.venue_id
+        AND (cs.date BETWEEN #{fromDate} AND #{toDate})
+        WHERE cs.date IS NULL
+    </select>
+
+
 </mapper>
