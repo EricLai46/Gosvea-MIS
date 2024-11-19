@@ -168,6 +168,7 @@ public class InstructorController {
            //System.out.println("venue "+instructor);
            List<String> instructorDTOvenueIds=instructorDTO.getVenueIds();
            System.out.println("venueIDs"+instructorDTOvenueIds);
+           System.out.println("Instructordto:  "+instructorDTO);
          if(instructorDTOvenueIds!=null&&!instructorDTOvenueIds.isEmpty())
          {
              for(String venueDToInstructorId:instructorDTOvenueIds) {

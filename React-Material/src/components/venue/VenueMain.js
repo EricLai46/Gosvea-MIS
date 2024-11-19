@@ -23,7 +23,7 @@ const VenueMain = () => {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  const timeZones = ['PST', 'EST', 'CST', 'MST', 'GMT', 'UTC','AKST'];
+  const timeZones = ['PST', 'EST', 'CST', 'MST', 'GMT', 'UTC', 'AKST'];
   const { showNotification } = useNotification();
   const [totalPages, setTotalPages] = useState(1); // 添加 totalPages 状态
   const [selectedFile,setSelectedFile]=useState(null);
@@ -98,6 +98,7 @@ const VenueMain = () => {
       });
       if (response.data.message === 'success') {
         setVenues(response.data.data.items);
+        
       } else {
         showNotification('Get Venue information failed!', 'error');
       }
@@ -348,15 +349,18 @@ const handleInsert = () => {
 };
 //删除场地
   const handleDelete = () => {
-    axiosInstance
-      .delete('/venue', { params: { venueId: currentVenue.id } })
-      .then((response) => {
-        setOpen(false);
-        showNotification('Venue deleted successfully!', 'success');
-      })
-      .catch((error) => {
-        console.error('bad request', error);
-      });
+    const confirmDelete = window.confirm("Are you sure you want to delete this venue? This action cannot be undone.");
+    if (confirmDelete) {
+        axiosInstance
+            .delete('/venue', { params: { venueId: currentVenue.id } })
+            .then((response) => {
+                setOpen(false);
+                showNotification('Venue deleted successfully!', 'success');
+            })
+            .catch((error) => {
+                console.error('bad request', error);
+            });
+    }
   };
 //重置搜索条件
   const handleReset = () => {

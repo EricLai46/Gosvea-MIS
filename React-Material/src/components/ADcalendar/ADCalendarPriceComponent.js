@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,Typography  } from '@mui/material';
+import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,Typography,Grid  } from '@mui/material';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import axiosInstance from '../AxiosInstance';
@@ -41,36 +41,28 @@ const ADCalendarPriceComponent=({selectedVenue})=>{
         { label: 'CPR Instructor Class', value: venue?.data?.cprinstructorPrice ?? 'N/A' }
     ];
 
-return (
-    <Box display="flex" alignItems="center" flexDirection="column" mb={3}>
-        <TableContainer component={Paper}>
-            <Table>
-                <TableHead>
-                    <TableRow>
-                    <TableCell>
-                                <Typography variant="subtitle1" fontWeight="bold" fontFamily="Arial">
-                                    Class Type
-                                </Typography>
-                            </TableCell>
-                            <TableCell>
-                                <Typography variant="subtitle1" fontWeight="bold" fontFamily="Arial">
-                                    Long Time Price
-                                </Typography>
-                            </TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
+    return (
+        <Box display="flex" alignItems="center" flexDirection="column" mb={3}>
+            <Paper elevation={3} style={{ padding: 16, width: '100%' }}>
+                <Grid container spacing={0}>
+                    {/* 第一行：Class Type */}
                     {data.map((row, index) => (
-                        <TableRow key={index}>
-                            <TableCell>{row.label}</TableCell>
-                            <TableCell>{row.value ?? 'N/A'}</TableCell>
-                        </TableRow>
+                        <Grid item xs={2.4} key={`label-${index}`} textAlign="center">
+                            <Typography variant="subtitle1" fontWeight="bold" fontFamily="Arial">
+                                {row.label}
+                            </Typography>
+                        </Grid>
                     ))}
-                </TableBody>
-            </Table>
-        </TableContainer>
-    </Box>
-);
-};
 
+                    {/* 第二行：Long Time Price */}
+                    {data.map((row, index) => (
+                        <Grid item xs={2.45} key={`value-${index}`} textAlign="center">
+                            <Typography>{row.value}</Typography>
+                        </Grid>
+                    ))}
+                </Grid>
+            </Paper>
+        </Box>
+    );
+};
 export default ADCalendarPriceComponent;

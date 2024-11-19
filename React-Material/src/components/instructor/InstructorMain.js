@@ -46,9 +46,38 @@ const InstructorMain = () => {
 
   useEffect(() => {
     fetchInstructors();
+    //fetchVenues();
     handleSearch();
   }, [currentPage]);
-  
+  //获取venues信息
+  const fetchVenues = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      //("Stored JWT in localStorage:", token);
+      
+      const authHeader = 'Bearer ' + token;
+       // 判断 userRole 是否是 'ROLE_ICPIE'
+    let queryParams = {};
+    if (userRole !== 'ROLE_ICPIE') {
+      queryParams = {
+          role: userRole,
+          icpisName: icpisname
+      };
+  } else {
+      queryParams = { role: userRole }; // ROLE_ICPIE 也应该有 role 参数
+  }
+    const response = await axiosInstance.get('/venue/venuelistbyinstructor', {
+      params: queryParams
+      ,headers: {
+        'Authorization': authHeader
+      }
+       // 传递参数
+    });
+      setInstructors(response.data); // 设置 instructors 数据
+    } catch (error) {
+      console.error('Error fetching instructors:', error);
+    }
+  };
   //获取instructor
   const fetchInstructors = async () => {
     try {
@@ -125,6 +154,7 @@ const InstructorMain = () => {
           setInstructors(response.data.data.items);
           setTotalInstructors(response.data.totalElements);
           setTotalPages(Math.ceil(response.data.data.totalElement / itemsPerPage));
+          console.log("chaxun instrucot xinxi",instructors);
         } else {
           console.error('Error in response data:', response.data.message); // 添加日志
           showNotification('Instructor search failed!', 'error');
@@ -180,8 +210,8 @@ const InstructorMain = () => {
 //保存instructor 信息
   const handleSave = () => {
    // 从 currentVenue 中提取 instructor 对象，并生成 instructorIds 列表
-const venueIds = Array.isArray(currentInstructor.venueIds) 
-? currentInstructor.venueIds.map(venue => venue.id) 
+const venueIds = Array.isArray(currentInstructor.venues) 
+? currentInstructor.venues.map(venue => venue.id) 
 : []; // 提取 ID
 const firstname=currentInstructor.firstname;
 const lastname=currentInstructor.lastname;
@@ -198,7 +228,7 @@ const rentManikinNumbers=currentInstructor.rentManikinNumbers;
 const totalClassTimes=currentInstructor.totalClassTimes;
 const rentStatus=currentInstructor.rentStatus;
 // 构建符合 VenueDTO 格式的对象
-const venueDTO = {
+const instructorDTO = {
   ...currentInstructor,
   venueIds: venueIds,  // 替换 instructor 对象为 ID 列表
   firstname:firstname,
@@ -217,7 +247,7 @@ const venueDTO = {
   rentStatus:rentStatus,
 };
 
-    axiosInstance.put('/instructor', currentInstructor, {
+    axiosInstance.put('/instructor', instructorDTO, {
       headers: {
         'Content-Type': 'application/json'
       }
@@ -227,6 +257,7 @@ const venueDTO = {
         handleSearch();
         setOpen(false);
         showNotification('Instructor updated successfully!', 'success');
+        console.log("venue information:",instructorDTO);
       })
       .catch(error => {
         console.error('Error in request:', error);
@@ -258,6 +289,8 @@ const venueDTO = {
   };
   //删除instructor
   const handleDelete = () => {
+    const confrimDelete=window.confirm("Are you sure you want to delete this instructor. This action cannot be undone.");
+    if(confrimDelete){
     axiosInstance.delete('/instructor', { params: { instructorId: currentInstructor.id } })
       .then(response => {
         setOpen(false);
@@ -268,6 +301,7 @@ const venueDTO = {
         console.error('Error in request', error);
         showNotification('Instructor deletion failed!', 'error');
       });
+    }
   };
   //重置搜索instructor的条件
   const handleReset = () => {

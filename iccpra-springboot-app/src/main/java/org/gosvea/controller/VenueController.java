@@ -754,7 +754,19 @@ public class VenueController {
             return ResponseEntity.badRequest().body(null);
         }
     }
-
+    //d获取venuelist
+    @GetMapping("/venuelist")
+    public List<Map<String,Object>> getVenueList(@RequestParam String role,@RequestParam(required = false) String icpisName)
+    {
+        if(role.equals("ROLE_ICPIE"))
+        {
+            return instructorService.getInstructorNameList();
+        }
+        else
+        {
+            return instructorService.getInstructorNameListByIcpis(icpisName);
+        }
+    }
     //获取所有Venue status为Normal的场地
     @GetMapping("/normal")
     public Result<PageResponse<Venue>> getNormalStatusVenues( Integer pageNum,

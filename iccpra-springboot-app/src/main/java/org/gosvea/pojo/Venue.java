@@ -69,6 +69,7 @@ public class Venue {
         TIME_ZONE_MAP.put("MST", "America/Denver");
         TIME_ZONE_MAP.put("CST", "America/Chicago");
         TIME_ZONE_MAP.put("MNT", "America/Boise");
+        TIME_ZONE_MAP.put("AKST", "America/Anchorage");
     }
 
     // 需要更新提醒的方法

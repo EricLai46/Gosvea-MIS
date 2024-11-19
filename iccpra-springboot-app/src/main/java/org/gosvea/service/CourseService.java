@@ -45,4 +45,8 @@ public interface CourseService {
     List<Venue> getNoCourseSchedleVenueFromTo(LocalDate fromData,LocalDate toDate);
 
     List<CourseSchedule> getActivedCourseScheduleSummaryByVenyeId(LocalDate date);
+
+    void checkNeededToNoticeJurinToAddAd(List<CourseSchedule> courseScheduleList);
+    boolean isDateInCurrentADCyle(LocalDate date);
+    LocalDate currentDateInWhichADCycleDate(LocalDate currentDate);
 }

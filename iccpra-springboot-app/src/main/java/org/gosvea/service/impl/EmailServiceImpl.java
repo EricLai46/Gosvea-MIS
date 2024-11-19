@@ -9,6 +9,8 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class EmailServiceImpl implements EmailService {
 
@@ -69,6 +71,28 @@ public class EmailServiceImpl implements EmailService {
 
 
     }
+    //告诉Jurin广告需要补打
+    @Override
+    public void noticeJurinAddAd(String city,String date) {
+
+        SimpleMailMessage message=new SimpleMailMessage();
+        message.setTo("jurinji@usjus.org");
+        message.setSubject("***广告需要补打***");
+
+        message.setText("注意："+city+"需要补打广告"+" "+"广告日期："+date);
+        mailSender.send(message);
+    }
+    //告诉Jurin广告信息需要更新
+    @Override
+    public void noticeJurinChangedAD(String city, String date) {
+        SimpleMailMessage message=new SimpleMailMessage();
+
+        message.setTo("jurinji@usjus.org");
+        message.setSubject("***广告信息变更***");
+        message.setText("注意："+city+"广告信息变更"+" "+"广告日期"+date);
+        mailSender.send(message);
+    }
+
 
 
 }

@@ -2,9 +2,11 @@ package org.gosvea.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import org.apache.ibatis.cache.decorators.BlockingCache;
 import org.gosvea.mapper.CourseScheduleMapper;
 import org.gosvea.pojo.*;
 import org.gosvea.service.CourseService;
+import org.gosvea.service.EmailService;
 import org.gosvea.service.InstructorService;
 import org.gosvea.service.VenueService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +14,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 
 @Service
@@ -30,6 +30,8 @@ public class CourseServiceImpl implements CourseService {
     @Autowired
     private VenueService venueService;
 
+    @Autowired
+    private EmailService emailService;
     //添加课程schedule
     @Override
     public void insertCourseSchedule(List<CourseSchedule> courseSchedules) {
@@ -294,9 +296,22 @@ public Map<String, String> generateOrUpdateCourseSchedules(String venueId, Strin
 
 // 处理批量更新、插入和删除课程表的操作
     if (!schedulesToUpdate.isEmpty()) {
+        //检查是否需要通知jurin
+
+            //heckNeededToNoticeJurinToAddAd(schedulesToUpdate);
+            //System.out.println("已发送邮件通知");
+            //emailService.noticeJurinAddAd(schedulesToUpdate.get(0).getAddress(),);
+
         updateCourseSchedules(schedulesToUpdate);
     }
     if (!schedulesToInsert.isEmpty()) {
+        //检查是否需要通知jurin
+
+        //checkNeededToNoticeJurinToAddAd(schedulesToInsert);
+            //System.out.println("已发送邮件通知");
+            //emailService.noticeJurinAddAd(schedulesToInsert.get(0).getAddress());
+
+        System.out.println(schedulesToInsert);
         insertCourseSchedules(schedulesToInsert);
     }
     if (!schedulesToDelete.isEmpty()) {
@@ -333,14 +348,14 @@ public Map<String, String> generateOrUpdateCourseSchedules(String venueId, Strin
 
     @Override
     public List<CourseSchedule> getCourseScheduleSummary(LocalDate date) {
-        LocalDate fromDate=date.plusDays(24);
+        LocalDate fromDate=date.plusDays(17);
         LocalDate toDate=fromDate.plusDays(13);
         return courseScheduleMapper.getCourseScheduleSummary(fromDate,toDate);
     }
 
     @Override
     public List<CourseSchedule> getCourseScheduleSummaryByVenueId(LocalDate date) {
-        LocalDate fromDate=date.plusDays(24);
+        LocalDate fromDate=date.plusDays(17);
         LocalDate toDate=fromDate.plusDays(13);
         return courseScheduleMapper.getCourseScheduleSummaryByVenueId(fromDate,toDate);
     }
@@ -352,13 +367,61 @@ public Map<String, String> generateOrUpdateCourseSchedules(String venueId, Strin
 
     @Override
     public List<CourseSchedule> getActivedCourseScheduleSummaryByVenyeId(LocalDate date) {
-        LocalDate fromDate=date.plusDays(24);
+        LocalDate fromDate=date.plusDays(17);
         LocalDate toDate=fromDate.plusDays(13);
         return courseScheduleMapper.getActivedCourseScheduleSummaryByVenyeId(fromDate,toDate);
     }
 
+    @Override
+    public void checkNeededToNoticeJurinToAddAd(List<CourseSchedule> courseScheduleList) {
+        LocalDate currentDate=LocalDate.now();
+        boolean isNeedToSendMail=false;
+        StringBuilder stringBuilder=new StringBuilder();
+        Set<LocalDate> uniqueDates = new HashSet<>(); // 用于存储唯一的日期
+        for (CourseSchedule courseSchedule : courseScheduleList) {
+            LocalDate csDate = courseSchedule.getDate();
+            if (isDateInCurrentADCyle(csDate)) {
+                if (!csDate.isBefore(currentDate.plusDays(7)) && uniqueDates.add(csDate)) { 
+                    isNeedToSendMail = true;
+                    stringBuilder.append(csDate).append(",");
+                }
+
+
+            }
+        }
+        if(isNeedToSendMail)
+        {
+            System.out.println("已发送邮件");
+            emailService.noticeJurinAddAd(courseScheduleList.get(0).getAddress(),stringBuilder.toString());
+        }
+
+
+    }
+
+    @Override
+    public boolean isDateInCurrentADCyle(LocalDate date) {
+        LocalDate currentDate=LocalDate.now();
+      LocalDate currentCycleDate=currentDateInWhichADCycleDate(currentDate);
+      LocalDate fromDate=currentCycleDate.plusDays(17);
+      LocalDate toDate=fromDate.plusDays(13);
+
+        return (date.isBefore(fromDate));
+    }
+
+    @Override
+    public LocalDate currentDateInWhichADCycleDate(LocalDate currentDate) {
+
+        LocalDate targetDate=LocalDate.of(2024,11,8);
+        int daysBetween = (int) Math.ceil( ChronoUnit.DAYS.between(targetDate, currentDate));
+        int cycleindex=daysBetween%14==0?daysBetween/14-1:daysBetween/14;
+        int plussdays=(cycleindex+1)*14;
+        LocalDate currentCycleDate=targetDate.plusDays(plussdays);
+        return currentCycleDate;
+    }
+
     public void deleteCourseSchedules(List<CourseSchedule> schedulesToDelete) {
         courseScheduleMapper.deleteCourseSchedules(schedulesToDelete);
+        
     }
 
     public void insertCourseSchedules(List<CourseSchedule> schedulesToInsert) {
